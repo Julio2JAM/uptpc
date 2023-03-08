@@ -1,0 +1,42 @@
+{
+  "name": "sistema_escolar",
+  "version": "1.0.0",
+  "description": "sistema_escolar by: Julio Alvarez",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev src/index.ts",
+    "start": "node build/index.js",
+    "tsc": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Julio2JAM/uptpc.git"
+  },
+  "keywords": [
+    "sistema_escolar",
+    "api",
+    "backend",
+    "typescript",
+    "nodejs",
+    "mariadb",
+    "mysql",
+    "sistema",
+    "escolar"
+  ],
+  "author": "Julio Alavarez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Julio2JAM/uptpc/issues"
+  },
+  "homepage": "https://github.com/Julio2JAM/uptpc#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "express": "4.18.2",
+    "mariadb": "3.1.0"
+  }
+}
