@@ -6,7 +6,8 @@ app.use(express.json());
 
 const PORT = 3000;
 
-app.use("/api/estudiante", userRouter)
+//app.use("/api/user", userRouter)
+app.use("/api/user", userRouter)
 
 app.listen(PORT,() => {
     console.log(`Escuchando el puerto ${PORT}`)

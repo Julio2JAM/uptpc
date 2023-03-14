@@ -4,7 +4,7 @@ const router = express.Router();
 
 const controller = new UserController();
 
-router.get('/user',controller.get);
-router.get('/user/:id',controller.getById);
+router.get('/',controller.get);
+router.get('/:id',controller.getById);
 
 export default router;
