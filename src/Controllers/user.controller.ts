@@ -3,7 +3,7 @@ import { UserModel } from "../Models/user.model";
 
 export class UserController{
 
-    async get(res: Response){
+    async get(_req:Request, res:Response){
         try {
             const userModel = new UserModel();
             const user = await userModel.get();

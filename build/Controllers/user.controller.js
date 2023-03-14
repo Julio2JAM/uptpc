@@ -12,11 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const user_model_1 = require("../Models/user.model");
 class UserController {
-    get(res) {
+    get(_err, _req, res, _next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const userModel = new user_model_1.UserModel();
                 const user = yield userModel.get();
+                console.log(user);
                 return res.status(200).json(user);
             }
             catch (err) {
