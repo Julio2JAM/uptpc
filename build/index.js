@@ -4,9 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const user_router_1 = __importDefault(require("./Routers/user.router"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const PORT = 3000;
+//app.use("/api/user", userRouter)
+app.use("/api/user", user_router_1.default);
 app.listen(PORT, () => {
-    console.log("Escuchando el puerto ${PORT}");
+    console.log(`Escuchando el puerto ${PORT}`);
 });
