@@ -19,7 +19,7 @@ const AppDataSource = new typeorm_1.DataSource({
     database: 'sstest',
     username: globals_1.DATABASE.USER,
     password: globals_1.DATABASE.PASS,
-    entities: ['build/model/user.model.js'],
+    entities: ['**/*.model.ts'],
     synchronize: true,
     logging: true
 });

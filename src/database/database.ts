@@ -17,7 +17,7 @@ const AppDataSource = new DataSource({
     database: 'sstest',//DATABASE.NAME,
     username: DATABASE.USER,
     password: DATABASE.PASS,
-    entities: ['**/*.model.js'],
+    entities: ['**/*.model.ts'],
     synchronize: true,
     logging: true
 });
