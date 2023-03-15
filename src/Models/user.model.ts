@@ -7,13 +7,19 @@ export class User {
     id!: number
 
     @Column({type: String})
-    username!: string
+    username: string
 
     @Column({type: String})
-    password!: string
+    password: string
 
     @Column({type: Number})
     id_status!: number
+
+    constructor(username: string, password: string) {
+        this.username = username;
+        this.password = password;
+        this.id_status = 1;
+    }
 }
 
 export class UserModel{
@@ -28,6 +34,10 @@ export class UserModel{
         return await AppDataSource.manager.findOneBy(User,{"id":Number(id)});
     }
     
+    async create(user:User):Promise<User>{
+        console.log("creating a new user");
+        return await AppDataSource.manager.save(User,user);
+    }
 }
 
 /*import {pool} from '../database/database';
