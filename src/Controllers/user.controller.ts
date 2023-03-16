@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
-//import { validate } from "class-validator";
+import { validate } from "class-validator";
 
 export class UserController{
 
@@ -68,11 +68,13 @@ export class UserController{
             const errors = await validate(newUser);
             if(errors.length > 0){
                 //let error = errors[0].constraints;
-                const { constraints } = errors[0];
-                if (typeof constraints === 'object') {
-                    console.log(Object.values(constraints));
-                }
+                //if (typeof constraints === 'object') {
+                //    console.log(Object.values(constraints));
+                //}
                 //let aux = Object.values(constraints[0]);
+
+                //const [{ constraints }] = errors;
+                //console.log(Object.values(constraints));
             }
             return res.status(400).json({ message: `Error de validación: ${errors}` });
             //const userModel = new UserModel();
