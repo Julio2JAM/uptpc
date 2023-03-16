@@ -6,13 +6,13 @@ export class User {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @Column({type: String})
+    @Column({type: 'varchar', length: 16, nullable: false})
     username: string
 
-    @Column({type: String})
+    @Column({type: 'varchar', length: 16, nullable: false})
     password: string
 
-    @Column({type: Number})
+    @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status!: number
 
     constructor(username: string, password: string) {
