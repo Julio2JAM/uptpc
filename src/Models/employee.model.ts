@@ -6,10 +6,7 @@ export class employee {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @Column({ type: 'varchar', nullable: false, length: 60})
-    position!: string
-
-    @Column({ type: 'int', nullable: false, width: 3})
+    @Column({ type: 'int', nullable: false, width: 12})
     cedule!: number
 
     @Column({ type: 'varchar', nullable: true, length: 60})
@@ -31,29 +28,15 @@ export class employee {
     datetime!: Date
 
     @Column({ type: 'tinyint', nullable: false, width: 2, default: 1})
-    status!: number
+    id_status!: number
 
-    /*constructor(username: string, password: string) {
-        this.username = username;
-        this.password = password;
+    constructor(cedule: number, name: string, lastName: string, phone: string, email: string, birthday: Date) {
+        this.cedule = cedule;
+        this.name = name;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+        this.birthday = birthday;
         this.id_status = 1;
-    }*/
+    }
 }
-/*
-export class UserModel{
-    
-    async get():Promise<User[]>{
-        console.log("getting users");
-        return await AppDataSource.manager.find(User);
-    }
-
-    async getById(id:Number):Promise<User | null>{
-        console.log("getting user by id");
-        return await AppDataSource.manager.findOneBy(User,{"id":Number(id)});
-    }
-    
-    async create(user:User):Promise<User>{
-        console.log("creating a new user");
-        return await AppDataSource.manager.save(User,user);
-    }
-}*/

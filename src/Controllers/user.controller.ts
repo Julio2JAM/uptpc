@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
+//import { validate } from "class-validator";
 
 export class UserController{
 
@@ -47,7 +48,6 @@ export class UserController{
         try {
             const {username, password} = req.body
             const newUser = new User(username,password);
-
             const userModel = new UserModel();
             const user = await userModel.create(newUser);
             return res.status(200).json(user);
@@ -56,7 +56,24 @@ export class UserController{
             return res.status(500).send({"message":'something was wrong',"status":500});
         }
     }
-
+/*
+    async create(req: Request, res: Response){
+        try {
+            const {username, password} = req.body
+            const newUser = new User(username,password);
+            console.log(newUser);
+            const errors:any = await validate(newUser);
+            console.log(errors[0].constraints.minLength);
+            return res.status(400).json({ message: `Error de validación: ${errors}` });
+            //const userModel = new UserModel();
+            //const user = await userModel.create(newUser);
+            //return res.status(200).json(user);
+        } catch (err) {
+            console.error(err);
+            return res.status(500).send({"message":'something was wrong',"status":500});
+        }
+    }
+*/
     async update(req: Request, res: Response){
         try {
             const {id, username, password} = req.body
@@ -76,7 +93,6 @@ export class UserController{
             if(username){
                 userToUpdate.username = username;
             }
-    
             if(password){
                 userToUpdate.password = password;
             }

@@ -1,5 +1,6 @@
 import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { MinLength } from 'class-validator';
 
 @Entity()
 export class User {
@@ -10,10 +11,11 @@ export class User {
     username: string
 
     @Column({type: 'varchar', length: 16, nullable: false})
+    @MinLength(30,{message: "Please enter a username"}) //TEST
     password: string
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
-    id_status!: number
+    id_status: number
 
     constructor(username: string, password: string) {
         this.username = username;
@@ -39,20 +41,3 @@ export class UserModel{
         return await AppDataSource.manager.save(User,user);
     }
 }
-
-/*import {pool} from '../database/database';
-export class EstudianteModel{
-    conn:any;
-    async get(){
-        try{
-            this.conn = await pool.getConnection();
-            const rows = await this.conn.query('SELECT * FROM estudiante');
-            return rows;
-        }catch(err){
-            console.log(err);
-        }finally{
-            this.conn.end;
-        }
-    }
-}
-*/
