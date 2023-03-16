@@ -61,9 +61,13 @@ export class UserController{
         try {
             const {username, password} = req.body
             const newUser = new User(username,password);
-            console.log(newUser);
-            const errors:any = await validate(newUser);
-            console.log(errors[0].constraints.minLength);
+            
+            const errors = await validate(newUser);
+            if(errors != undefined){
+                //errors[0].constraints?.minLength;
+                //const { constraints: { minlength } = {} } = errors[0];
+                
+            }
             return res.status(400).json({ message: `Error de validación: ${errors}` });
             //const userModel = new UserModel();
             //const user = await userModel.create(newUser);
