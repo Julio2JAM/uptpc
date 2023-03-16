@@ -56,17 +56,23 @@ export class UserController{
             return res.status(500).send({"message":'something was wrong',"status":500});
         }
     }
+
 /*
     async create(req: Request, res: Response){
         try {
+            //Se obtienen los datos del req y se usa el constructor para asignarlos
             const {username, password} = req.body
             const newUser = new User(username,password);
             
+            //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validate(newUser);
-            if(errors != undefined){
-                //errors[0].constraints?.minLength;
-                //const { constraints: { minlength } = {} } = errors[0];
-                
+            if(errors.length > 0){
+                //let error = errors[0].constraints;
+                const { constraints } = errors[0];
+                if (typeof constraints === 'object') {
+                    console.log(Object.values(constraints));
+                }
+                //let aux = Object.values(constraints[0]);
             }
             return res.status(400).json({ message: `Error de validación: ${errors}` });
             //const userModel = new UserModel();
