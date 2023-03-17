@@ -7,8 +7,8 @@ export class UserController{
     async get(_req:Request, res:Response){
         try {
             const userModel = new UserModel();
-            const user = await userModel.get();
-            
+            const user = await userModel.get(User);
+
             if(user.length === 0){
                 console.log("no data found");
                 return res.status(404).send({"message":'not users found',"status":404});
@@ -30,7 +30,7 @@ export class UserController{
                 return res.status(500).send({"message":'id is requered',"status":500});
             }
 
-            const user = await userModel.getById(Number(id));
+            const user = await userModel.getById(User,Number(id));
 
             if(!user){
                 console.log("no data found");
@@ -58,7 +58,7 @@ export class UserController{
             }
 
             const userModel = new UserModel();
-            const user = await userModel.create(newUser);
+            const user = await userModel.create(User,newUser);
             return res.status(200).json(user);
         } catch (err) {
             console.error(err);
@@ -76,7 +76,7 @@ export class UserController{
             
             //const newUser = new User(username,password);
             const userModel = new UserModel();
-            const userToUpdate = await userModel.getById(Number(id));
+            const userToUpdate = await userModel.getById(User,Number(id));
             
             if(!userToUpdate){
                 return res.status(404).send({"message":'id is requered',"status":500});
@@ -89,7 +89,7 @@ export class UserController{
                 userToUpdate.password = password;
             }
 
-            const user = await userModel.create(userToUpdate);
+            const user = await userModel.create(User,userToUpdate);
             return res.status(200).json(user);
         } catch (err) {
             console.error(err);

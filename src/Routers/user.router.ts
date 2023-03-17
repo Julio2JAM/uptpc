@@ -1,6 +1,6 @@
-import express from "express";
+import { Router } from "express";
 import { UserController } from "../Controllers/user.controller";
-const router = express.Router();
+const router = Router();
 
 const controller = new UserController();
 

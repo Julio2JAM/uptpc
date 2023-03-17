@@ -1,4 +1,5 @@
-import AppDataSource from "../database/database"
+//import AppDataSource from "../database/database"
+import { Model } from "../base/model";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 import { IsNotEmpty,MinLength,MaxLength } from 'class-validator';
 
@@ -26,20 +27,6 @@ export class User {
     }
 }
 
-export class UserModel{
+export class UserModel extends Model {
     
-    async get():Promise<User[]>{
-        console.log("getting users");
-        return await AppDataSource.manager.find(User);
-    }
-
-    async getById(id:Number):Promise<User | null>{
-        console.log("getting user by id");
-        return await AppDataSource.manager.findOneBy(User,{"id":Number(id)});
-    }
-    
-    async create(user:User):Promise<User>{
-        console.log("creating a new user");
-        return await AppDataSource.manager.save(User,user);
-    }
 }

@@ -9,7 +9,7 @@ export class student {
     id!: number
 
     @Column({ type: 'int', nullable: false, width: 12})
-    @IsNotEmpty()
+    @IsNotEmpty({"message": "The C.I is obligatory"})
     @IsNumber()
     cedule: number
 
