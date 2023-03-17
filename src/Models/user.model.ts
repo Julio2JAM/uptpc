@@ -1,5 +1,5 @@
 //import AppDataSource from "../database/database"
-import { Model } from "../base/model";
+import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 import { IsNotEmpty,MinLength,MaxLength } from 'class-validator';
 

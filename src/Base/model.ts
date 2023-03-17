@@ -14,7 +14,7 @@ export class Model{
         return await AppDataSource.manager.findOneBy(entity,{"id":Number(id)});
     }
 
-    async create(entity:EntityTarget<ObjectLiteral>,data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
+    async create(entity:EntityTarget<ObjectLiteral>, data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
         console.log("creating a new user");
         return await AppDataSource.manager.save(entity,data);
     }

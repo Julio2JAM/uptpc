@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Subject } from "../Models/subject.model";
-import { Model } from "../base/model";
+import { Model } from "../Base/model";
 
 export class subjectController{
     
