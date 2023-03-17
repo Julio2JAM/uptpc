@@ -1,6 +1,6 @@
 import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
-import { MinLength } from 'class-validator';
+import { IsNotEmpty,MinLength,MaxLength } from 'class-validator';
 
 @Entity()
 export class User {
@@ -8,10 +8,12 @@ export class User {
     id!: number
 
     @Column({type: 'varchar', length: 16, nullable: false})
+    @IsNotEmpty({message: "Please enter a username"})
     username: string
 
     @Column({type: 'varchar', length: 16, nullable: false})
-    @MinLength(30,{message: "Please enter a username"}) //TEST
+    @MinLength(8,{message: "The password must be bigger than 8 caracteres"})
+    @MaxLength(16,{message: "The password must be smaller than 16 caracteres"})
     password: string
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})

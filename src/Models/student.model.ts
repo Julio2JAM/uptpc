@@ -1,5 +1,7 @@
 //import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { IsNotEmpty,IsNumber,IsDate,IsString,IsEmail} from 'class-validator';
+
 
 @Entity()
 export class student {
@@ -7,22 +9,29 @@ export class student {
     id!: number
 
     @Column({ type: 'int', nullable: false, width: 12})
-    cedule!: number
+    @IsNotEmpty()
+    @IsNumber()
+    cedule: number
 
     @Column({ type: 'varchar', nullable: true, length: 60})
-    name!: string
+    @IsString()
+    name: string
 
     @Column({ type: 'varchar', nullable: true, length: 60})
-    lastName!: string
+    @IsString()
+    lastName: string
 
     @Column({ type: 'varchar', nullable: true, length: 14})
-    phone!: string
+    @IsString()
+    phone: string
 
     @Column({ type: 'varchar', nullable: true, length: 60})
-    email!: string
+    @IsEmail()
+    email: string
 
     @Column({ type: 'date' })
-    birthday!: Date
+    @IsDate()
+    birthday: Date
 
     @Column({ type: 'date' })
     datetime!: Date
