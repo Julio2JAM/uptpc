@@ -23,13 +23,13 @@ export class UserController{
 
     async getById(req: Request, res: Response){
         try {
-            const userModel = new UserModel();
-            const id = req.params.id;
+            const { id } = req.params;
 
             if(!id){
                 return res.status(500).send({"message":'id is requered',"status":500});
             }
 
+            const userModel = new UserModel();
             const user = await userModel.getById(User,Number(id));
 
             if(!user){
