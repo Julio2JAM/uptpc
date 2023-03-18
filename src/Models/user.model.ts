@@ -1,12 +1,17 @@
 //import AppDataSource from "../database/database"
 import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
-import { IsNotEmpty,MinLength,MaxLength } from 'class-validator';
+import { IsNotEmpty,MinLength,MaxLength,IsNumber } from 'class-validator';
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
     id!: number
+
+    @Column({type:"tinyint", nullable: false})
+    @IsNumber()
+    @IsNotEmpty({message: "Level is requiered"})
+    id_level!: number
 
     @Column({type: 'varchar', length: 16, nullable: false})
     @IsNotEmpty({message: "Please enter a username"})
@@ -20,7 +25,8 @@ export class User {
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status: number
 
-    constructor(username: string, password: string) {
+    constructor(id_level:number, username: string, password: string) {
+        this.id_level = id_level;
         this.username = username;
         this.password = password;
         this.id_status = 1;

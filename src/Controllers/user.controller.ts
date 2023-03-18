@@ -47,8 +47,8 @@ export class UserController{
     async create(req: Request, res: Response){
         try {
             //Se obtienen los datos del req y se usa el constructor para asignarlos
-            const {username, password} = req.body
-            const newUser = new User(username,password);
+            const {id_level, username, password} = req.body
+            const newUser = new User(id_level,username,password);
             
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validate(newUser);
@@ -68,10 +68,10 @@ export class UserController{
 
     async update(req: Request, res: Response){
         try {
-            const {id, username, password} = req.body
+            const {id, id_level, username, password} = req.body
 
             if(!id){
-                return res.status(500).send({"message":'id is requered',"status":500});
+                return res.status(400).send({"message":'id is requered',"status":500});
             }
             
             //const newUser = new User(username,password);
@@ -82,6 +82,9 @@ export class UserController{
                 return res.status(404).send({"message":'id is requered',"status":500});
             }
 
+            if(id_level){
+                userToUpdate.id_level = id_level;
+            }
             if(username){
                 userToUpdate.username = username;
             }
