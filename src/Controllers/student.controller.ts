@@ -28,8 +28,12 @@ export class StudentController{
                 return res.status(400).json({"message": "Is is requiered", "status":400});
             }
 
+            if(typeof id !== "number"){
+                return res.status(400).send({ message:"The id is not a number"});
+            }
+
             const studentModel = new StudentModel();
-            const student = await studentModel.getById(Student,Number(id));
+            const student = await studentModel.getById(Student,id);
 
             if(!student){
                 return res.status(404).json({"message": "No student found", "status":404});

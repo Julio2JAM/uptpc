@@ -29,8 +29,12 @@ export class SubjectController{
                 return res.status(400).send({"error": "Invalid id"});
             }
     
+            if(typeof id !== "number"){
+                return res.status(400).send({ message:"The id is not a number"});
+            }
+
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.getById(Subject,Number(id));
+            const subject = await subjectModel.getById(Subject,id);
     
             if(!subject){
                 return res.status(404).send({"message": "Subject not found"});

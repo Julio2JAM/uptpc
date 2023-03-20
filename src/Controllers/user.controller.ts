@@ -29,8 +29,12 @@ export class UserController{
                 return res.status(500).send({"message":'id is requered',"status":500});
             }
 
+            if(typeof id !== "number"){
+                return res.status(400).send({ message:"The id is not a number"});
+            }
+
             const userModel = new UserModel();
-            const user = await userModel.getById(User,Number(id));
+            const user = await userModel.getById(User,id);
 
             if(!user){
                 console.log("no data found");

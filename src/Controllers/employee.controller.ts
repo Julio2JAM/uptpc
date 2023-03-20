@@ -25,12 +25,15 @@ export class EmployeeController{
             const { id } = req.params;
 
             if(!id){
-                console.log("Invalid id passed for employee");
                 return res.status(400).send({ message:"id is required", "status":400});
             }
 
+            if(typeof id !== "number"){
+                return res.status(400).send({ message:"The id is not a number"});
+            }
+
             const employeeModel = new EmployeeModel();
-            const employee = employeeModel.getById(Employee,Number(id));
+            const employee = employeeModel.getById(Employee,id);
 
             return res.status(200).json(employee);
         } catch (err) {
