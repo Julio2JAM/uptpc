@@ -60,4 +60,25 @@ export class StudentController{
             return res.status(500).send({"error": "Something went wrong"});
         }
     }
+
+    async update(req: Request, res: Response){
+        try {
+            const { id } = req.params;
+            if(!id){
+                return res.status(400).send({"error": "id is required", "status": "400"});
+            }
+
+            const studentModel = new StudentModel();
+            const student = await studentModel.getById(Student,Number(id));
+
+            if(!student){
+                return res.status(404).send({"message": "Student not found", "status": "404"});
+            }
+
+            //no terminado
+            return res.status(200).json(student);
+        } catch (err) {
+            return res.status(500).send({"message": "Something went wrong", "status": "500"});
+        }
+    }
 }

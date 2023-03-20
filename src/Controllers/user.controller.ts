@@ -44,7 +44,7 @@ export class UserController{
         }
     }
     
-    async create(req: Request, res: Response){
+    async post(req: Request, res: Response){
         try {
             //Se obtienen los datos del req y se usa el constructor para asignarlos
             const {id_level, username, password} = req.body
