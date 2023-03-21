@@ -6,7 +6,7 @@ import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
 @Entity()
-export class GradeStudent{
+export class ClassroomStudent{
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -32,7 +32,7 @@ export class GradeStudent{
     }
 }
 
-export class GradeStudentModel extends Model{
+export class ClassroomStudentModel extends Model{
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroom = await this.getById(Classroom,data.id_classroom);
@@ -54,8 +54,8 @@ export class GradeStudentModel extends Model{
             return {error: "student not found", status: 404};
         }
 
-        const gradeStudent = await AppDataSource.manager.save(GradeStudent,data);
-        return {gradeStudent, status:200};
+        const classroomStudent = await AppDataSource.manager.save(ClassroomStudent,data);
+        return {classroomStudent, status:200};
     }
 
 }

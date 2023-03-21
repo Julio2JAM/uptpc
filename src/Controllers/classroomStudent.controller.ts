@@ -1,20 +1,20 @@
-import { GradeStudent, GradeStudentModel } from "../Models/gradeStudent.model";
+import { ClassroomStudent, ClassroomStudentModel } from "../Models/classroomStudent.model";
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 
-export class GradeStudentController{
+export class ClassroomStudentController{
 
     async get(_req: Request, res:Response){
         try {
-            const gsm = new GradeStudentModel();
-            const gs = await gsm.get(GradeStudent);
+            const csm = new ClassroomStudentModel();
+            const cs = await csm.get(ClassroomStudent);
 
-            if(gs.length == 0){
-                console.log("No gradeStudent found");
-                return res.status(404).send({message:"No gradeStudent found",status:404});
+            if(cs.length == 0){
+                console.log("No classroomStudent found");
+                return res.status(404).send({message:"No classroomStudent found",status:404});
             }
 
-            return res.status(200).json(gs);
+            return res.status(200).json(cs);
         } catch (err) {
             console.log(err);
             return res.status(500).send({message:"Something went wrong",status:500});
@@ -32,14 +32,14 @@ export class GradeStudentController{
                 return res.status(400).send({message: "Invalid id", status: 400});
             }
 
-            const gsm = new GradeStudentModel();
-            const gs = await gsm.getById(GradeStudent, id);
+            const csm = new ClassroomStudentModel();
+            const cs = await csm.getById(ClassroomStudent, id);
 
-            if(!gs){
+            if(!cs){
                 console.log("No gradeStudent found");
                 res.status(404).send({message:"No gradeStudent found",status:404});
             }
-            return res.status(200).json(gs);
+            return res.status(200).json(cs);
         } catch (err) {
             console.log(err);
             return res.status(500).send({message:"Something went wrong",status:500});
@@ -48,10 +48,10 @@ export class GradeStudentController{
 
     async post(req:Request, res:Response){
         try {
-            const dgs = new Map(Object.entries(req.body));
-            const newGS = new GradeStudent(dgs);
+            const dcs = new Map(Object.entries(req.body));
+            const newCS = new ClassroomStudent(dcs);
 
-            const errors = await validate(newGS);
+            const errors = await validate(newCS);
             if(errors.length > 0){
                 console.log(errors);
                 const keys = errors.map(err => err.property);
@@ -62,9 +62,9 @@ export class GradeStudentController{
                 //const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
             }
 
-            const gsm = new GradeStudentModel();
-            const gs = await gsm.post_validation(newGS);
-            return res.status(gs.status).json(gs);
+            const csm = new ClassroomStudentModel();
+            const cs = await csm.post_validation(newCS);
+            return res.status(cs.status).json(cs);
         } catch (err) {
             console.log(err);
             return res.status(500).send({message:"Something went wrong",status:500});
