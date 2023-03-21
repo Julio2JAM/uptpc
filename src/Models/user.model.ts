@@ -8,7 +8,7 @@ export class User {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @Column({type:"tinyint", nullable: false})
+    @Column({type:"tinyint", width: 3, nullable: false})
     @IsNumber()
     @IsNotEmpty({message: "Level is requiered"})
     id_level!: number

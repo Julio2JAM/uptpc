@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { Employee, EmployeeModel } from "../Models/employee.model";
 
 export class EmployeeController{
-    async get(_req:Request, res: Response){
+    async get(_req:Request, res: Response):Promise<Response>{
         try {
             const employeeModel = new EmployeeModel();
             const employee = await employeeModel.get(Employee);
@@ -20,7 +20,7 @@ export class EmployeeController{
         }
     }
 
-    async getById(req: Request, res: Response){
+    async getById(req: Request, res: Response):Promise<Response>{
         try {
             const { id } = req.params;
 
@@ -42,7 +42,7 @@ export class EmployeeController{
         }
     }
 
-    async post(req: Request, res: Response){
+    async post(req: Request, res: Response):Promise<Response>{
         try {
             const dataEmployee = new Map(Object.entries(req.body));
             const newEmployee = new Employee(dataEmployee);

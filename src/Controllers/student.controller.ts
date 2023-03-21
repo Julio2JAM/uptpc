@@ -4,7 +4,7 @@ import { Student, StudentModel } from "../Models/student.model";
 
 export class StudentController{
 
-    async get(_req:Request, res:Response){
+    async get(_req:Request, res:Response):Promise<Response>{
         try {
             const studentModel = new StudentModel();
             const students = await studentModel.get(Student);
@@ -20,7 +20,7 @@ export class StudentController{
         }
     }
 
-    async getById(req:Request,res:Response){
+    async getById(req:Request,res:Response):Promise<Response>{
         try {
             const { id } = req.params;
 
@@ -45,7 +45,7 @@ export class StudentController{
         }
     }
 
-    async post(req:Request,res:Response){
+    async post(req:Request,res:Response):Promise<Response>{
         try {
             const dataStudent = new Map(Object.entries(req.body));
             const newStudent = new Student(dataStudent);
@@ -65,7 +65,7 @@ export class StudentController{
         }
     }
 
-    async update(req: Request, res: Response){
+    async update(req: Request, res: Response):Promise<Response>{
         try {
             const { id } = req.params;
             if(!id){

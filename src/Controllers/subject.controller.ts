@@ -4,7 +4,7 @@ import { Subject, SubjectModel } from "../Models/subject.model";
 
 export class SubjectController{
     
-    async get(_req:Request, res:Response){
+    async get(_req:Request, res:Response):Promise<Response>{
         try {
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.get(Subject);
@@ -21,7 +21,7 @@ export class SubjectController{
         }
     }
 
-    async getById(req:Request, res:Response){
+    async getById(req:Request, res:Response):Promise<Response>{
         try{
             const { id } = req.params;
     
@@ -48,7 +48,7 @@ export class SubjectController{
         }
     }
 
-    async post(req:Request, res:Response){
+    async post(req:Request, res:Response):Promise<Response>{
         try {
             const {name/*, code*/} = req.body;
             const newSubject = new Subject(name/*, code*/);
@@ -69,7 +69,7 @@ export class SubjectController{
         }
     }
 
-    async update(req: Request, res: Response){
+    async update(req: Request, res: Response):Promise<Response>{
         try {
             const {id, name} = req.body
 

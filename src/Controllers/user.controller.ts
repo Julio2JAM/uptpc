@@ -4,7 +4,7 @@ import { validate } from "class-validator";
 
 export class UserController{
 
-    async get(_req:Request, res:Response){
+    async get(_req:Request, res:Response):Promise<Response>{
         try {
             const userModel = new UserModel();
             const user = await userModel.get(User);
@@ -21,7 +21,7 @@ export class UserController{
         }
     }
 
-    async getById(req: Request, res: Response){
+    async getById(req: Request, res: Response):Promise<Response>{
         try {
             const { id } = req.params;
 
@@ -48,7 +48,7 @@ export class UserController{
         }
     }
     
-    async post(req: Request, res: Response){
+    async post(req: Request, res: Response):Promise<Response>{
         try {
             //Se obtienen los datos del req y se usa el constructor para asignarlos
             const {id_level, username, password} = req.body
@@ -70,7 +70,7 @@ export class UserController{
         }
     }
 
-    async update(req: Request, res: Response){
+    async update(req: Request, res: Response):Promise<Response>{
         try {
             const {id, id_level, username, password} = req.body
 

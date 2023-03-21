@@ -13,7 +13,7 @@ export class Employee {
     @IsNumber()
     id_profession: number
 
-    @Column({ type: 'int', nullable: false, width: 12})
+    @Column({ type:'int', unique:true, nullable:false, width:12})
     @IsNotEmpty({"message": "The C.I is obligatory"})
     @IsNumber()
     cedule: number
