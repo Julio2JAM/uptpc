@@ -49,7 +49,7 @@ export class Student {
         this.lastName   = dataStudent?.get("lastName");
         this.phone      = dataStudent?.get("phone");
         this.email      = dataStudent?.get("email");
-        this.birthday   = new Date(dataStudent?.get("birthday"));
+        this.birthday   = dataStudent?.get("birthday");
         this.id_status  = 1;
     }
 }

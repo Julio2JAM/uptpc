@@ -9,11 +9,11 @@ export class Activity{
 
     @Column({type:'varchar', length:60, nullable:false})
     @IsNotEmpty({message:"The name of the activity is not specified"})
-    name!: string;
+    name: string;
 
     @Column({type:'varchar', length:255, nullable:true})
     @IsNotEmpty({message:"The description of the activity is not specified"})
-    description!: string;
+    description: string;
 
     @Column({type:'tinyint', width:3, nullable:false})
     @IsNotEmpty({message:"The porcentage of the activity is required"})
@@ -21,18 +21,18 @@ export class Activity{
     @IsInt({message:"The porcentage is not numeric"})
     @Min(1,{message:"The porcentage must be greater than 0"})
     @Max(100,{message:"The porcentage must be less than 100"})
-    porcentage!: number;
+    porcentage: number;
 
     @Column({type:'tinyint', width:3, nullable:true})
     @IsOptional()
     @IsNumber()
     @IsPositive({message: 'The porcentage must be greater than 0'})
     @IsInt({message:"The quantity is not numeric"})
-    quantity!: number;
+    quantity: number;
 
     @Column({type:'date', nullable:true})
     @IsOptional()
-    datetime_end!: Date;
+    datetime_end: Date;
 
     @CreateDateColumn()
     datetime!: Date;
@@ -45,7 +45,7 @@ export class Activity{
         this.description = dataActivity?.get('description');
         this.porcentage = dataActivity?.get('porcentage');
         this.quantity = dataActivity?.get('quantity');
-        //this.datetime_end = new Date(dataActivity?.get('datetime_end'));
+        this.datetime_end = dataActivity?.get('datetime_end');
     }
 }
 

@@ -54,13 +54,17 @@ export class GradeStudentController{
             const errors = await validate(newGS);
             if(errors.length > 0){
                 console.log(errors);
-                const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
+                const keys = errors.map(err => err.property);
+                const values = errors.map(({constraints}) => Object.values(constraints!));
+                const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
+                console.log(message);
                 return res.status(400).json({message, "status": "400"});
+                //const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
             }
 
             const gsm = new GradeStudentModel();
-            const gs = await gsm.create(GradeStudent, newGS);
-            return res.status(200).json(gs);
+            const gs = await gsm.post_validation(newGS);
+            return res.status(gs.status).json(gs);
         } catch (err) {
             console.log(err);
             return res.status(500).send({message:"Something went wrong",status:500});

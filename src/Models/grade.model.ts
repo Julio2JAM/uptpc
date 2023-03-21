@@ -7,7 +7,7 @@ export class Grade{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type: "string", nullable: false, length: 20})
+    @Column({type: "varchar", nullable: false, length: 20})
     @IsNotEmpty({message:"The section is required"})
     seccion!: string;
 

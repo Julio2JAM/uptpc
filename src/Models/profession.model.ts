@@ -1,9 +1,9 @@
-//import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 import { IsNotEmpty } from 'class-validator';
+import { Model } from "../Base/model";
 
 @Entity()
-export class Subject {
+export class Profession {
     @PrimaryGeneratedColumn()
     id!: number
 
@@ -18,4 +18,8 @@ export class Subject {
         this.name = name;
         this.id_status = 1;
     }
+}
+
+export class ProfessionModel extends Model {
+
 }

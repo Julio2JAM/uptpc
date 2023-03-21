@@ -55,7 +55,7 @@ export class Employee {
         this.lastName = dataEmployee?.get("lastName");
         this.phone = dataEmployee?.get("phone");
         this.email = dataEmployee?.get("email");
-        this.birthday = new Date(dataEmployee?.get("birthday"));
+        this.birthday = dataEmployee?.get("birthday");
         this.id_status = 1;
     }
 }
