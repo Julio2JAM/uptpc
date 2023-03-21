@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ObjectLiteral, DeepPartial } from "typeorm";
-import { Grade } from "../Models/grade.model";
+import { Classroom } from "./classroom.model";
 import { Student } from "./student.model";
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
@@ -13,7 +13,7 @@ export class GradeStudent{
     @Column({type:"int", nullable:false, width:11})
     @IsNotEmpty({message: "Please enter a grade"})
     @IsInt({message: "The grade is not available"})
-    id_grade!: number;
+    id_classroom!: number;
 
     @Column({type:"int", nullable:false, width:11})
     @IsNotEmpty({message: "Please enter a student"})
@@ -27,7 +27,7 @@ export class GradeStudent{
     id_status!: number;
 
     constructor(data:Map<any, any>) {
-        this.id_grade = data?.get("id_grade");
+        this.id_classroom = data?.get("id_grade");
         this.id_student = data?.get("id_student");
     }
 }
@@ -35,10 +35,19 @@ export class GradeStudent{
 export class GradeStudentModel extends Model{
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
-        const grade = await this.getById(Grade,data.id_grade);
+        const classroom = await this.getById(Classroom,data.id_classroom);
         const student = await this.getById(Student,data.id_student);
-        
-        if(!grade){
+
+        /*
+        //Select tomando campos especificos
+        const user = await AppDataSource.manager
+        .createQueryBuilder(Grade, "grade")
+        .select("grade.id, grade.seccion")
+        .where("id = :id", { id:1 })
+        .getRawOne();
+        */
+
+        if(!classroom){
             return {error: "grade not found", status: 404};
         }
         if(!student){

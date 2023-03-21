@@ -3,7 +3,7 @@ import { IsNotEmpty,  } from "class-validator";
 import { Model } from "../Base/model";
 
 @Entity()
-export class Grade{
+export class Classroom{
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -23,13 +23,13 @@ export class Grade{
     @Column({type:"tinyint", default: "1", nullable: false})
     id_status!:number;
 
-    constructor(dataGrade:Map<any,any>){
-        this.seccion = dataGrade?.get("seccion");
-        this.datetime_start = dataGrade?.get("datetime_start");
-        this.datetime_end = dataGrade?.get("datetime_end");
+    constructor(dataClassroom:Map<any,any>){
+        this.seccion = dataClassroom?.get("seccion");
+        this.datetime_start = dataClassroom?.get("datetime_start");
+        this.datetime_end = dataClassroom?.get("datetime_end");
     }
 }
 
-export class GradeModel extends Model{
+export class ClassroomModel extends Model{
 
 }

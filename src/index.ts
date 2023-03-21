@@ -4,7 +4,7 @@ import subjectRouter from './Routers/subject.router';
 import studentRouter from './Routers/student.router';
 import employeeRouter from './Routers/employee.router';
 import activityRouter from './Routers/activity.router';
-import gradeRouter from './Routers/grade.model';
+import classroomRouter from './Routers/classroom.model';
 import gradeStudentRouter from './Routers/gradeStudent.router';
 
 const app = express();
@@ -17,7 +17,7 @@ app.use("/api/user", userRouter)
 app.use("/api/student", studentRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/activity", activityRouter);
-app.use("/api/grade", gradeRouter);
+app.use("/api/classroom", classroomRouter);
 app.use("/api/gradeStudent", gradeStudentRouter);
 
 app.listen(PORT,() => {
