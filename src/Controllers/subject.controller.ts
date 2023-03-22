@@ -15,8 +15,7 @@ export class SubjectController{
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not users found',"status":HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(HTTP_STATUS.OK).json({subject});
-
+            return res.status(HTTP_STATUS.OK).json(subject);
         }catch (err) {
             console.error(err);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
