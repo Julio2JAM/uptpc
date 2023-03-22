@@ -1,6 +1,7 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { Subject, SubjectModel } from "../Models/subject.model";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class SubjectController{
     
@@ -11,13 +12,14 @@ export class SubjectController{
 
             if(subject.length == 0){
                 console.log("no data found");
-                return res.status(404).send({"message":'not users found',"status":404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not users found',"status":HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(200).json({subject});
-        }catch(err){
-            console.log(err);
-            return res.status(500).send({err});
+            return res.status(HTTP_STATUS.OK).json({subject});
+
+        }catch (err) {
+            console.error(err);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -26,25 +28,25 @@ export class SubjectController{
             const { id } = req.params;
     
             if(!id){
-                return res.status(400).send({"error": "Invalid id"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id", status:HTTP_STATUS.BAD_RESQUEST});
             }
     
             if(typeof id !== "number"){
-                return res.status(400).send({ message:"The id is not a number"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.getById(Subject,id);
     
             if(!subject){
-                return res.status(404).send({"message": "Subject not found"});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});
             }
     
-            return res.status(200).json(subject);
+            return res.status(HTTP_STATUS.OK).json(subject);
 
-        }catch(err){
-            console.log(err);
-            return res.status(500).send({"message": "Something went wrong"});
+        }catch (err) {
+            console.error(err);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -56,16 +58,16 @@ export class SubjectController{
             const errors = await validate(newSubject);
             if(errors.length > 0){
                 const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(400).json({message, "status": "400"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": "HTTP_STATUS.BAD_RESQUEST"});
             }
 
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.create(Subject, newSubject);
-            return res.status(201).json(subject);
+            return res.status(HTTP_STATUS.CREATED).json(subject);
 
         } catch (err) {
-            console.log(err);
-            return res.status(500).send({"error": "Something went wrong"});
+            console.error(err);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -74,14 +76,14 @@ export class SubjectController{
             const {id, name} = req.body
 
             if(!id){
-                return res.status(400).send({"message":'id is requered',"status":500});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:'id is requered',"status":HTTP_STATUS.BAD_RESQUEST});
             }
             
             const subjectModel = new SubjectModel();
             const subjectToUpdate = await subjectModel.getById(Subject,Number(id));
             
             if(!subjectToUpdate){
-                return res.status(404).send({"message":'id is requered',"status":500});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
             if(name){
@@ -89,10 +91,10 @@ export class SubjectController{
             }
 
             const subject = await subjectModel.create(Subject,subjectToUpdate);
-            return res.status(200).json(subject);
+            return res.status(HTTP_STATUS.CREATED).json(subject);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":'something was wrong',"status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }

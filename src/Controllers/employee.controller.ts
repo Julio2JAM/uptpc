@@ -28,7 +28,6 @@ export class EmployeeController{
             if(!id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"id is required", status:HTTP_STATUS.BAD_RESQUEST});
             }
-
             if(typeof id !== "number"){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
             }
