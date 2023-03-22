@@ -3,7 +3,7 @@ import { Classroom } from "./classroom.model";
 import { Student } from "./student.model";
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
+//import AppDataSource from "../database/database";
 
 @Entity()
 export class ClassroomStudent{
@@ -11,8 +11,8 @@ export class ClassroomStudent{
     id!: number;
 
     @Column({type:"int", nullable:false, width:11})
-    @IsNotEmpty({message: "Please enter a grade"})
-    @IsInt({message: "The grade is not available"})
+    @IsNotEmpty({message: "Please enter a classroom"})
+    @IsInt({message: "The classroom is not available"})
     id_classroom!: number;
 
     @Column({type:"int", nullable:false, width:11})
@@ -54,7 +54,8 @@ export class ClassroomStudentModel extends Model{
             return {error: "student not found", status: 404};
         }
 
-        const classroomStudent = await AppDataSource.manager.save(ClassroomStudent,data);
+        //const classroomStudent = await AppDataSource.manager.save(ClassroomStudent,data);
+        const classroomStudent = await this.create(ClassroomStudent,data);
         return {classroomStudent, status:200};
     }
 
