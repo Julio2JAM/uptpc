@@ -18,7 +18,7 @@ app.use("/api/student", studentRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/activity", activityRouter);
 app.use("/api/classroom", classroomRouter);
-app.use("/api/gradeStudent", classroomStudentRouter);
+app.use("/api/classroomStudent", classroomStudentRouter);
 
 app.listen(PORT,() => {
     console.log(`Escuchando el puerto ${PORT}`)

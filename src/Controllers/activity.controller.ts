@@ -1,6 +1,7 @@
 import { Activity, ActivityModel } from "../Models/activity.model";
 import { Request, Response } from "express";
 import { validate } from "class-validator";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ActivityController{
 
@@ -11,13 +12,13 @@ export class ActivityController{
 
             if(activity.length == 0){
                 console.log("No activity found");
-                return res.status(404).send({"message": "No Activity found.", "status":404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No Activity found.", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(200).json(activity);
+            return res.status(HTTP_STATUS.OK).json(activity);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":"Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -26,19 +27,19 @@ export class ActivityController{
             const { id } = req.params;
             
             if(!id){
-                return res.status(400).send({ message:"Id is required" });
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Id is required", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             if(typeof id !== "number"){
-                return res.status(400).send({ message:"The id is not a number"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const activityModel = new ActivityModel();
             const activity = await activityModel.getById(Activity,id)
-            return res.status(200).json(activity);
+            return res.status(HTTP_STATUS.OK).json(activity);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":"Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -51,15 +52,15 @@ export class ActivityController{
             if(errors.length > 0){
                 console.log(errors);
                 const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(400).send({"message": message, "status": 400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({"message": message, status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const activityModel = new ActivityModel();
             const acitvity = await activityModel.create(Activity,newActivity);
-            return res.status(200).json(acitvity)
+            return res.status(HTTP_STATUS.CREATED).json(acitvity)
         } catch (err) {
             console.log(err);
-            return res.status(500).send({"message":"Something went wrong", "status":500})
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR})
         }
     }
 }

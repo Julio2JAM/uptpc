@@ -1,6 +1,7 @@
 import { Classroom, ClassroomModel } from "../Models/classroom.model";
 import { Request, Response } from "express";
 import { validate } from "class-validator";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomController{
     async get(_req: Request, res: Response){
@@ -10,13 +11,13 @@ export class ClassroomController{
 
             if(classroom.length == 0){
                 console.log("No classroom found");
-                return res.status(404).send({message: "No classroom founds", status: 404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No classroom founds", status: HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(200).json(classroom);   
+            return res.status(HTTP_STATUS.OK).json(classroom);   
         } catch (err) {
             console.log(err);
-            return res.status(500).send({message: "Something went wrong", status: 500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -36,12 +37,12 @@ export class ClassroomController{
 
             if(!classroom){
                 console.log("No classroom found");
-                return res.status(404).send({message: "No classroom founds", status: 404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No classroom founds", status: HTTP_STATUS.NOT_FOUND});
             }
-            return res.status(200).json(classroom);
+            return res.status(HTTP_STATUS.OK).json(classroom);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({message: "Something went wrong", status: 500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -54,15 +55,15 @@ export class ClassroomController{
             if(errors.length > 0){
                 console.log(errors);
                 const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(404).send({message: message, status: 404});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: message, status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.create(Classroom, newClassroom);
-            return res.status(200).json(classroom);
+            return res.status(HTTP_STATUS.CREATED).json(classroom);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({message: "Something went wrong", status: 500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }

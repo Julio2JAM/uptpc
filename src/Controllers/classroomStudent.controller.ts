@@ -1,6 +1,7 @@
 import { ClassroomStudent, ClassroomStudentModel } from "../Models/classroomStudent.model";
 import { validate } from "class-validator";
 import { Request, Response } from "express";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomStudentController{
 
@@ -11,13 +12,13 @@ export class ClassroomStudentController{
 
             if(cs.length == 0){
                 console.log("No classroomStudent found");
-                return res.status(404).send({message:"No classroomStudent found",status:404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroomStudent found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(200).json(cs);
+            return res.status(HTTP_STATUS.OK).json(cs);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({message:"Something went wrong",status:500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -26,10 +27,10 @@ export class ClassroomStudentController{
             const { id } = req.params;
             
             if(!id){
-                return res.status(400).send({message: "The id is required", status: 400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "The id is required", status: HTTP_STATUS.BAD_RESQUEST});
             }
             if(typeof id !== "number"){
-                return res.status(400).send({message: "Invalid id", status: 400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const csm = new ClassroomStudentModel();
@@ -37,12 +38,12 @@ export class ClassroomStudentController{
 
             if(!cs){
                 console.log("No gradeStudent found");
-                res.status(404).send({message:"No gradeStudent found",status:404});
+                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
             }
-            return res.status(200).json(cs);
+            return res.status(HTTP_STATUS.OK).json(cs);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({message:"Something went wrong",status:500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -58,7 +59,7 @@ export class ClassroomStudentController{
                 const values = errors.map(({constraints}) => Object.values(constraints!));
                 const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
                 console.log(message);
-                return res.status(400).json({message, "status": "400"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": HTTP_STATUS.BAD_RESQUEST});
                 //const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
             }
 
@@ -67,7 +68,7 @@ export class ClassroomStudentController{
             return res.status(cs.status).json(cs);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({message:"Something went wrong",status:500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }

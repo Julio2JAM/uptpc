@@ -1,6 +1,7 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { Student, StudentModel } from "../Models/student.model";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class StudentController{
 
@@ -12,11 +13,11 @@ export class StudentController{
 
             if(students.length == 0){
                 console.log("no data found");
-                return res.status(404).send({"message":"No student found", "status":404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No student found", status:HTTP_STATUS.NOT_FOUND});
             }
-            return res.status(200).json(students);
+            return res.status(HTTP_STATUS.OK).json(students);
         } catch (error) {
-            return res.status(500).send({"message": "Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -25,23 +26,24 @@ export class StudentController{
             const { id } = req.params;
 
             if(!id){
-                return res.status(400).json({"message": "Is is requiered", "status":400});
+                return res.status(400).json({message: "Is is requiered", status:400});
             }
 
             if(typeof id !== "number"){
-                return res.status(400).send({ message:"The id is not a number"});
+                return res.status(400).send({message:"The id is not a number", status:400});
             }
 
             const studentModel = new StudentModel();
             const student = await studentModel.getById(Student,id);
 
             if(!student){
-                return res.status(404).json({"message": "No student found", "status":404});
+                return res.status(HTTP_STATUS.NOT_FOUND).json({message:"No student found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(200).json(student);
-        } catch (error) {
-            return res.status(500).json({"message": "Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.OK).json(student);
+        } catch (err) {
+            console.log(err);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -58,10 +60,10 @@ export class StudentController{
 
             const studentModel = new StudentModel();
             const student = await studentModel.create(Student,newStudent);
-            return res.status(200).json(student)
+            return res.status(HTTP_STATUS.CREATED).json(student)
         } catch (err) {
             console.log(err);
-            return res.status(500).send({"error": "Something went wrong"});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -76,13 +78,14 @@ export class StudentController{
             const student = await studentModel.getById(Student,Number(id));
 
             if(!student){
-                return res.status(404).send({"message": "Student not found", "status": "404"});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({"message": "Student not found", "status": "HTTP_STATUS.NOT_FOUND"});
             }
 
             //no terminado
-            return res.status(200).json(student);
+            return res.status(HTTP_STATUS.CREATED).json(student);
         } catch (err) {
-            return res.status(500).send({"message": "Something went wrong", "status": "500"});
+            console.log(err);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }

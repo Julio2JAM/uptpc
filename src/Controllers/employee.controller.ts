@@ -1,6 +1,7 @@
 import { validate } from "class-validator";
 import { Request, Response } from "express";
 import { Employee, EmployeeModel } from "../Models/employee.model";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class EmployeeController{
     async get(_req:Request, res: Response):Promise<Response>{
@@ -10,13 +11,13 @@ export class EmployeeController{
 
             if(!employee){
                 console.log("no data found for employee");
-                return res.status(404).send({"message":"No employee found", "status":404})
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No employee found", status:HTTP_STATUS.NOT_FOUND})
             }
 
-            return res.status(200).json(employee);
+            return res.status(HTTP_STATUS.OK).json(employee);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({"message":"Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -25,20 +26,25 @@ export class EmployeeController{
             const { id } = req.params;
 
             if(!id){
-                return res.status(400).send({ message:"id is required", "status":400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"id is required", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             if(typeof id !== "number"){
-                return res.status(400).send({ message:"The id is not a number"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const employeeModel = new EmployeeModel();
             const employee = employeeModel.getById(Employee,id);
 
-            return res.status(200).json(employee);
+            if(!employee){
+                console.log("no data found for employee");
+                return res.status(HTTP_STATUS.NOT_FOUND).send({"message":"No employee found", status:HTTP_STATUS.NOT_FOUND})
+            }
+
+            return res.status(HTTP_STATUS.OK).json(employee);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({"message":"Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -51,15 +57,15 @@ export class EmployeeController{
             if(errors.length > 0){
                 console.log("Invalid data passed for employee");
                 const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(400).json({message,"status":400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const employeeModel = new EmployeeModel();
             const employee = await employeeModel.create(Employee,newEmployee);
-            return res.status(200).json(employee);
+            return res.status(HTTP_STATUS.CREATED).json(employee);
         } catch (err) {
             console.log(err);
-            return res.status(500).send({"message":"Something went wrong", "status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }
