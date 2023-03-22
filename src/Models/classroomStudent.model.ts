@@ -48,7 +48,7 @@ export class ClassroomStudentModel extends Model{
         */
 
         if(!classroom){
-            return {error: "grade not found", status: 404};
+            return {error: "classroom not found", status: 404};
         }
         if(!student){
             return {error: "student not found", status: 404};

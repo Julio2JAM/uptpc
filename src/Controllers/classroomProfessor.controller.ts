@@ -1,4 +1,4 @@
-import { ClassroomProfessor, ClassroomProfessorModel } from "../Models/classroomProfessor.mode";
+import { ClassroomProfessor, ClassroomProfessorModel } from "../Models/classroomProfessor.model";
 import { Request, Response } from "express";
 import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
@@ -15,6 +15,7 @@ export class ClassroomProfessorController{
 
             return res.status(HTTP_STATUS.OK).json(classroomProfessor);
         } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -62,8 +63,6 @@ export class ClassroomProfessorController{
 
             const cpm = new ClassroomProfessorModel();
             const cp = await cpm.post_validation(newCP);
-            //!NO TERMINADO
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
             return res.status(cp.status).json(cp);
         } catch (err) {
             console.log(err);
