@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { validate } from "class-validator";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class UserController{
 
@@ -11,13 +12,13 @@ export class UserController{
 
             if(user.length === 0){
                 console.log("no data found");
-                return res.status(404).send({"message":'not users found',"status":404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not users found', status:HTTP_STATUS.NOT_FOUND});
             }
             
-            return res.status(200).json(user);
+            return res.status(HTTP_STATUS.OK).json(user);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":'something was wrong',"status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -26,11 +27,10 @@ export class UserController{
             const { id } = req.params;
 
             if(!id){
-                return res.status(500).send({"message":'id is requered',"status":500});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({"message":'id is requered', status:HTTP_STATUS.BAD_RESQUEST});
             }
-
             if(typeof id !== "number"){
-                return res.status(400).send({ message:"The id is not a number"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const userModel = new UserModel();
@@ -38,13 +38,13 @@ export class UserController{
 
             if(!user){
                 console.log("no data found");
-                return res.status(404).send({"message":'not users found',"status":404});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({"message":'not users found', status:HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(200).json(user);
+            return res.status(HTTP_STATUS.OK).json(user);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":'something was wrong',"status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":'something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
     
@@ -58,15 +58,15 @@ export class UserController{
             const errors = await validate(newUser);
             if(errors.length > 0){
                 const messages = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(400).json({messages, "status": "400"});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({messages, status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const userModel = new UserModel();
             const user = await userModel.create(User,newUser);
-            return res.status(200).json(user);
+            return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":'something was wrong',"status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -75,7 +75,7 @@ export class UserController{
             const {id, id_level, username, password} = req.body
 
             if(!id){
-                return res.status(400).send({"message":'id is requered',"status":500});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({"message":'id is requered',"status":HTTP_STATUS.BAD_RESQUEST});
             }
             
             //const newUser = new User(username,password);
@@ -83,7 +83,7 @@ export class UserController{
             const userToUpdate = await userModel.getById(User,Number(id));
             
             if(!userToUpdate){
-                return res.status(404).send({"message":'id is requered',"status":500});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({"message":'User not found',"status":HTTP_STATUS.NOT_FOUND});
             }
 
             if(id_level){
@@ -97,10 +97,10 @@ export class UserController{
             }
 
             const user = await userModel.create(User,userToUpdate);
-            return res.status(200).json(user);
+            return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (err) {
             console.error(err);
-            return res.status(500).send({"message":'something was wrong',"status":500});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
     
