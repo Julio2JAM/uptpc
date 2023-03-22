@@ -1,6 +1,6 @@
 //import mariadb from 'mariadb';
 import { DataSource } from 'typeorm';
-import { DATABASE } from '../globals';
+import { DATABASE } from '../Base/globals';
 /*
 export const pool = mariadb.createPool({
     "host": DATABASE.HOST,
