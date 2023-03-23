@@ -5,7 +5,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomStudentController{
 
-    async get(_req: Request, res:Response){
+    async get(_req: Request, res:Response):Promise<Response>{
         try {
             const csm = new ClassroomStudentModel();
             const cs = await csm.get(ClassroomStudent);
@@ -22,7 +22,7 @@ export class ClassroomStudentController{
         }
     }
 
-    async getById(req: Request, res:Response){
+    async getById(req: Request, res:Response):Promise<Response>{
         try {
             const { id } = req.params;
             
@@ -47,7 +47,7 @@ export class ClassroomStudentController{
         }
     }
 
-    async post(req:Request, res:Response){
+    async post(req:Request, res:Response):Promise<Response>{
         try {
             const dcs = new Map(Object.entries(req.body));
             const newCS = new ClassroomStudent(dcs);

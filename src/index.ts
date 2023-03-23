@@ -7,6 +7,7 @@ import activityRouter from './Routers/activity.router';
 import classroomRouter from './Routers/classroom.model';
 import classroomStudentRouter from './Routers/classroomStudent.router';
 import classroomProfessorRouter from './Routers/classroomProfessor.router';
+import subjectGradeRouter from './Routers/subjectGrade.router';
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,7 @@ app.use("/api/activity", activityRouter);
 app.use("/api/classroom", classroomRouter);
 app.use("/api/classroomStudent", classroomStudentRouter);
 app.use('/api/classroomProfesor', classroomProfessorRouter);
+app.use('/api/subjectGrade', subjectGradeRouter);
 
 app.listen(PORT,() => {
     console.log(`Escuchando el puerto ${PORT}`)

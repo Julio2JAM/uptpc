@@ -20,7 +20,7 @@ export class ClassroomProfessorController{
         }
     }
 
-    async getById(req: Request, res:Response){
+    async getById(req: Request, res:Response):Promise<Response>{
         try {
             const { id } = req.params;
             
@@ -45,7 +45,7 @@ export class ClassroomProfessorController{
         }
     }
 
-    async post(req:Request, res:Response){
+    async post(req:Request, res:Response):Promise<Response>{
         try {
             const dcp = new Map(Object.entries(req.body));
             const newCP = new ClassroomProfessor(dcp);

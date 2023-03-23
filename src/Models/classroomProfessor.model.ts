@@ -41,7 +41,7 @@ export class ClassroomProfessor{
 
 export class ClassroomProfessorModel extends Model{
 
-    async post_validation(dataClassroomProfessor:DeepPartial<ObjectLiteral>)/*:Promise<ObjectLiteral>*/{
+    async post_validation(dataClassroomProfessor:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
 
         const data: {[key:string]:ObjectLiteral|null} = {
             employee:await this.getById(Employee,dataClassroomProfessor.id_professor),
@@ -52,11 +52,11 @@ export class ClassroomProfessorModel extends Model{
         for(let value in data){
             if(!data[value]){
                 console.log(`${value} not found`);
-                return {error:`${value} not found`, status: HTTP_STATUS.NOT_FOUND};
+                return {error:`${value} not found`, status: HTTP_STATUS.BAD_RESQUEST};
             }
         }
 
-        const classroomProfessor = this.create(ClassroomProfessor, dataClassroomProfessor);
+        const classroomProfessor = await this.create(ClassroomProfessor, dataClassroomProfessor);
         return {classroomProfessor, status: HTTP_STATUS.CREATED};
     }
 

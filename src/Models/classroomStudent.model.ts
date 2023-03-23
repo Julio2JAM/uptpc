@@ -3,6 +3,7 @@ import { Classroom } from "./classroom.model";
 import { Student } from "./student.model";
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
+import { HTTP_STATUS } from "../Base/statusHttp";
 //import AppDataSource from "../database/database";
 
 @Entity()
@@ -48,15 +49,15 @@ export class ClassroomStudentModel extends Model{
         */
 
         if(!classroom){
-            return {error: "classroom not found", status: 404};
+            return {error: "classroom not found", status: HTTP_STATUS.BAD_RESQUEST};
         }
         if(!student){
-            return {error: "student not found", status: 404};
+            return {error: "student not found", status: HTTP_STATUS.BAD_RESQUEST};
         }
 
         //const classroomStudent = await AppDataSource.manager.save(ClassroomStudent,data);
         const classroomStudent = await this.create(ClassroomStudent,data);
-        return {classroomStudent, status:200};
+        return {classroomStudent, status:HTTP_STATUS.CREATED};
     }
 
 }

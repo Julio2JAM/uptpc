@@ -4,7 +4,7 @@ import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomController{
-    async get(_req: Request, res: Response){
+    async get(_req: Request, res: Response):Promise<Response>{
         try {
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.get(Classroom);
@@ -21,15 +21,15 @@ export class ClassroomController{
         }
     }
 
-    async getById(req: Request, res: Response){
+    async getById(req: Request, res: Response):Promise<Response>{
         try {
             const {id} = req.params;
 
             if(!id){
-                return res.status(400).send({message: "The id is required", status: 400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "The id is required", status: HTTP_STATUS.BAD_RESQUEST});
             }
             if(typeof id !== "number"){
-                return res.status(400).send({message: "Invalid id for classroom", status: 400});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id for classroom", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const classroomModel = new ClassroomModel();
@@ -46,7 +46,7 @@ export class ClassroomController{
         }
     }
 
-    async post(req: Request, res: Response){
+    async post(req: Request, res: Response):Promise<Response>{
         try {
             const dataClassroom = new Map(Object.entries(req.body));
             const newClassroom = new Classroom(dataClassroom);

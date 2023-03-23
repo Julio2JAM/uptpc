@@ -56,7 +56,7 @@ export class ActivityController{
             }
 
             const activityModel = new ActivityModel();
-            const acitvity = await activityModel.create(Activity,newActivity);
+            const acitvity = await activityModel.post_validation(newActivity);
             return res.status(HTTP_STATUS.CREATED).json(acitvity)
         } catch (err) {
             console.log(err);

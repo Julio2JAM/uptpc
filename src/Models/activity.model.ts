@@ -1,11 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral, } from "typeorm";
 import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
+import { ClassroomProfessor } from "./classroomProfessor.model";
 import { Model } from "../Base/model";
+import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()
 export class Activity{
     @PrimaryGeneratedColumn()
     id!: number;
+
+    @Column({type: "int", nullable: false})
+    @IsNotEmpty({message:"Please enter a classroom, professor and subject"})
+    @IsNumber()
+    @IsInt({message:"The classroom is not available"})
+    id_classroomProfessor: number;
 
     @Column({type:'varchar', length:60, nullable:false})
     @IsNotEmpty({message:"The name of the activity is not specified"})
@@ -41,6 +49,7 @@ export class Activity{
     id_status!: number
 
     constructor(dataActivity:Map<any,any>){
+        this.id_classroomProfessor = dataActivity?.get('id_classroomProfessor');
         this.name = dataActivity?.get('name');
         this.description = dataActivity?.get('description');
         this.porcentage = dataActivity?.get('porcentage');
@@ -50,5 +59,14 @@ export class Activity{
 }
 
 export class ActivityModel extends Model {
+
+    async post_validation(data:DeepPartial<ObjectLiteral>){
+        const classroomProfessor = await this.getById(ClassroomProfessor,data.id_classroomProfessor);
+        if(!classroomProfessor){
+            return {error: "The classroom, professor and subject was not found", status: HTTP_STATUS.BAD_RESQUEST};
+        }
+        const activity = await this.create(Activity, data);
+        return {activity, status: HTTP_STATUS.CREATED};
+    }
 
 }
