@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { ActivityController } from "../Controllers/activity.controller";
+import { AssignmentController } from "../Controllers/activity.controller";
 
 const router = Router();
-const controller = new ActivityController();
+const controller = new AssignmentController();
 
 router.get('/', controller.get)
 router.get('/:id', controller.getById)
