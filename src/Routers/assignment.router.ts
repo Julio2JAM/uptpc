@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AssignmentController } from "../Controllers/activity.controller";
+import { AssignmentController } from "../Controllers/assignment.controller";
 
 const router = Router();
 const controller = new AssignmentController();
