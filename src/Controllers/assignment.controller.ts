@@ -16,8 +16,8 @@ export class AssignmentController{
             }
 
             return res.status(HTTP_STATUS.OK).json(assignment);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -37,8 +37,8 @@ export class AssignmentController{
             const assignmentModel = new AssignmentModel();
             const assignment = await assignmentModel.getById(Assignment,id)
             return res.status(HTTP_STATUS.OK).json(assignment);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -58,8 +58,8 @@ export class AssignmentController{
             const assignmentModel = new AssignmentModel();
             const acitvity = await assignmentModel.post_validation(newAssignment);
             return res.status(HTTP_STATUS.CREATED).json(acitvity)
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR})
         }
     }

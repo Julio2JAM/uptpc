@@ -16,8 +16,8 @@ export class ClassroomStudentController{
             }
 
             return res.status(HTTP_STATUS.OK).json(cs);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -41,8 +41,8 @@ export class ClassroomStudentController{
                 res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
             }
             return res.status(HTTP_STATUS.OK).json(cs);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -55,7 +55,7 @@ export class ClassroomStudentController{
             const errors = await validate(newCS);
             if(errors.length > 0){
                 console.log(errors);
-                const keys = errors.map(err => err.property);
+                const keys = errors.map(error => error.property);
                 const values = errors.map(({constraints}) => Object.values(constraints!));
                 const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
                 console.log(message);
@@ -66,8 +66,8 @@ export class ClassroomStudentController{
             const csm = new ClassroomStudentModel();
             const cs = await csm.post_validation(newCS);
             return res.status(cs.status).json(cs);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }

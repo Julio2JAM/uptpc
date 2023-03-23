@@ -56,7 +56,7 @@ export class SubjectGradeController{
             const errors = await validate(newSubjectGrade);
             if(errors.length > 0){
                 console.log(errors);
-                const keys = errors.map(err => err.property);
+                const keys = errors.map(error => error.property);
                 const values = errors.map(({constraints}) => Object.values(constraints!));
                 const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
                 console.log(message);

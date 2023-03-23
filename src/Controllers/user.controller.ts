@@ -16,8 +16,8 @@ export class UserController{
             }
             
             return res.status(HTTP_STATUS.OK).json(user);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -42,8 +42,8 @@ export class UserController{
             }
 
             return res.status(HTTP_STATUS.OK).json(user);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":'something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -64,8 +64,8 @@ export class UserController{
             const userModel = new UserModel();
             const user = await userModel.create(User,newUser);
             return res.status(HTTP_STATUS.CREATED).json(user);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -98,8 +98,8 @@ export class UserController{
 
             const user = await userModel.create(User,userToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(user);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }

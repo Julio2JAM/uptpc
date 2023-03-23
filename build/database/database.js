@@ -25,5 +25,5 @@ const AppDataSource = new typeorm_1.DataSource({
 });
 AppDataSource.initialize()
     .then(() => { console.log('DataSource initialized'); })
-    .catch((err) => { console.log('DataSource failed', err); });
+    .catch((error) => { console.log('DataSource failed', error); });
 exports.default = AppDataSource;

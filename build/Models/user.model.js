@@ -62,8 +62,8 @@ export class EstudianteModel{
             this.conn = await pool.getConnection();
             const rows = await this.conn.query('SELECT * FROM estudiante');
             return rows;
-        }catch(err){
-            console.log(err);
+        }catch(error){
+            console.log(error);
         }finally{
             this.conn.end;
         }

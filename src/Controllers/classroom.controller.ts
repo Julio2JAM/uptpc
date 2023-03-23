@@ -15,8 +15,8 @@ export class ClassroomController{
             }
 
             return res.status(HTTP_STATUS.OK).json(classroom);   
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -40,8 +40,8 @@ export class ClassroomController{
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No classroom founds", status: HTTP_STATUS.NOT_FOUND});
             }
             return res.status(HTTP_STATUS.OK).json(classroom);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -61,8 +61,8 @@ export class ClassroomController{
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.create(Classroom, newClassroom);
             return res.status(HTTP_STATUS.CREATED).json(classroom);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }

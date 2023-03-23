@@ -16,8 +16,8 @@ export class SubjectController{
             }
 
             return res.status(HTTP_STATUS.OK).json(subject);
-        }catch (err) {
-            console.error(err);
+        }catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -43,8 +43,8 @@ export class SubjectController{
     
             return res.status(HTTP_STATUS.OK).json(subject);
 
-        }catch (err) {
-            console.error(err);
+        }catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -64,8 +64,8 @@ export class SubjectController{
             const subject = await subjectModel.create(Subject, newSubject);
             return res.status(HTTP_STATUS.CREATED).json(subject);
 
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -91,8 +91,8 @@ export class SubjectController{
 
             const subject = await subjectModel.create(Subject,subjectToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(subject);
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }

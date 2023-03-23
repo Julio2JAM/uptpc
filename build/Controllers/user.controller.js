@@ -20,8 +20,8 @@ class UserController {
                 console.log(user);
                 return res.status(200).json(user);
             }
-            catch (err) {
-                console.error(err);
+            catch (error) {
+                console.error(error);
                 return res.status(404).send({ "message": 'not users found', "status": 404 });
             }
         });
@@ -34,8 +34,8 @@ class UserController {
                 const user = yield userModel.getById(Number(id));
                 return res.status(200).json(user);
             }
-            catch (err) {
-                console.error(err);
+            catch (error) {
+                console.error(error);
                 return res.status(404).send({ "message": 'not users found', "status": 404 });
             }
         });

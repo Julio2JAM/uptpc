@@ -40,8 +40,8 @@ export class StudentController{
             }
 
             return res.status(HTTP_STATUS.OK).json(student);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -60,8 +60,8 @@ export class StudentController{
             const studentModel = new StudentModel();
             const student = await studentModel.create(Student,newStudent);
             return res.status(HTTP_STATUS.CREATED).json(student)
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
@@ -86,8 +86,8 @@ export class StudentController{
 
             //no terminado
             return res.status(HTTP_STATUS.CREATED).json(student);
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
