@@ -1,19 +1,19 @@
-import { ClassroomProfessor, ClassroomProfessorModel } from "../Models/classroomProfessor.model";
+import { ClassroomSubject, ClassroomSubjectModel } from "../Models/classroomSubject.model";
 import { Request, Response } from "express";
 import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
-export class ClassroomProfessorController{
+export class ClassroomSubjectController{
     async get(_req: Request, res: Response):Promise<Response>{
         try {
-            const classroomProfessorModel = new ClassroomProfessorModel();
-            const classroomProfessor = await classroomProfessorModel.get(ClassroomProfessor);
+            const classroomSubjectModel = new ClassroomSubjectModel();
+            const classroomSubject = await classroomSubjectModel.get(ClassroomSubject);
 
-            if(classroomProfessor.length == 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroomProfessor found", status: HTTP_STATUS.NOT_FOUND});
+            if(classroomSubject.length == 0){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroomSubject found", status: HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(HTTP_STATUS.OK).json(classroomProfessor);
+            return res.status(HTTP_STATUS.OK).json(classroomSubject);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -31,14 +31,14 @@ export class ClassroomProfessorController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const classroomProfessorModel = new ClassroomProfessorModel();
-            const classroomProfessor = await classroomProfessorModel.getById(ClassroomProfessor, id);
+            const classroomSubjectModel = new ClassroomSubjectModel();
+            const classroomSubject = await classroomSubjectModel.getById(ClassroomSubject, id);
 
-            if(!classroomProfessor){
-                console.log("No classroomProfessor found");
-                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroomProfessor found", status:HTTP_STATUS.NOT_FOUND});
+            if(!classroomSubject){
+                console.log("No classroomSubject found");
+                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroomSubject found", status:HTTP_STATUS.NOT_FOUND});
             }
-            return res.status(HTTP_STATUS.OK).json(classroomProfessor);
+            return res.status(HTTP_STATUS.OK).json(classroomSubject);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -48,7 +48,7 @@ export class ClassroomProfessorController{
     async post(req:Request, res:Response):Promise<Response>{
         try {
             const dcp = new Map(Object.entries(req.body));
-            const newCP = new ClassroomProfessor(dcp);
+            const newCP = new ClassroomSubject(dcp);
 
             const errors = await validate(newCP);
             if(errors.length > 0){
@@ -61,7 +61,7 @@ export class ClassroomProfessorController{
                 //const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
             }
 
-            const cpm = new ClassroomProfessorModel();
+            const cpm = new ClassroomSubjectModel();
             const cp = await cpm.post_validation(newCP);
             return res.status(cp.status).json(cp);
         } catch (error) {

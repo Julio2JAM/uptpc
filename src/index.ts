@@ -8,7 +8,7 @@ import assignmentGradeRouter from './Routers/assignmentGrade.router';
 //Classroom
 import classroomRouter from './Routers/classroom.model';
 import classroomStudentRouter from './Routers/classroomStudent.router';
-import classroomProfessorRouter from './Routers/classroomProfessor.router';
+import classroomSubjectRouter from './Routers/classroomSubject.router';
 //Others
 import userRouter from './Routers/user.router';
 import studentRouter from './Routers/student.router';
@@ -27,7 +27,7 @@ app.use("/api/assignment", assignmentRouter);
 app.use("/api/assignmentGrade", assignmentGradeRouter);
 app.use("/api/classroom", classroomRouter);
 app.use("/api/classroomStudent", classroomStudentRouter);
-app.use('/api/classroomProfesor', classroomProfessorRouter);
+app.use('/api/classroomProfesor', classroomSubjectRouter);
 app.use('/api/subjectGrade', subjectGradeRouter);
 
 app.listen(PORT,() => {

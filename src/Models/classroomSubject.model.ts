@@ -7,7 +7,7 @@ import { Classroom } from "./classroom.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()
-export class ClassroomProfessor{
+export class ClassroomSubject{
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -39,14 +39,14 @@ export class ClassroomProfessor{
     }
 }
 
-export class ClassroomProfessorModel extends Model{
+export class ClassroomSubjectModel extends Model{
 
-    async post_validation(dataClassroomProfessor:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
+    async post_validation(dataClassroomSubject:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
 
         const data: {[key:string]:ObjectLiteral|null} = {
-            employee:await this.getById(Employee,dataClassroomProfessor.id_professor),
-            subject:await this.getById(Subject,dataClassroomProfessor.id_subject),
-            classroom:await this.getById(Classroom,dataClassroomProfessor.id_classroom)
+            employee:await this.getById(Employee,dataClassroomSubject.id_professor),
+            subject:await this.getById(Subject,dataClassroomSubject.id_subject),
+            classroom:await this.getById(Classroom,dataClassroomSubject.id_classroom)
         };
 
         for(let value in data){
@@ -56,8 +56,8 @@ export class ClassroomProfessorModel extends Model{
             }
         }
 
-        const classroomProfessor = await this.create(ClassroomProfessor, dataClassroomProfessor);
-        return {classroomProfessor, status: HTTP_STATUS.CREATED};
+        const classroomSubject = await this.create(ClassroomSubject, dataClassroomSubject);
+        return {classroomSubject, status: HTTP_STATUS.CREATED};
     }
 
 }

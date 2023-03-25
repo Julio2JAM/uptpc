@@ -1,7 +1,7 @@
 import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeepPartial, ObjectLiteral } from "typeorm";
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
-import { ClassroomProfessor } from "./classroomProfessor.model";
+import { ClassroomSubject } from "./classroomSubject.model";
 import { Student } from "./student.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -13,7 +13,7 @@ export class SubjectGrade{
     @Column({type:"int", nullable:false})
     @IsNotEmpty({message: "Subject, professor and classroom are required"})
     @IsInt()
-    id_classroomProfessor!: number;
+    id_classroomSubject!: number;
 
     @Column({type:"int", nullable:false})
     @IsNotEmpty({message: "The student is required"})
@@ -35,7 +35,7 @@ export class SubjectGrade{
     id_status!: number;
 
     constructor(data:Map<any, any>) {
-        this.id_classroomProfessor = data?.get("id_classroomProfessor");
+        this.id_classroomSubject = data?.get("id_classroomSubject");
         this.id_student = data?.get("id_student");
         this.grade = data?.get("grade");
     }
@@ -44,11 +44,11 @@ export class SubjectGrade{
 export class SubjectGradeModel extends Model {
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
-        const classroomProfessor = await this.getById(ClassroomProfessor,data.id_classroomProfessor);
+        const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
         const student = await this.getById(Student,data.id_student);
 
-        if(!classroomProfessor){
-            return {error:"ClassroomProfessor not found", status:HTTP_STATUS.BAD_RESQUEST}
+        if(!classroomSubject){
+            return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         if(!student){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
