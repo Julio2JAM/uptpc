@@ -1,11 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const user_controller_1 = require("../Controllers/user.controller");
+const assignmentGrade_controller_1 = require("../Controllers/assignmentGrade.controller");
 const express_1 = require("express");
 const router = (0, express_1.Router)();
-const controller = new user_controller_1.UserController();
+const controller = new assignmentGrade_controller_1.AssignmentGradeController();
 router.get('/', controller.get);
 router.get('/:id', controller.getById);
 router.post('/', controller.post);
-router.put('/', controller.update);
 exports.default = router;

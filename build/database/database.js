@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 //import mariadb from 'mariadb';
 const typeorm_1 = require("typeorm");
-const globals_1 = require("../globals");
+const globals_1 = require("../Base/globals");
 /*
 export const pool = mariadb.createPool({
     "host": DATABASE.HOST,
