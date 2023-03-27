@@ -1,7 +1,7 @@
 import { ClassroomSubject, ClassroomSubjectModel } from "../Models/classroomSubject.model";
 import { Request, Response } from "express";
-import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { validation } from "../Base/helper";
 
 export class ClassroomSubjectController{
     async get(_req: Request, res: Response):Promise<Response>{
@@ -50,15 +50,9 @@ export class ClassroomSubjectController{
             const dcp = new Map(Object.entries(req.body));
             const newCP = new ClassroomSubject(dcp);
 
-            const errors = await validate(newCP);
-            if(errors.length > 0){
-                console.log(errors);
-                const keys = errors.map(error => error.property);
-                const values = errors.map(({constraints}) => Object.values(constraints!));
-                const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
-                console.log(message);
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": HTTP_STATUS.BAD_RESQUEST});
-                //const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
+            const errors = await validation(newCP);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const cpm = new ClassroomSubjectModel();

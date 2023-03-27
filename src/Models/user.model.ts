@@ -11,7 +11,7 @@ export class User {
     @Column({type:"tinyint", width: 3, nullable: false})
     @IsNumber()
     @IsNotEmpty({message: "Level is requiered"})
-    id_level!: number
+    id_level: number
 
     @Column({type: 'varchar', length: 16, nullable: false, unique:true})
     @IsNotEmpty({message: "Please enter a username"})

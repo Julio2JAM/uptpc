@@ -13,17 +13,17 @@ export class SubjectGrade{
     @Column({type:"int", nullable:false})
     @IsNotEmpty({message: "Subject, professor and classroom are required"})
     @IsInt()
-    id_classroomSubject!: number;
+    id_classroomSubject: number;
 
     @Column({type:"int", nullable:false})
     @IsNotEmpty({message: "The student is required"})
     @IsInt()
-    id_student!: number;
+    id_student: number;
 
     @Column({type:"tinyint", nullable:true, width:3})
     @IsNotEmpty({message: "The grade is required"})
     @IsInt()
-    grade!: number;
+    grade: number;
 
     @CreateDateColumn()
     datetime!: Date;
@@ -31,7 +31,7 @@ export class SubjectGrade{
     @UpdateDateColumn()
     datetime_updated!: Date;
 
-    @Column()
+    @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status!: number;
 
     constructor(data:Map<any, any>) {

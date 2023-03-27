@@ -1,7 +1,7 @@
 import { Assignment, AssignmentModel } from "../Models/assignment.model";
 import { Request, Response } from "express";
-import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { validation } from "../Base/helper";
 
 export class AssignmentController{
 
@@ -48,11 +48,9 @@ export class AssignmentController{
             const dataAssignment = new Map(Object.entries(req.body));
             const newAssignment = new Assignment(dataAssignment);
 
-            const errors = await validate(newAssignment);
-            if(errors.length > 0){
-                console.log(errors);
-                const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({"message": message, status: HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newAssignment);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const assignmentModel = new AssignmentModel();
