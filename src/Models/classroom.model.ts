@@ -9,7 +9,7 @@ export class Classroom{
 
     @Column({type: "varchar", nullable: false, length: 20})
     @IsNotEmpty({message:"The section is required"})
-    seccion!: string;
+    seccion: string;
 
     @Column({type:"date", nullable: true})
     datetime_start!:Date;

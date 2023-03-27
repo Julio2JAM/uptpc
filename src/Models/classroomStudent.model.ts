@@ -14,12 +14,12 @@ export class ClassroomStudent{
     @Column({type:"int", nullable:false, width:11})
     @IsNotEmpty({message: "Please enter a classroom"})
     @IsInt({message: "The classroom is not available"})
-    id_classroom!: number;
+    id_classroom: number;
 
     @Column({type:"int", nullable:false, width:11})
     @IsNotEmpty({message: "Please enter a student"})
     @IsInt({message: "The student is not available"})
-    id_student!: number;
+    id_student: number;
 
     @CreateDateColumn()
     datetime!: Date;

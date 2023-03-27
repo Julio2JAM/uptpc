@@ -1,4 +1,4 @@
-import { validate } from "class-validator";
+import { validation } from "../Base/helper";
 import { Request, Response } from "express";
 import { Student, StudentModel } from "../Models/student.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
@@ -51,10 +51,9 @@ export class StudentController{
             const dataStudent = new Map(Object.entries(req.body));
             const newStudent = new Student(dataStudent);
             
-            const errors = await validate(newStudent);
-            if(errors.length > 0){
-                const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, status: HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newStudent);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const studentModel = new StudentModel();

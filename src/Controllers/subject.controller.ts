@@ -1,7 +1,7 @@
-import { validate } from "class-validator";
-import { Request, Response } from "express";
 import { Subject, SubjectModel } from "../Models/subject.model";
+import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { validation } from "../Base/helper";
 
 export class SubjectController{
     
@@ -38,14 +38,14 @@ export class SubjectController{
             const subject = await subjectModel.getById(Subject,id);
     
             if(!subject){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Subject not found", status:HTTP_STATUS.NOT_FOUND});
             }
     
             return res.status(HTTP_STATUS.OK).json(subject);
 
         }catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -54,10 +54,9 @@ export class SubjectController{
             const {name/*, code*/} = req.body;
             const newSubject = new Subject(name/*, code*/);
 
-            const errors = await validate(newSubject);
-            if(errors.length > 0){
-                const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": "HTTP_STATUS.BAD_RESQUEST"});
+            const errors = await validation(newSubject);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectModel = new SubjectModel();
@@ -66,7 +65,7 @@ export class SubjectController{
 
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -75,7 +74,7 @@ export class SubjectController{
             const {id, name} = req.body
 
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:'id is requered',"status":HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_RESQUEST});
             }
             
             const subjectModel = new SubjectModel();
@@ -93,7 +92,7 @@ export class SubjectController{
             return res.status(HTTP_STATUS.CREATED).json(subject);
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }

@@ -1,5 +1,5 @@
 import { AssignmentGrade, AssignmentGradeModel } from "../Models/assignmentGrade.model";
-import { validate } from "class-validator";
+import { validation } from "../Base/helper";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -52,14 +52,9 @@ export class AssignmentGradeController{
             const dataAssignmentGrade = new Map(Object.entries(req.body));
             const newAssignmentGrade = new AssignmentGrade(dataAssignmentGrade);
 
-            const errors = await validate(newAssignmentGrade);
-            if(errors.length > 0){
-                console.log(errors);
-                const keys = errors.map(error => error.property);
-                const values = errors.map(({constraints}) => Object.values(constraints!));
-                const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
-                console.log(message);
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newAssignmentGrade);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const assignmentGradeModel = new AssignmentGradeModel();

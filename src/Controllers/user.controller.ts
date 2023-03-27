@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
-import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { validation } from "../Base/helper";
 
 export class UserController{
 
@@ -18,7 +18,7 @@ export class UserController{
             return res.status(HTTP_STATUS.OK).json(user);
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -27,10 +27,10 @@ export class UserController{
             const { id } = req.params;
 
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({"message":'id is requered', status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"id is requered", status:HTTP_STATUS.BAD_RESQUEST});
             }
             if(typeof id !== "number"){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const userModel = new UserModel();
@@ -38,13 +38,13 @@ export class UserController{
 
             if(!user){
                 console.log("no data found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({"message":'not users found', status:HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Users not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
             return res.status(HTTP_STATUS.OK).json(user);
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":'something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
     
@@ -55,10 +55,9 @@ export class UserController{
             const newUser = new User(id_level,username,password);
             
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
-            const errors = await validate(newUser);
-            if(errors.length > 0){
-                const messages = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({messages, status:HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newUser);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const userModel = new UserModel();
@@ -66,7 +65,7 @@ export class UserController{
             return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -75,7 +74,7 @@ export class UserController{
             const {id, id_level, username, password} = req.body
 
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({"message":'id is requered',"status":HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_RESQUEST});
             }
             
             //const newUser = new User(username,password);
@@ -83,7 +82,7 @@ export class UserController{
             const userToUpdate = await userModel.getById(User,Number(id));
             
             if(!userToUpdate){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({"message":'User not found',"status":HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
             if(id_level){
@@ -100,7 +99,7 @@ export class UserController{
             return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'something was wrong', status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
     

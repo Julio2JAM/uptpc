@@ -1,7 +1,7 @@
 import { SubjectGrade, SubjectGradeModel } from "../Models/subjectGrade.model";
 import { Request, Response } from "express";
-import { validate } from "class-validator";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { validation } from "../Base/helper";
 
 export class SubjectGradeController{
 
@@ -27,7 +27,7 @@ export class SubjectGradeController{
             const { id } = req.params;
 
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "The id is required", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Id is required", status: HTTP_STATUS.BAD_RESQUEST});
             }
             if(typeof id !== "number"){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id for subjectGrade", status: HTTP_STATUS.BAD_RESQUEST});
@@ -53,14 +53,9 @@ export class SubjectGradeController{
             const dataSubjectGrade = new Map(Object.entries(req.body));
             const newSubjectGrade = new SubjectGrade(dataSubjectGrade);
 
-            const errors = await validate(newSubjectGrade);
-            if(errors.length > 0){
-                console.log(errors);
-                const keys = errors.map(error => error.property);
-                const values = errors.map(({constraints}) => Object.values(constraints!));
-                const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
-                console.log(message);
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newSubjectGrade);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectGradeModel = new SubjectGradeModel();

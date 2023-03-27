@@ -1,6 +1,6 @@
 import { Classroom, ClassroomModel } from "../Models/classroom.model";
 import { Request, Response } from "express";
-import { validate } from "class-validator";
+import { validation } from "../Base/helper";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomController{
@@ -51,11 +51,9 @@ export class ClassroomController{
             const dataClassroom = new Map(Object.entries(req.body));
             const newClassroom = new Classroom(dataClassroom);
 
-            const errors = await validate(newClassroom);
-            if(errors.length > 0){
-                console.log(errors);
-                const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: message, status: HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newClassroom);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const classroomModel = new ClassroomModel();

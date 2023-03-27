@@ -1,7 +1,7 @@
-import { validate } from "class-validator";
-import { Request, Response } from "express";
 import { Employee, EmployeeModel } from "../Models/employee.model";
+import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { validation } from "../Base/helper";
 
 export class EmployeeController{
     async get(_req:Request, res: Response):Promise<Response>{
@@ -52,11 +52,9 @@ export class EmployeeController{
             const dataEmployee = new Map(Object.entries(req.body));
             const newEmployee = new Employee(dataEmployee);
 
-            const errors = await validate(newEmployee);
-            if(errors.length > 0){
-                console.log("Invalid data passed for employee");
-                const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, status:HTTP_STATUS.BAD_RESQUEST});
+            const errors = await validation(newEmployee);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const employeeModel = new EmployeeModel();

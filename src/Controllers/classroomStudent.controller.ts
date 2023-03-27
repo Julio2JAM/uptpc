@@ -1,5 +1,5 @@
 import { ClassroomStudent, ClassroomStudentModel } from "../Models/classroomStudent.model";
-import { validate } from "class-validator";
+import { validation } from "../Base/helper";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -52,15 +52,9 @@ export class ClassroomStudentController{
             const dcs = new Map(Object.entries(req.body));
             const newCS = new ClassroomStudent(dcs);
 
-            const errors = await validate(newCS);
-            if(errors.length > 0){
-                console.log(errors);
-                const keys = errors.map(error => error.property);
-                const values = errors.map(({constraints}) => Object.values(constraints!));
-                const message = Object.fromEntries(keys.map((key, index) => [key, values[index]]));
-                console.log(message);
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message, "status": HTTP_STATUS.BAD_RESQUEST});
-                //const message = errors.map(({constraints}) => Object.values(constraints!)).flat();
+            const errors = await validation(newCS);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const csm = new ClassroomStudentModel();
