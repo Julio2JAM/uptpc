@@ -31,7 +31,7 @@ export class Assignment{
     @Max(100,{message:"The porcentage must be less than 100"})
     porcentage: number;
 
-    @Column({type:'tinyint', width:3, nullable:true})
+    @Column({type:'tinyint', width:3, nullable:true, default: 20})
     @IsOptional()
     @IsNumber()
     @IsPositive({message: 'The porcentage must be greater than 0'})

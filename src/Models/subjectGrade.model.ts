@@ -1,8 +1,10 @@
-import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeepPartial, ObjectLiteral } from "typeorm";
+import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeepPartial, ObjectLiteral/*, OneToOne, ManyToMany */} from "typeorm";
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
 import { ClassroomSubject } from "./classroomSubject.model";
-import { Student } from "./student.model";
+import { ClassroomStudent } from "./classroomStudent.model";
+//import { AssignmentGrade } from "./assignmentGrade.model";
+//import AppDataSource from "../database/database";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()
@@ -18,7 +20,7 @@ export class SubjectGrade{
     @Column({type:"int", nullable:false})
     @IsNotEmpty({message: "The student is required"})
     @IsInt()
-    id_student: number;
+    id_classroomStudent: number;
 
     @Column({type:"tinyint", nullable:true, width:3})
     @IsNotEmpty({message: "The grade is required"})
@@ -36,7 +38,7 @@ export class SubjectGrade{
 
     constructor(data:Map<any, any>) {
         this.id_classroomSubject = data?.get("id_classroomSubject");
-        this.id_student = data?.get("id_student");
+        this.id_classroomStudent = data?.get("id_classroomStudent");
         this.grade = data?.get("grade");
     }
 }
@@ -45,15 +47,35 @@ export class SubjectGradeModel extends Model {
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const student = await this.getById(Student,data.id_student);
+        const classroomStudent = await this.getById(ClassroomStudent,data.classroomStudent);
 
+        if(!classroomSubject){
+            return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
+        }
+        if(!classroomStudent){
+            return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
+        }
+
+        const subjectGrade = await this.create(SubjectGrade,data);
+        return {subjectGrade, status:HTTP_STATUS.CREATED};
+    }
+
+    async calculateGrade(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
+        const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
+        const student = await this.getById(ClassroomStudent,data.id_student);
+        
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         if(!student){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
-
+        /*
+        const assignment = await AppDataSource.createQueryBuilder(ClassroomSubject,"classroomSubject")
+        .leftJoinAndSelect(AssignmentGrade, "assignment", "AssignmentGrade.id_classroomSubject = classroomSubject.id")
+        .getMany();
+        //const assignment = await this.getById(Assignment, classroomSubject.id);
+        */
         const subjectGrade = await this.create(SubjectGrade,data);
         return {subjectGrade, status:HTTP_STATUS.CREATED};
     }
