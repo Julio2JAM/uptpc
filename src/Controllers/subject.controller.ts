@@ -51,8 +51,8 @@ export class SubjectController{
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
-            const {name/*, code*/} = req.body;
-            const newSubject = new Subject(name/*, code*/);
+            const {name, description} = req.body;
+            const newSubject = new Subject(name, description);
 
             const errors = await validation(newSubject);
             if(errors) {
