@@ -1,6 +1,11 @@
+//Entity
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral, } from "typeorm";
 import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
+import AppDataSource from "../database/database";
+//Models
 import { ClassroomSubject } from "./classroomSubject.model";
+import { AssignmentGrade } from "./assignmentGrade.model";
+import { Student } from "./student.model";
 import { Model } from "../Base/model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -69,4 +74,21 @@ export class AssignmentModel extends Model {
         return {assignment, status: HTTP_STATUS.CREATED};
     }
 
+    async getByClassroomSubject(id:number):Promise<any>{
+        const classroomSubject = await this.getById(ClassroomSubject,id);
+
+        if(!classroomSubject){
+            return {error:"Not found", status: HTTP_STATUS.BAD_RESQUEST}
+        }
+
+        const assignment = AppDataSource.manager
+            .createQueryBuilder(Assignment, "assignment")
+            .leftJoinAndSelect(AssignmentGrade, "assignmentGrade", "assignmentGrade.id_assignment = assignment.id")
+            .leftJoinAndSelect(Student, "student", "assignmentGrade.id_student = student.id")
+            .where("assignment.id_classroomSubject = :id", {"id":id})
+            //.printSql()
+            .getMany();
+
+        console.log(assignment);
+    }
 }

@@ -13,7 +13,7 @@ export class AssignmentGrade{
     id_assignment: number;
 
     @Column({type:"int", nullable:false})
-    id_classroomStudent: number;
+    id_student: number;
 
     @Column({type:"int", nullable:false})
     grade: number;
@@ -29,7 +29,7 @@ export class AssignmentGrade{
 
     constructor(data:Map<any, any>) {
         this.id_assignment = data?.get("id_assignment");
-        this.id_classroomStudent = data?.get("id_classroomStudent");
+        this.id_student = data?.get("id_student");
         this.grade = data?.get("grade");;
     }
 }
@@ -38,12 +38,12 @@ export class AssignmentGradeModel extends Model{
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
         const assignment = await this.getById(Assignment,data.id_assignment);
-        const classroomStudent = await this.getById(ClassroomStudent,data.id_classroomStudent);
+        const student = await this.getById(ClassroomStudent,data.id_student);
 
         if(!assignment){
             return {error:"Assignment not found", status: HTTP_STATUS.BAD_RESQUEST}
         }
-        if(!classroomStudent){
+        if(!student){
             return {error:"Student not found", status: HTTP_STATUS.BAD_RESQUEST}
         }
 

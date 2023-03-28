@@ -47,7 +47,7 @@ export class SubjectGradeModel extends Model {
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const classroomStudent = await this.getById(ClassroomStudent,data.classroomStudent);
+        const classroomStudent = await this.getById(ClassroomStudent,data.id_classroomStudent);
 
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
@@ -62,16 +62,17 @@ export class SubjectGradeModel extends Model {
 
     async calculateGrade(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const student = await this.getById(ClassroomStudent,data.id_student);
+        const classroomStudent = await this.getById(ClassroomStudent,data.id_classroomStudent);
         
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
-        if(!student){
+        if(!classroomStudent){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         /*
         const assignment = await AppDataSource.createQueryBuilder(ClassroomSubject,"classroomSubject")
+        //.leftJoinAndSelect(AssignmentGrade, "assignment", "AssignmentGrade.id_classroomSubject = classroomSubject.id")
         .leftJoinAndSelect(AssignmentGrade, "assignment", "AssignmentGrade.id_classroomSubject = classroomSubject.id")
         .getMany();
         //const assignment = await this.getById(Assignment, classroomSubject.id);

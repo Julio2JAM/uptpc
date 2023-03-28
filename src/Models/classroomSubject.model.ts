@@ -1,8 +1,11 @@
+//Entity
 import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ObjectLiteral, DeepPartial } from "typeorm";
 import { IsNotEmpty, IsInt } from "class-validator";
+import AppDataSource from "../database/database";
+//Models
 import { Model } from "../Base/model";
-import { Employee } from "./employee.model";
 import { Subject } from "./subject.model";
+import { Employee } from "./employee.model";
 import { Classroom } from "./classroom.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -60,4 +63,23 @@ export class ClassroomSubjectModel extends Model{
         return {classroomSubject, status: HTTP_STATUS.CREATED};
     }
 
+    async getSubject(id_professor:number){
+
+        const employee = await this.getById(Employee,id_professor);
+
+        if(!employee){
+            return {error:`Professor not found`, status: HTTP_STATUS.BAD_RESQUEST};
+        }
+
+        const subject = await AppDataSource.manager
+            .createQueryBuilder(ClassroomSubject, "classroomSubject")
+            .select("subject.name")
+            .leftJoinAndSelect(Subject, "subject", "subject.id = classroomSubject.id_subject")
+            .where("classroomSubject.id_professor = :id", {"id":id_professor})
+            .groupBy("subject.id")
+            .getMany();
+
+        console.log(`${subject}`);
+        return subject;
+    }
 }
