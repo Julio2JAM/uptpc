@@ -24,13 +24,10 @@ export class ClassroomStudentController{
 
     async getById(req: Request, res:Response):Promise<Response>{
         try {
-            const { id } = req.params;
             
+            const id = Number(req.params.id);
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "The id is required", status: HTTP_STATUS.BAD_RESQUEST});
-            }
-            if(typeof id !== "number"){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const csm = new ClassroomStudentModel();

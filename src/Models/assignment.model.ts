@@ -74,20 +74,21 @@ export class AssignmentModel extends Model {
         return {assignment, status: HTTP_STATUS.CREATED};
     }
 
-    async getByClassroomSubject(id:number):Promise<any>{
-        const classroomSubject = await this.getById(ClassroomSubject,id);
+    async getByClassroomSubject(id_classroomSubject:number):Promise<any>{
+        const classroomSubject = await this.getById(ClassroomSubject,id_classroomSubject);
 
         if(!classroomSubject){
             return {error:"Not found", status: HTTP_STATUS.BAD_RESQUEST}
         }
 
-        const assignment = AppDataSource.manager
+        const assignment = await AppDataSource.manager
             .createQueryBuilder(Assignment, "assignment")
+            .select("assignment.name, assignmentGrade.grade, student.name")
             .leftJoinAndSelect(AssignmentGrade, "assignmentGrade", "assignmentGrade.id_assignment = assignment.id")
             .leftJoinAndSelect(Student, "student", "assignmentGrade.id_student = student.id")
-            .where("assignment.id_classroomSubject = :id", {"id":id})
+            .where("assignment.id_classroomSubject = :id", {"id":id_classroomSubject})
             //.printSql()
-            .getMany();
+            .getRawMany();
 
         console.log(assignment);
     }

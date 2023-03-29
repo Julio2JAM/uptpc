@@ -24,13 +24,10 @@ export class SubjectGradeController{
 
     async getById(req: Request, res: Response):Promise<Response>{
         try {
-            const { id } = req.params;
-
+            
+            const id = Number(req.params.id);
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Id is required", status: HTTP_STATUS.BAD_RESQUEST});
-            }
-            if(typeof id !== "number"){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id for subjectGrade", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectGradeModel = new SubjectGradeModel();
