@@ -63,7 +63,7 @@ export class ClassroomSubjectModel extends Model{
         return {classroomSubject, status: HTTP_STATUS.CREATED};
     }
 
-    async getSubject(id_professor:number){
+    async getSubject(id_professor:number):Promise<ObjectLiteral>{
 
         const employee = await this.getById(Employee,id_professor);
 

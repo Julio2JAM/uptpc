@@ -1,7 +1,7 @@
 import { Employee, EmployeeModel } from "../Models/employee.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 
 export class EmployeeController{
     async get(_req:Request, res: Response):Promise<Response>{
