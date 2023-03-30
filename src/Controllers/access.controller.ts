@@ -46,6 +46,7 @@ export class AccessController{
         try {
 
             const id_user = Number(req.params.id);
+            
             if(!id_user){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }

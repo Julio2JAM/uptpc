@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
@@ -10,15 +10,17 @@ export class Access{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type: "int", nullable: false})
-    @IsNotEmpty({message: "User is required"})
-    id_user: number;
-
     @CreateDateColumn()
     datetime!: Date;
 
-    constructor(id_user: number){
-        this.id_user = id_user;
+    @ManyToOne(() => User, {nullable: false})
+    @JoinColumn({name: "idUser"})
+    @Index("access_FK_1", { synchronize: false })
+    @IsNotEmpty({message: "User is required"})
+    id_user!: User;
+
+    constructor(user: User){
+        this.id_user = user;
     }
 }
 
