@@ -16,12 +16,22 @@ import classroomSubjectRouter from './Routers/classroomSubject.router';
 //Person
 import studentRouter from './Routers/student.router';
 import employeeRouter from './Routers/employee.router';
+//cors
+import cors from 'cors';
 
+//Se inicializa la app con express
 const app = express();
+
+// Configurar CORS para poder recibir solicitudes a la api desde cualquier origen
+app.use(cors());
+
+// Analizar el cuerpo de las solicitudes como JSON
 app.use(express.json());
 
+//Puerto en cual se van a correr la api
 const PORT = 3000;
 
+//Todas las direcciones que maneja la api
 app.use("/api/user", userRouter)
 app.use("/api/access", accessRouter)
 app.use("/api/subject", subjectRouter)

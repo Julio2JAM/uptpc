@@ -11,7 +11,7 @@ export class User {
     @Column({type:"tinyint", width: 3, nullable: false})
     @IsNumber()
     @IsNotEmpty({message: "Level is requiered"})
-    id_level: number
+    id_level!: number
 
     @Column({type: 'varchar', length: 16, nullable: false, unique:true})
     @IsNotEmpty({message: "Please enter a username"})
@@ -25,10 +25,10 @@ export class User {
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status: number
 
-    constructor(id_level:number, username: string, password: string) {
-        this.id_level = id_level;
-        this.username = username;
-        this.password = password;
+    constructor(data:Map<any, any>) {
+        this.id_level = 1;//id_level;
+        this.username = data?.get("username");
+        this.password = data?.get("password");
         this.id_status = 1;
     }
 }

@@ -48,8 +48,9 @@ export class UserController{
     async post(req: Request, res: Response):Promise<Response>{
         try {
             //Se obtienen los datos del req y se usa el constructor para asignarlos
-            const {id_level, username, password} = req.body
-            const newUser = new User(id_level,username,password);
+            const dataUser = new Map(Object.entries(req.body));
+            const newUser = new User(dataUser);
+            console.log(req.body);
             
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validation(newUser);
