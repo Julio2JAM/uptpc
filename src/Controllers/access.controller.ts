@@ -57,8 +57,8 @@ export class AccessController{
 
             const accessModel = new AccessModel();
             const access = await accessModel.post_validate(req);
-            console.log(access);
-            if(!access){
+
+            if(access.status != HTTP_STATUS.CREATED){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
 

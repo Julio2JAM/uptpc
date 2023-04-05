@@ -27,7 +27,7 @@ export class Access{
 
 export class AccessModel extends Model {
 
-    async post_validate(data:DeepPartial<ObjectLiteral>): Promise<ObjectLiteral | null>{
+    async post_validate(data:DeepPartial<ObjectLiteral>): Promise<ObjectLiteral>{
         
         const user = await AppDataSource.manager
             .createQueryBuilder(User, "user")
@@ -40,7 +40,7 @@ export class AccessModel extends Model {
         }
 
         //const access = await this.create(Access, user);
-        return {/*access, */status: HTTP_STATUS.CREATED}
+        return {user, status: HTTP_STATUS.CREATED}
     }
 
 }
