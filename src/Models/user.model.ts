@@ -1,6 +1,5 @@
-import AppDataSource from "../database/database"
 import { Model } from "../Base/model";
-import { Entity, PrimaryGeneratedColumn, Column, DeepPartial, ObjectLiteral } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 import { IsNotEmpty,MinLength,MaxLength,IsNumber } from 'class-validator';
 
 @Entity()
@@ -34,15 +33,5 @@ export class User {
 }
 
 export class UserModel extends Model {
-
-    async login(data:DeepPartial<ObjectLiteral>):Promise<Object | null> { 
-        const user = await AppDataSource.manager
-            .createQueryBuilder(User, "user")
-            .where("username = :username", {username: data.body.username})
-            .where("password = :password", {password: data.body.password})
-            .getOne();
-
-        return await user;
-    }
     
 }

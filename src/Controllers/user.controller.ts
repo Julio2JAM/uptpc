@@ -101,31 +101,4 @@ export class UserController{
         }
     }
 
-    async login(req:Request, res: Response):Promise<Response>{
-        try {
-
-            if(!req.body.username){
-                const errors = "Invalid username";
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            if(!req.body.password){
-                const errors = "Invalid password";
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const userModel = new UserModel();
-            const user = userModel.login(req);
-
-            if(!user){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(user);
-        } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-    
 }
