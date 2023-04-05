@@ -2,7 +2,6 @@ import { Access, AccessModel } from "../Models/access.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { UserController } from "./user.controller";
-import { Any } from "typeorm";
 
 export class AccessController{
     async get(_req:Request, res:Response):Promise<Response>{
