@@ -28,7 +28,6 @@ export class Access{
 export class AccessModel extends Model {
 
     async post_validate(data:DeepPartial<ObjectLiteral>): Promise<ObjectLiteral>{
-        
         const user = await AppDataSource.manager
             .createQueryBuilder(User, "user")
             .where("username = :username", {username: data.body.username})
@@ -39,8 +38,9 @@ export class AccessModel extends Model {
             return {error: "User not found", status: HTTP_STATUS.BAD_RESQUEST};
         }
 
-        //const access = await this.create(Access, user);
-        return {user, status: HTTP_STATUS.CREATED}
+        const newAcess = new Access(user);
+        const access = await this.create(Access, newAcess);
+        return {access, status: HTTP_STATUS.CREATED}
     }
 
 }
