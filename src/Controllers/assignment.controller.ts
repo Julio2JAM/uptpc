@@ -1,7 +1,7 @@
 import { Assignment, AssignmentModel } from "../Models/assignment.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 
 export class AssignmentController{
 
@@ -36,6 +36,24 @@ export class AssignmentController{
 
             const assignmentModel = new AssignmentModel();
             const assignment = await assignmentModel.getById(Assignment,id)
+            return res.status(HTTP_STATUS.OK).json(assignment);
+        } catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+
+    async getByClassroomSubject(req: Request, res: Response):Promise<Response>{
+        try {
+
+            const id_classroomSubject = Number(req.params.id);
+            if(!id_classroomSubject){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const assignmentModel = new AssignmentModel();
+            const assignment = await assignmentModel.getByClassroomSubject(Number(id_classroomSubject))
             return res.status(HTTP_STATUS.OK).json(assignment);
         } catch (error) {
             console.error(error);

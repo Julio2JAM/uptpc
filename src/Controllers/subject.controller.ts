@@ -1,7 +1,7 @@
 import { Subject, SubjectModel } from "../Models/subject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 
 export class SubjectController{
     
@@ -24,14 +24,10 @@ export class SubjectController{
 
     async getById(req:Request, res:Response):Promise<Response>{
         try{
-            const { id } = req.params;
-    
+            
+            const id = Number(req.params.id);
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid id", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-    
-            if(typeof id !== "number"){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectModel = new SubjectModel();
@@ -51,8 +47,8 @@ export class SubjectController{
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
-            const {name/*, code*/} = req.body;
-            const newSubject = new Subject(name/*, code*/);
+            const {name, description} = req.body;
+            const newSubject = new Subject(name, description);
 
             const errors = await validation(newSubject);
             if(errors) {
