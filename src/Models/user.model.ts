@@ -1,4 +1,4 @@
-//import AppDataSource from "../database/database"
+import AppDataSource from "../database/database"
 import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
 import { IsNotEmpty,MinLength,MaxLength,IsNumber } from 'class-validator';
@@ -34,5 +34,17 @@ export class User {
 }
 
 export class UserModel extends Model {
+
+    async login(data:Map<any, any>):Promise<Object | null> { 
+
+        const user = await AppDataSource.manager
+            .createQueryBuilder(User, "user")
+            .where("username = :username", {username: data?.get("username")})
+            .where("password = :password", {password: data?.get("password")})
+            .getOne();
+
+        return user;
+                
+    }
     
 }
