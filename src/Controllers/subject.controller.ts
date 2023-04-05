@@ -1,7 +1,7 @@
 import { Subject, SubjectModel } from "../Models/subject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 
 export class SubjectController{
     

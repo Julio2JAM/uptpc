@@ -1,7 +1,7 @@
 import { ClassroomSubject, ClassroomSubjectModel } from "../Models/classroomSubject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 
 export class ClassroomSubjectController{
     async get(_req: Request, res: Response):Promise<Response>{

@@ -1,5 +1,5 @@
 import { AssignmentGrade, AssignmentGradeModel } from "../Models/assignmentGrade.model";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 

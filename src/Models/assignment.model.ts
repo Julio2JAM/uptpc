@@ -1,5 +1,5 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral, } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral } from "typeorm";
 import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
 import AppDataSource from "../database/database";
 //Models
@@ -65,7 +65,7 @@ export class Assignment{
 
 export class AssignmentModel extends Model {
 
-    async post_validation(data:DeepPartial<ObjectLiteral>){
+    async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
         if(!classroomSubject){
             return {error: "The classroom, professor and subject was not found", status: HTTP_STATUS.BAD_RESQUEST};
@@ -74,7 +74,7 @@ export class AssignmentModel extends Model {
         return {assignment, status: HTTP_STATUS.CREATED};
     }
 
-    async getByClassroomSubject(id_classroomSubject:number):Promise<any>{
+    async getByClassroomSubject(id_classroomSubject:number):Promise<any> /*:Promise<Object>*/{
         const classroomSubject = await this.getById(ClassroomSubject,id_classroomSubject);
 
         if(!classroomSubject){

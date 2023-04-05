@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/helper";
+import { validation } from "../Base/toolkit";
 
 export class UserController{
 
@@ -48,8 +48,9 @@ export class UserController{
     async post(req: Request, res: Response):Promise<Response>{
         try {
             //Se obtienen los datos del req y se usa el constructor para asignarlos
-            const {id_level, username, password} = req.body
-            const newUser = new User(id_level,username,password);
+            const dataUser = new Map(Object.entries(req.body));
+            const newUser = new User(dataUser);
+            console.log(req.body);
             
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validation(newUser);
@@ -99,5 +100,5 @@ export class UserController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
-    
+
 }
