@@ -46,14 +46,14 @@ export class AccessController{
     async post(req: Request, res: Response):Promise<Response>{
         try {
 
-            const dataAcess = new Map(Object.entries(req.params.id));
             const userController = new UserController();
-
-            const user = await userController.login(dataAcess, res);
+            const user = await userController.login(req, res);
             console.log(user);
 
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-            return res.status(HTTP_STATUS.CREATED).json(user);
+            //const accessModel = new AccessModel();
+            //const access = accessModel.create(Access, user.id);
+            //return res.status(HTTP_STATUS.CREATED).json(access);
         } catch (error) {
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

@@ -101,14 +101,15 @@ export class UserController{
         }
     }
 
-    async login(req:Map<any, any>, res: Response){
+    async login(req:Request, res: Response):Promise<Response>{
         try {
-            if(!req?.get("username")){
+
+            if(!req.body.username){
                 const errors = "Invalid username";
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            if(!req?.get("password")){
+            if(!req.body.password){
                 const errors = "Invalid password";
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
