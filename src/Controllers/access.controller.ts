@@ -1,6 +1,8 @@
 import { Access, AccessModel } from "../Models/access.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { UserModel } from "../Models/user.model";
+import { generateToken } from "../middlewares/authMiddleware";
 
 export class AccessController{
     async get(_req:Request, res:Response):Promise<Response>{
@@ -55,13 +57,21 @@ export class AccessController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const accessModel = new AccessModel();
-            const access = await accessModel.post_validate(req);
+            const userModel = new UserModel();
+            const user = await userModel.login(req);
 
-            if(access.status != HTTP_STATUS.CREATED){
+            if(!user){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
+        
+            const dataAccess = new Map<any, any>([
+                ["user", user],
+                ["token", generateToken({id:Number} = user)]
+            ]);
 
+            const newAccess = new Access(dataAccess);
+            const accessModel = new AccessModel();
+            const access = accessModel.create(Access, newAccess)
             return res.status(HTTP_STATUS.CREATED).json(access);
         } catch (error) {
             console.error(error);
