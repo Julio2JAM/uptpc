@@ -1,9 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index, DeepPartial, ObjectLiteral } from "typeorm";
-import { HTTP_STATUS } from "../Base/statusHttp";
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index, Column } from "typeorm";
 import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
 import { User } from "./user.model";
-import AppDataSource from "../database/database";
 
 @Entity()
 export class Access{
@@ -11,8 +9,9 @@ export class Access{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @CreateDateColumn()
-    datetime!: Date;
+    @Column({type:"varchar", nullable:false, length:20})
+    @IsNotEmpty({message:"Access requires a token"})
+    token!: string;
 
     @ManyToOne(() => User, {nullable: false})
     @JoinColumn({name: "idUser"})
@@ -20,27 +19,15 @@ export class Access{
     @IsNotEmpty({message: "User is required"})
     id_user!: User;
 
-    constructor(user: User){
-        this.id_user = user;
+    @CreateDateColumn()
+    datetime!: Date;
+
+    constructor(data:Map<any, any>){
+        this.id_user = data.get("user");
+        this.token = data.get("token");
     }
 }
 
 export class AccessModel extends Model {
-
-    async post_validate(data:DeepPartial<ObjectLiteral>): Promise<ObjectLiteral>{
-        const user = await AppDataSource.manager
-            .createQueryBuilder(User, "user")
-            .where("username = :username", {username: data.body.username})
-            .where("password = :password", {password: data.body.password})
-            .getOne();
-
-        if(!user){
-            return {error: "User not found", status: HTTP_STATUS.BAD_RESQUEST};
-        }
-
-        const newAcess = new Access(user);
-        const access = await this.create(Access, newAcess);
-        return {access, status: HTTP_STATUS.CREATED}
-    }
 
 }
