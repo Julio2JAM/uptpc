@@ -9,7 +9,7 @@ export class Access{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type:"varchar", nullable:false, length:20})
+    @Column({type:"varchar", nullable:false, length:200})
     @IsNotEmpty({message:"Access requires a token"})
     token!: string;
 
@@ -23,8 +23,8 @@ export class Access{
     datetime!: Date;
 
     constructor(data:Map<any, any>){
-        this.id_user = data.get("user");
-        this.token = data.get("token");
+        this.id_user = data?.get("user");
+        this.token = data?.get("token");
     }
 }
 

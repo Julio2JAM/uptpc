@@ -24,7 +24,6 @@ export class AccessController{
 
     async getById(req: Request, res: Response):Promise<Response>{
         try {
-            
             const id = Number(req.params.id);
             if(!id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
@@ -63,15 +62,17 @@ export class AccessController{
             if(!user){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
-        
+
+
             const dataAccess = new Map<any, any>([
                 ["user", user],
-                ["token", generateToken({id:Number} = user)]
+                ["token", generateToken({id: user.id})]
             ]);
-
+            
             const newAccess = new Access(dataAccess);
             const accessModel = new AccessModel();
-            const access = accessModel.create(Access, newAccess)
+            const access = await accessModel.create(Access, newAccess)
+            console.log("Access: ", access);
             return res.status(HTTP_STATUS.CREATED).json(access);
         } catch (error) {
             console.error(error);
