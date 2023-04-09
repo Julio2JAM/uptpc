@@ -44,6 +44,52 @@ export class UserController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
+
+    async validateUsername(req: Request, res: Response):Promise<Response>{
+        try {
+        
+            const { username } = req.params;
+            if(!username){
+                console.log("No username send");
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_RESQUEST});    
+            }
+            
+            const userModel = new UserModel();
+            const user = await userModel.getByUsername(username);
+            
+            return res.status(HTTP_STATUS.OK).send({message: user ? true : false, status:HTTP_STATUS.OK});
+
+        }catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+
+    async getByUsername(req: Request, res: Response):Promise<Response>{
+        try {
+        
+            const { username } = req.params;
+            if(!username){
+                console.log("No username send");
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_RESQUEST});    
+            }
+            
+            const userModel = new UserModel();
+            const user = await userModel.getByUsername(username);
+
+            if(!user){
+                console.log("no data found");
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Users not found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(user);
+
+        }catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
     
     async post(req: Request, res: Response):Promise<Response>{
         try {

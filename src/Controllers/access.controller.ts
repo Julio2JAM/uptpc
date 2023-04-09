@@ -60,7 +60,7 @@ export class AccessController{
             const user = await userModel.login(req);
 
             if(!user){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Password or username incorrect", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
 

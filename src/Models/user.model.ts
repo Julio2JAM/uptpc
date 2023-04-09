@@ -45,4 +45,15 @@ export class UserModel extends Model {
         return user;
     }
 
+    async getByUsername(username:String):Promise<ObjectLiteral | null>{
+        const user = await AppDataSource.manager
+            .createQueryBuilder(User, "user")
+            //.select("username")
+            .where("username = :username", {username: username})
+            //.getRawOne();
+            .getOne();
+
+        return user;
+    }
+
 }
