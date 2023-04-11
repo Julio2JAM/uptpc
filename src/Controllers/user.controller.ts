@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/toolkit";
+import { validation, hashPassword } from "../Base/toolkit";
 
 export class UserController{
 
@@ -65,7 +65,6 @@ export class UserController{
         }
     }
 
-
     async getByUsername(req: Request, res: Response):Promise<Response>{
         try {
         
@@ -93,10 +92,15 @@ export class UserController{
     
     async post(req: Request, res: Response):Promise<Response>{
         try {
+            //Se valida que se haya enviado una password para procedeser a hashearse
+            if(!req.body.password || req.body.password.length < 8 || req.body.password.length < 16){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: " Invalid password", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+            req.body.password = await hashPassword(req.body.password);
+            
             //Se obtienen los datos del req y se usa el constructor para asignarlos
             const dataUser = new Map(Object.entries(req.body));
             const newUser = new User(dataUser);
-            console.log(req.body);
             
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validation(newUser);

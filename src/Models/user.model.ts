@@ -1,6 +1,6 @@
 import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column, DeepPartial, ObjectLiteral } from "typeorm"
-import { IsNotEmpty,MinLength,MaxLength,IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 import AppDataSource from "../database/database";
 
 @Entity()
@@ -17,9 +17,7 @@ export class User {
     @IsNotEmpty({message: "Please enter a username"})
     username: string
 
-    @Column({type: 'varchar', length: 16, nullable: false})
-    @MinLength(8,{message: "The password must be bigger than 8 caracteres"})
-    @MaxLength(16,{message: "The password must be smaller than 16 caracteres"})
+    @Column({type: 'varchar', length: 80, nullable: false})
     password: string
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
