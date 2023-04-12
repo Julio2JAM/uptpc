@@ -11,7 +11,7 @@ export function generateToken(payload: any): string{
 export function verifyToken(token: string): any{
     try {
         // Verificar el token JWT
-        const decoded = jwt.verify(token, 'secret-key') as { [key: string]: any };
+        const decoded = jwt.verify(token, secret) as { [key: string]: any };
         console.log(decoded);
         return decoded;
       } catch (error) {

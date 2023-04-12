@@ -37,7 +37,7 @@ export class UserModel extends Model {
         const user = await AppDataSource.manager
             .createQueryBuilder(User, "user")
             .where("username = :username", {username: data.body.username})
-            .where("password = :password", {password: data.body.password})
+            //.where("password = :password", {password: data.body.password})
             .getOne();
             
         return user;

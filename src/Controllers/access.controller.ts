@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { UserModel } from "../Models/user.model";
 import { generateToken } from "../middlewares/authMiddleware";
+import { matchPassword } from "../Base/toolkit";
 
 export class AccessController{
     async get(_req:Request, res:Response):Promise<Response>{
@@ -63,6 +64,11 @@ export class AccessController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Password or username incorrect", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
+            const validatePassword = await matchPassword(req.body.password, user.password);
+            
+            if(!validatePassword){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Password or username incorrect", status:HTTP_STATUS.BAD_RESQUEST});
+            }
 
             const dataAccess = new Map<any, any>([
                 ["user", user],
