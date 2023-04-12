@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { HTTP_STATUS } from '../Base/statusHttp';
 import jwt from 'jsonwebtoken';
 
-const secret = "LaPromesa-JustinQuiles-2017";
+const secret = "LaPromesa-JustinQuiles";
 
 export function generateToken(payload: any): string{
     return jwt.sign(payload, secret, {expiresIn: '8h'});
@@ -11,7 +11,7 @@ export function generateToken(payload: any): string{
 export function verifyToken(token: string): any{
     try {
         // Verificar el token JWT
-        const decoded = jwt.verify(token, 'secret-key') as { [key: string]: any };
+        const decoded = jwt.verify(token, secret) as { [key: string]: any };
         console.log(decoded);
         return decoded;
       } catch (error) {
@@ -39,6 +39,6 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     return;
   }
 
-  //req.user = payload;
+  req.user = payload;
   next();
 }

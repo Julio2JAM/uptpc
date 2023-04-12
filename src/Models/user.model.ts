@@ -1,6 +1,6 @@
 import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column, DeepPartial, ObjectLiteral } from "typeorm"
-import { IsNotEmpty,MinLength,MaxLength,IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 import AppDataSource from "../database/database";
 
 @Entity()
@@ -17,9 +17,7 @@ export class User {
     @IsNotEmpty({message: "Please enter a username"})
     username: string
 
-    @Column({type: 'varchar', length: 16, nullable: false})
-    @MinLength(8,{message: "The password must be bigger than 8 caracteres"})
-    @MaxLength(16,{message: "The password must be smaller than 16 caracteres"})
+    @Column({type: 'varchar', length: 80, nullable: false})
     password: string
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
@@ -39,9 +37,20 @@ export class UserModel extends Model {
         const user = await AppDataSource.manager
             .createQueryBuilder(User, "user")
             .where("username = :username", {username: data.body.username})
-            .where("password = :password", {password: data.body.password})
+            //.where("password = :password", {password: data.body.password})
             .getOne();
             
+        return user;
+    }
+
+    async getByUsername(username:String):Promise<ObjectLiteral | null>{
+        const user = await AppDataSource.manager
+            .createQueryBuilder(User, "user")
+            //.select("username")
+            .where("username = :username", {username: username})
+            //.getRawOne();
+            .getOne();
+
         return user;
     }
 
