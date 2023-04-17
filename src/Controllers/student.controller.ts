@@ -43,6 +43,28 @@ export class StudentController{
         }
     }
 
+    async getByStudent(req: Request, res: Response): Promise<Response>{
+        try {
+            const { cedule } = req.body;
+            
+            if(!cedule){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid cedule", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const studentModel = new StudentModel();
+            const student = await studentModel.getByCedule(Number(cedule));
+
+            if(!student){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Student not found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(student);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
     async post(req:Request,res:Response):Promise<Response>{
         try {
             const dataStudent = new Map(Object.entries(req.body));

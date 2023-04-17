@@ -1,7 +1,8 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
 import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt} from 'class-validator';
 import { Model } from "../Base/model";
+import AppDataSource from "../database/database";
 
 @Entity()
 export class Student {
@@ -56,5 +57,14 @@ export class Student {
 }
 
 export class StudentModel extends Model {
+
+    async getByCedule(cedule:Number):Promise<ObjectLiteral | null> {
+        const student = await AppDataSource.manager
+        .createQueryBuilder(Student, "student")
+        .where("student.cedule = :cedule", {cedule:cedule})
+        .getOne();
+
+        return student;
+    }
 
 }
