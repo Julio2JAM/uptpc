@@ -6,7 +6,7 @@ const controller = new StudentController();
 
 router.get('/',controller.get);
 router.get('/:id',controller.getById);
-router.get('/cedule/:cedule',controller.getByCedule);
+router.get('/cedule/:cedule',controller.validateCedule);
 router.post('/',controller.post);
 
 export default router;

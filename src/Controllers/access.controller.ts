@@ -58,7 +58,7 @@ export class AccessController{
             }
 
             const userModel = new UserModel();
-            const user = await userModel.login(req);
+            const user = await userModel.getByUsername(req.body.username);
 
             if(!user){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Password or username incorrect", status:HTTP_STATUS.BAD_RESQUEST});
