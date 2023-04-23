@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { validation, hashPassword } from "../Base/toolkit";
+import { StudentController } from "./student.controller";
 
 export class UserController{
 
@@ -90,10 +91,10 @@ export class UserController{
         }
     }
     
-    async post(req: Request, res: Response):Promise<Response>{
+    async post(req: Request, res: Response, child?:Record<string, any>):Promise<any>{
         try {
             //Se valida que se haya enviado una password para procedeser a hashearse
-            if(!req.body.password || req.body.password.length < 8 || req.body.password.length < 16){
+            if(!req.body.password || req.body.password.length < 8 || req.body.password.length > 16){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: " Invalid password", "status": HTTP_STATUS.BAD_RESQUEST});
             }
             req.body.password = await hashPassword(req.body.password);
@@ -110,10 +111,51 @@ export class UserController{
 
             const userModel = new UserModel();
             const user = await userModel.create(User,newUser);
-            return res.status(HTTP_STATUS.CREATED).json(user);
+            
+            return child == undefined ? res.status(HTTP_STATUS.CREATED).json(user) : undefined;
         } catch (error) {
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async register(req: Request, res: Response):Promise<Response | undefined>{
+        try {
+            
+            if(!req.body.user){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Data for user not found", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            if(!req.body.person){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Data for person not found", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const child: Record<string, any> = {
+                bool:true
+            };
+            const user = req.body.user;
+            const person = req.body.person;
+
+            const personController = new StudentController();//new PersonController();
+            req.body = person;
+            const newPerson = await personController.post(req, res, child);
+            
+            if(newPerson){
+                return;
+            }
+            
+            req.body = user;
+            const userController = new UserController();
+            const newUser = await userController.post(req, res, child);
+              
+            if(newUser){
+                return;
+            }
+            
+            return res.status(HTTP_STATUS.OK).send(/*{person:newPerson, user:newUser}*/);
+        }catch(error){
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something was wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -150,5 +192,4 @@ export class UserController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
-
 }

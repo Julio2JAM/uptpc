@@ -46,12 +46,12 @@ export class Student {
     id_status!: number
 
     constructor(dataStudent:Map<any,any>) {
-        this.cedule     = dataStudent?.get('cedule');
+        this.cedule     = Number(dataStudent?.get('cedule'));
         this.name       = dataStudent?.get("name");
         this.lastName   = dataStudent?.get("lastName");
         this.phone      = dataStudent?.get("phone");
         this.email      = dataStudent?.get("email");
-        this.birthday   = dataStudent?.get("birthday");
+        this.birthday   = new Date(dataStudent?.get("birthday"));
         this.id_status  = 1;
     }
 }
