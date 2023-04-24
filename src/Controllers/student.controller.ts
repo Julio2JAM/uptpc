@@ -85,7 +85,8 @@ export class StudentController{
         }
     }
 
-    async post(req:Request,res:Response):Promise<Response>{
+
+    async post(req:Request,res:Response, child?:Record<string, any>):Promise<any>{
         try {
             const dataStudent = new Map(Object.entries(req.body));
             const newStudent = new Student(dataStudent);
@@ -97,7 +98,7 @@ export class StudentController{
 
             const studentModel = new StudentModel();
             const student = await studentModel.create(Student,newStudent);
-            return res.status(HTTP_STATUS.CREATED).json(student)
+            return child == undefined ? res.status(HTTP_STATUS.CREATED).json(student) : undefined;
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

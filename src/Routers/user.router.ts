@@ -8,6 +8,7 @@ router.get('/',controller.get);
 router.get('/:id',controller.getById);
 router.get('/username/:username',controller.validateUsername);
 router.post('/',controller.post);
+router.post ('/register',controller.register);
 router.put('/',controller.update);
 
 export default router;
