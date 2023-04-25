@@ -45,7 +45,6 @@ export class SubjectController{
         }
     }
 
-
     async getByName(req:Request, res:Response):Promise<Response>{
         try{
             
@@ -54,12 +53,11 @@ export class SubjectController{
             }
 
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.getByName(req.body.name);
+            const subject = await subjectModel.getByName(req.params.name);
 
             if(!subject){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Subject not found", status:HTTP_STATUS.NOT_FOUND});
             }
-
             
             return res.status(HTTP_STATUS.OK).json(subject);
 

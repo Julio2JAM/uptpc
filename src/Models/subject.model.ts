@@ -1,5 +1,5 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
@@ -16,8 +16,11 @@ export class Subject {
     @IsOptional()
     description: string
 
-    @Column({type: 'date'})
+    @CreateDateColumn()
     datetime!: Date
+
+    @UpdateDateColumn()
+    datetime_update!: Date
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status: number
