@@ -1,7 +1,8 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral } from "typeorm"
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Model } from "../Base/model";
+import AppDataSource from "../database/database";
 @Entity()
 export class Subject {
     @PrimaryGeneratedColumn()
@@ -29,5 +30,14 @@ export class Subject {
 }
 
 export class SubjectModel extends Model{
+
+    async getByName(name: string): Promise<ObjectLiteral | null>{
+
+        const subject = await AppDataSource.createQueryBuilder(Subject,"subject")
+        .where("subject.name = :name", {name: name})
+        .getOne();
+
+        return subject;
+    }
 
 }

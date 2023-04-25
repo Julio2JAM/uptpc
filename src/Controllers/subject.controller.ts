@@ -45,6 +45,30 @@ export class SubjectController{
         }
     }
 
+
+    async getByName(req:Request, res:Response):Promise<Response>{
+        try{
+            
+            if(!req.params.name){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid name", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const subjectModel = new SubjectModel();
+            const subject = await subjectModel.getByName(req.body.name);
+
+            if(!subject){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Subject not found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            
+            return res.status(HTTP_STATUS.OK).json(subject);
+
+        }catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
     async post(req:Request, res:Response):Promise<Response>{
         try {
             const {name, description} = req.body;
