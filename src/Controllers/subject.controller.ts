@@ -89,7 +89,7 @@ export class SubjectController{
 
     async update(req: Request, res: Response):Promise<Response>{
         try {
-            const {id, name} = req.body
+            const {id} = req.body
 
             if(!id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_RESQUEST});
@@ -102,8 +102,8 @@ export class SubjectController{
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            if(name){
-                subjectToUpdate.name = name;
+            for (const key in subjectToUpdate) {
+                subjectToUpdate[key] = req.body[key] ?? subjectToUpdate[key];
             }
 
             const subject = await subjectModel.create(Subject,subjectToUpdate);
