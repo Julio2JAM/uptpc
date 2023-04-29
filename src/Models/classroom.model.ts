@@ -9,7 +9,7 @@ export class Classroom{
 
     @Column({type: "varchar", nullable: false, length: 20})
     @IsNotEmpty({message:"The section is required"})
-    seccion: string;
+    name: string;
 
     @Column({type:"date", nullable: true})
     datetime_start!:Date;
@@ -24,7 +24,7 @@ export class Classroom{
     id_status!:number;
 
     constructor(dataClassroom:Map<any,any>){
-        this.seccion = dataClassroom?.get("seccion");
+        this.name = dataClassroom?.get("name");
         this.datetime_start = dataClassroom?.get("datetime_start");
         this.datetime_end = dataClassroom?.get("datetime_end");
     }

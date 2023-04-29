@@ -113,4 +113,36 @@ export class SubjectController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
+
+    async postOrUpdate(req: Request, res: Response):Promise<Response | undefined>{
+        try {
+            const {id, name} = req.body
+
+            if(!id && !name){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or id is requered","status":HTTP_STATUS.BAD_RESQUEST});
+            }
+            
+            const subjectModel = new SubjectModel();
+            const subjectToUpdate = (id !== undefined) ? await subjectModel.getById(Subject,Number(id)) : await subjectModel.getByName(name);
+            console.log(subjectToUpdate);
+
+            if(!subjectToUpdate){
+                const subjectController = new SubjectController();
+                const subject = await subjectController.post(req, res);
+                console.log(subject.req.body);
+                return;
+            }
+
+            for (const key in subjectToUpdate) {
+                subjectToUpdate[key] = req.body[key] ?? subjectToUpdate[key];
+            }
+
+            const subject = await subjectModel.create(Subject,subjectToUpdate);
+            console.log(subject);
+            return res.status(HTTP_STATUS.CREATED).json(subject);
+        } catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
 }
