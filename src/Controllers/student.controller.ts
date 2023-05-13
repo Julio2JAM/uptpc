@@ -43,7 +43,50 @@ export class StudentController{
         }
     }
 
-    async post(req:Request,res:Response):Promise<Response>{
+    async getByParams(req: Request, res: Response): Promise<Response>{
+        try {
+            const { cedule } = req.params;
+            
+            if(!cedule){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid cedule", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const studentModel = new StudentModel();
+            const student = await studentModel.getByCedule(Number(cedule));
+
+            if(!student){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Student not found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(student);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async validateCedule(req: Request, res: Response): Promise<Response>{
+        try {
+        
+            const { cedule } = req.params;
+            if(!cedule){
+                console.log("No cedule send");
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No cedule send.", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+            
+            const studentModel = new StudentModel();
+            const student = await studentModel.getByCedule(Number(cedule));
+            
+            return res.status(HTTP_STATUS.OK).send({message: student ? true : false, status:HTTP_STATUS.OK});
+
+        }catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+
+    async post(req:Request,res:Response, child?:Record<string, any>):Promise<any>{
         try {
             const dataStudent = new Map(Object.entries(req.body));
             const newStudent = new Student(dataStudent);
@@ -55,7 +98,7 @@ export class StudentController{
 
             const studentModel = new StudentModel();
             const student = await studentModel.create(Student,newStudent);
-            return res.status(HTTP_STATUS.CREATED).json(student)
+            return child == undefined ? res.status(HTTP_STATUS.CREATED).json(student) : undefined;
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

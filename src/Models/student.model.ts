@@ -1,7 +1,8 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
 import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt} from 'class-validator';
 import { Model } from "../Base/model";
+import AppDataSource from "../database/database";
 
 @Entity()
 export class Student {
@@ -45,16 +46,25 @@ export class Student {
     id_status!: number
 
     constructor(dataStudent:Map<any,any>) {
-        this.cedule     = dataStudent?.get('cedule');
+        this.cedule     = Number(dataStudent?.get('cedule'));
         this.name       = dataStudent?.get("name");
         this.lastName   = dataStudent?.get("lastName");
         this.phone      = dataStudent?.get("phone");
         this.email      = dataStudent?.get("email");
-        this.birthday   = dataStudent?.get("birthday");
+        this.birthday   = new Date(dataStudent?.get("birthday"));
         this.id_status  = 1;
     }
 }
 
 export class StudentModel extends Model {
+
+    async getByCedule(cedule:Number):Promise<ObjectLiteral | null> {
+        const student = await AppDataSource.manager
+        .createQueryBuilder(Student, "student")
+        .where("student.cedule = :cedule", {cedule:cedule})
+        .getOne();
+
+        return student;
+    }
 
 }
