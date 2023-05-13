@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ObjectLiteral } from "typeorm";
 import { IsNotEmpty,  } from "class-validator";
 import { Model } from "../Base/model";
+import AppDataSource from "../database/database";
 
 @Entity()
 export class Classroom{
@@ -31,5 +32,13 @@ export class Classroom{
 }
 
 export class ClassroomModel extends Model{
+
+    async getByName(name:String):Promise<ObjectLiteral | null>{
+        const classroom = AppDataSource.createQueryBuilder(Classroom, "classroom")
+        .where("classroom.name = :name", {name:name})
+        .getOne();
+
+        return classroom;
+    }
 
 }

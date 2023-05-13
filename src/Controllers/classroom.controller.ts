@@ -37,16 +37,41 @@ export class ClassroomController{
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No classroom founds", status: HTTP_STATUS.NOT_FOUND});
             }
             return res.status(HTTP_STATUS.OK).json(classroom);
+
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
+    async getByName(req: Request, res: Response):Promise<Response>{
+        try {
+            const {name} = req.params;
+            
+            if(!name){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid name", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const classroomModel = new ClassroomModel();
+            const classroom = await classroomModel.getByName(name);
+
+            if(!classroom){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroom found", status:HTTP_STATUS.NOT_FOUND});
+            }
+            return res.status(HTTP_STATUS.OK).json(classroom);
+        } catch (error) {    
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});            
+        }
+    }
     async post(req: Request, res: Response):Promise<Response>{
         try {
             const dataClassroom = new Map(Object.entries(req.body));
             const newClassroom = new Classroom(dataClassroom);
+
+            if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
 
             const errors = await validation(newClassroom);
             if(errors) {
@@ -56,6 +81,67 @@ export class ClassroomController{
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.create(Classroom, newClassroom);
             return res.status(HTTP_STATUS.CREATED).json(classroom);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async put(req: Request, res: Response):Promise<Response>{
+        try {
+            const {id} = req.body;
+            
+            if(!id){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            console.log("here");
+            const classroomModel = new ClassroomModel();
+            const classroomToUpdate = await classroomModel.getById(Classroom, Number(id));
+
+            if(!classroomToUpdate){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Classroom not found", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            for(const key in classroomToUpdate){
+                classroomToUpdate[key] = req.body[key] ?? classroomToUpdate[key];
+            }
+
+            const classroom = await classroomModel.create(Classroom, classroomToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(classroom);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async postOrUpdate(req: Request, res:Response):Promise<Response | undefined>{
+        try {
+            const {id, name} = req.body;
+            
+            if(!id && !name){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or id requiered"});
+            }
+
+            const classroomModel = new ClassroomModel();
+            const classroomToUpdate = (id !== undefined) 
+            ? await classroomModel.getById(Classroom, Number(id))
+            : await classroomModel.getByName(name);
+            
+            const classroomController = new ClassroomController();
+            if(!classroomToUpdate){
+                classroomController.post(req, res);
+                return;
+            }else{
+                req.body.id = classroomToUpdate.id;
+                classroomController.put(req, res);
+                return;
+            }
+
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
