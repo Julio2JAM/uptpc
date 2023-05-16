@@ -43,7 +43,7 @@ export class StudentController{
         }
     }
 
-    async getByCedule(req: Request, res: Response): Promise<Response>{
+    async getByParams(req: Request, res: Response): Promise<Response>{
         try {
             const { cedule } = req.params;
             

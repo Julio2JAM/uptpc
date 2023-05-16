@@ -152,7 +152,7 @@ export class UserController{
                 return;
             }
             
-            return res.status(HTTP_STATUS.OK).send(/*{person:newPerson, user:newUser}*/);
+            return res.status(HTTP_STATUS.OK).send({person:newPerson, user:newUser});
         }catch(error){
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something was wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});

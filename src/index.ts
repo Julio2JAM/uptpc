@@ -10,7 +10,7 @@ import subjectGradeRouter from './Routers/subjectGrade.router';
 import assignmentRouter from './Routers/assignment.router';
 import assignmentGradeRouter from './Routers/assignmentGrade.router';
 //Classroom
-import classroomRouter from './Routers/classroom.model';
+import classroomRouter from './Routers/classroom.router';
 import classroomStudentRouter from './Routers/classroomStudent.router';
 import classroomSubjectRouter from './Routers/classroomSubject.router';
 //Person
