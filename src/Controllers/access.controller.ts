@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { UserModel } from "../Models/user.model";
 import { generateToken } from "../middlewares/authMiddleware";
-import { matchPassword } from "../Base/toolkit";
+import { matchPassword, validation } from "../Base/toolkit";
 
 export class AccessController{
     async get(_req:Request, res:Response):Promise<Response>{
@@ -76,6 +76,12 @@ export class AccessController{
             ]);
             
             const newAccess = new Access(dataAccess);
+
+            const errors = await validation(newAccess);
+            if(errors){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:errors, status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
             const accessModel = new AccessModel();
             const access = await accessModel.create(Access, newAccess)
             console.log("Access: ", access);

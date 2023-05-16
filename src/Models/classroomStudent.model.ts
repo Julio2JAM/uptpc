@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ObjectLiteral, DeepPartial } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ObjectLiteral, DeepPartial, ManyToOne, JoinColumn, Index, UpdateDateColumn } from "typeorm";
 import { Classroom } from "./classroom.model";
 import { Student } from "./student.model";
 import { IsNotEmpty, IsInt } from "class-validator";
@@ -11,25 +11,32 @@ export class ClassroomStudent{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type:"int", nullable:false, width:11})
+    @ManyToOne(() => Classroom, {nullable: false})
+    @JoinColumn({name: "id_classroom"})
+    @Index("classroomStudent_FK_1")
     @IsNotEmpty({message: "Please enter a classroom"})
     @IsInt({message: "The classroom is not available"})
-    id_classroom: number;
+    classroom: Classroom;
 
-    @Column({type:"int", nullable:false, width:11})
+    @ManyToOne(() => Student, {nullable:false})
+    @JoinColumn({name:"id_student"})
+    @Index("classroomStudent_FK_2")
     @IsNotEmpty({message: "Please enter a student"})
     @IsInt({message: "The student is not available"})
-    id_student: number;
+    student!: Student;
 
     @CreateDateColumn()
     datetime!: Date;
+
+    @UpdateDateColumn()
+    datetime_update!: Date;
 
     @Column({type:"tinyint", nullable:false, width:3, default:1})
     id_status!: number;
 
     constructor(data:Map<any, any>) {
-        this.id_classroom = data?.get("id_grade");
-        this.id_student = data?.get("id_student");
+        this.classroom = data?.get("classroom");
+        this.student = data?.get("student");
     }
 }
 
@@ -39,15 +46,6 @@ export class ClassroomStudentModel extends Model{
         const classroom = await this.getById(Classroom,data.id_classroom);
         const student = await this.getById(Student,data.id_student);
 
-        /*
-        //Select tomando campos especificos
-        const user = await AppDataSource.manager
-        .createQueryBuilder(Grade, "grade")
-        .select("grade.id, grade.seccion")
-        .where("id = :id", { id:1 })
-        .getRawOne();
-        */
-
         if(!classroom){
             return {error: "classroom not found", status: HTTP_STATUS.BAD_RESQUEST};
         }
@@ -55,7 +53,6 @@ export class ClassroomStudentModel extends Model{
             return {error: "student not found", status: HTTP_STATUS.BAD_RESQUEST};
         }
 
-        //const classroomStudent = await AppDataSource.manager.save(ClassroomStudent,data);
         const classroomStudent = await this.create(ClassroomStudent,data);
         return {classroomStudent, status:HTTP_STATUS.CREATED};
     }

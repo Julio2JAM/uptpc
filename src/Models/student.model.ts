@@ -62,6 +62,7 @@ export class StudentModel extends Model {
         const student = await AppDataSource.manager
         .createQueryBuilder(Student, "student")
         .where("student.cedule = :cedule", {cedule:cedule})
+        //.where("student.cedule LIKE :cedule", {cedule:`%${cedule}%`})
         .getOne();
 
         return student;

@@ -2,6 +2,10 @@ import { ClassroomStudent, ClassroomStudentModel } from "../Models/classroomStud
 import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { Classroom } from "../Models/classroom.model";
+import { Student } from "../Models/student.model";
+import { Model } from "../Base/model";
+import { ObjectLiteral } from "typeorm";
 
 export class ClassroomStudentController{
 
@@ -46,16 +50,27 @@ export class ClassroomStudentController{
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
-            const dcs = new Map(Object.entries(req.body));
-            const newCS = new ClassroomStudent(dcs);
+            const {id_student, id_classroom} = req.body;
+            const model = new Model();
+            const student = model.getById(Student, id_student);
+            const classroom = model.getById(Classroom, id_classroom);
 
+            if(!student || !classroom) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const dataClassroomStudent = new Map<String, ObjectLiteral>([
+                ["student", student],
+                ["classroom", classroom]
+            ]);
+
+            const newCS = new ClassroomStudent(dataClassroomStudent);
             const errors = await validation(newCS);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const csm = new ClassroomStudentModel();
-            const cs = await csm.post_validation(newCS);
+            const cs = await model.create(ClassroomStudent,newCS);
             return res.status(cs.status).json(cs);
         } catch (error) {
             console.log(error);
