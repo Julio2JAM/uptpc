@@ -3,13 +3,14 @@ import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { validation, hashPassword } from "../Base/toolkit";
 import { StudentController } from "./student.controller";
+import { Level, LevelModel } from "../Models/level.model";
 
 export class UserController{
 
     async get(_req:Request, res:Response):Promise<Response>{
         try {
             const userModel = new UserModel();
-            const user = await userModel.get(User);
+            const user = await userModel.getRelations(User,["level"]);
 
             if(user.length === 0){
                 console.log("no data found");
@@ -99,6 +100,17 @@ export class UserController{
             }
             req.body.password = await hashPassword(req.body.password);
             
+            if(!req.body.level){
+                const levelModel = new LevelModel();
+                const idLevel = levelModel.getById(Level,req.body.level);
+
+                if(!idLevel){
+                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No level found for that level", "status": HTTP_STATUS.BAD_RESQUEST});
+                }
+
+                req.body.level = idLevel;
+            }
+
             //Se obtienen los datos del req y se usa el constructor para asignarlos
             const dataUser = new Map(Object.entries(req.body));
             const newUser = new User(dataUser);

@@ -9,7 +9,6 @@ export class StudentController{
         try {
             const studentModel = new StudentModel();
             const students = await studentModel.get(Student);
-            console.log(students);
 
             if(students.length == 0){
                 console.log("no data found");
