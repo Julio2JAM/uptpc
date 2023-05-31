@@ -34,12 +34,23 @@ export class Subject {
 
 export class SubjectModel extends Model{
 
-    async getByName(name: string): Promise<ObjectLiteral | null>{
+    async getByParams(data:Map<String,any>):Promise<ObjectLiteral | null> {
 
-        const subject = await AppDataSource.createQueryBuilder(Subject,"subject")
-        .where("subject.name = :name", {name: name})
-        .getOne();
+        const query = AppDataSource.createQueryBuilder(Subject,"subject");
 
+        if(data?.get("name")){
+            query.where("subject.name = :name",{name:data?.get("name")});
+        }
+
+        if(data?.get("description")){
+            query.andWhere("subject.description LIKE :status",{status:`%${data?.get("description")}%`});
+        }
+
+        if(data?.get("status")){
+            query.andWhere("subject.id_status = :status",{status:data?.get("status")});
+        }
+
+        const subject = await query.getMany();
         return subject;
     }
 

@@ -45,15 +45,18 @@ export class SubjectController{
         }
     }
 
-    async getByName(req:Request, res:Response):Promise<Response>{
+    async getByParams(req:Request, res:Response):Promise<Response>{
         try{
             
-            if(!req.params.name){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid name", status:HTTP_STATUS.BAD_RESQUEST});
+            const data = new Map(Object.entries(req.params));
+            const validateData = Array.from(data.values()).every(value => value == undefined || "");
+            
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.getByName(req.params.name);
+            const subject = await subjectModel.getByParams(data);
 
             if(!subject){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Subject not found", status:HTTP_STATUS.NOT_FOUND});
@@ -113,7 +116,7 @@ export class SubjectController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
-
+/*
     async postOrUpdate(req: Request, res: Response):Promise<Response | undefined>{
         try {
             const {id, name} = req.body
@@ -144,5 +147,5 @@ export class SubjectController{
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
-    }
+    }*/
 }
