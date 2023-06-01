@@ -39,7 +39,7 @@ export class SubjectModel extends Model{
         const query = AppDataSource.createQueryBuilder(Subject,"subject");
 
         if(data?.get("name")){
-            query.where("subject.name = :name",{name:data?.get("name")});
+            query.where("subject.name LIKE :name",{name:`%${data?.get("name")}%`});
         }
 
         if(data?.get("description")){
