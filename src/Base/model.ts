@@ -19,6 +19,11 @@ export class Model{
         return await AppDataSource.manager.findOneBy(entity,{"id":Number(id)});
     }
 
+    async getByIdRelations(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral):Promise<ObjectLiteral | null>{
+        console.log("get by id relations");
+        return await AppDataSource.manager.findOne(entity, { where: { id: Number(id)}, relations: relationData });
+    }
+
     async create(entity:EntityTarget<ObjectLiteral>, data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
         console.log("creating");
         return await AppDataSource.manager.save(entity,data);

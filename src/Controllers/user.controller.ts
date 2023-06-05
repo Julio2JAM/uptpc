@@ -4,6 +4,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 import { validation, hashPassword } from "../Base/toolkit";
 import { StudentController } from "./student.controller";
 import { Level, LevelModel } from "../Models/level.model";
+import { Model } from "../Base/model";
 
 export class UserController{
 
@@ -33,11 +34,35 @@ export class UserController{
             }
 
             const userModel = new UserModel();
-            const user = await userModel.getById(User,id);
+            const user = await userModel.getByIdRelations(User,id,["level"]);
 
             if(!user){
                 console.log("no data found");
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Users not found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(user);
+        } catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async getByParams(req: Request, res: Response):Promise<Response>{
+        try {
+            
+            const data = new Map(Object.entries(req.params));
+            const validateData = Array.from(data.values()).every(value => value == undefined || "");
+            
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const userModel = new UserModel();
+            const user = await userModel.getByParams(data);
+
+            if(!user){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No user found", status:HTTP_STATUS.NOT_FOUND});
             }
 
             return res.status(HTTP_STATUS.OK).json(user);
@@ -173,31 +198,35 @@ export class UserController{
 
     async update(req: Request, res: Response):Promise<Response>{
         try {
-            const {id, id_level, username, password} = req.body
-
+            const {id, level} = req.body;
+            
             if(!id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_RESQUEST});
             }
-            
-            //const newUser = new User(username,password);
-            const userModel = new UserModel();
-            const userToUpdate = await userModel.getById(User,Number(id));
+
+            req.body.id = Number(id);
+            const model = new Model();
+            const userToUpdate = await model.getByIdRelations(User,Number(id),["level"]);
             
             if(!userToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            if(id_level){
-                userToUpdate.id_level = id_level;
-            }
-            if(username){
-                userToUpdate.username = username;
-            }
-            if(password){
-                userToUpdate.password = password;
+            if(level){
+                const levelData = await model.getById(Level,Number(level));
+
+                if(!levelData){
+                    res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Level not found", status:HTTP_STATUS.BAD_RESQUEST});
+                }
+                
+                req.body.level = levelData;
             }
 
-            const user = await userModel.create(User,userToUpdate);
+            for (const key in userToUpdate) {
+                userToUpdate[key] = req?.body[key] ?? userToUpdate[key];
+            }
+            
+            const user = await model.create(User,userToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {
             console.error(error);
