@@ -2,7 +2,7 @@ import { Access, AccessModel } from "../Models/access.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { UserModel } from "../Models/user.model";
-import { generateToken } from "../middlewares/authMiddleware";
+import { generateToken, verifyToken } from "../middlewares/authMiddleware";
 import { matchPassword, validation } from "../Base/toolkit";
 
 export class AccessController{
@@ -86,6 +86,32 @@ export class AccessController{
             const access = await accessModel.create(Access, newAccess)
             console.log("Access: ", access);
             return res.status(HTTP_STATUS.CREATED).json(access);
+        } catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async verifyToken(req: Request, res: Response){
+        try {
+            
+            const { token } = req.params;
+            
+            if(!token){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Token no send", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const validateToken = verifyToken(token);
+
+            if(!validateToken){
+                return res.status(HTTP_STATUS.OK).send({token:false});
+            }
+
+            const currentTime = Math.floor(Date.now() / 1000);
+            //const currentTime = new Date(validateToken.exp * 1000);
+            //const currentTimeString = currentTime.toLocaleDateString() + ' ' + currentTime.toLocaleTimeString()
+            return res.status(HTTP_STATUS.OK).send({token:(currentTime < validateToken.exp)});
+
         } catch (error) {
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
