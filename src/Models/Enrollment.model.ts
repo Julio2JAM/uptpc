@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from "typeorm";
 import { Classroom } from "./classroom.model";
 import { Student } from "./student.model";
-import { IsNotEmpty, IsInt } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
 
 @Entity()
@@ -13,14 +13,12 @@ export class Enrollment{
     @JoinColumn({name: "id_classroom"})
     @Index("Enrollment_FK_1")
     @IsNotEmpty({message: "Please enter a classroom"})
-    @IsInt({message: "The classroom is not available"})
-    classroom: Classroom;
+    classroom!: Classroom;
 
     @ManyToOne(() => Student, {nullable:false})
     @JoinColumn({name:"id_student"})
     @Index("Enrollment_FK_2")
     @IsNotEmpty({message: "Please enter a student"})
-    @IsInt({message: "The student is not available"})
     student!: Student;
 
     @CreateDateColumn()
@@ -35,6 +33,7 @@ export class Enrollment{
     constructor(data:Map<any, any>) {
         this.classroom = data?.get("classroom");
         this.student = data?.get("student");
+        this.id_status = data?.get("is_status") ?? 1;
     }
 }
 

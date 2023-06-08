@@ -51,9 +51,14 @@ export class EnrollmentController{
     async post(req:Request, res:Response):Promise<Response>{
         try {
             const {id_student, id_classroom} = req.body;
+
+            if(!id_student && !id_classroom){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
             const model = new Model();
-            const student = model.getById(Student, id_student);
-            const classroom = model.getById(Classroom, id_classroom);
+            const student = await model.getById(Student, id_student);
+            const classroom = await model.getById(Classroom, id_classroom);
 
             if(!student || !classroom) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
@@ -71,7 +76,8 @@ export class EnrollmentController{
             }
 
             const enrollment = await model.create(Enrollment,newEnrollment);
-            return res.status(enrollment.status).json(enrollment);
+
+            return res.status(HTTP_STATUS.CREATED).json(enrollment);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

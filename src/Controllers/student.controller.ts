@@ -87,6 +87,12 @@ export class StudentController{
 
     async post(req:Request,res:Response, child?:Record<string, any>):Promise<any>{
         try {
+            const { name, lastname } = req.body;
+
+            if(!name && !lastname){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or Lastname is required", status:HTTP_STATUS.BAD_RESQUEST})
+            }
+
             const dataStudent = new Map(Object.entries(req.body));
             const newStudent = new Student(dataStudent);
             
@@ -97,7 +103,7 @@ export class StudentController{
 
             const studentModel = new StudentModel();
             const student = await studentModel.create(Student,newStudent);
-            return child == undefined ? res.status(HTTP_STATUS.CREATED).json(student) : undefined;
+            return (!child) ? res.status(HTTP_STATUS.CREATED).json(student) : undefined;
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
