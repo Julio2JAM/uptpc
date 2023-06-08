@@ -2,7 +2,7 @@ import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateCol
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
 import { ClassroomSubject } from "./classroomSubject.model";
-import { ClassroomStudent } from "./classroomStudent.model";
+import { Enrollment } from "./enrollment.model";
 //import { AssignmentGrade } from "./assignmentGrade.model";
 //import AppDataSource from "../database/database";
 import { HTTP_STATUS } from "../Base/statusHttp";
@@ -20,7 +20,7 @@ export class SubjectGrade{
     @Column({type:"int", nullable:false})
     @IsNotEmpty({message: "The student is required"})
     @IsInt()
-    id_classroomStudent: number;
+    id_Enrollment: number;
 
     @Column({type:"tinyint", nullable:true, width:3})
     @IsNotEmpty({message: "The grade is required"})
@@ -38,7 +38,7 @@ export class SubjectGrade{
 
     constructor(data:Map<any, any>) {
         this.id_classroomSubject = data?.get("id_classroomSubject");
-        this.id_classroomStudent = data?.get("id_classroomStudent");
+        this.id_Enrollment = data?.get("id_Enrollment");
         this.grade = data?.get("grade");
     }
 }
@@ -47,12 +47,12 @@ export class SubjectGradeModel extends Model {
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const classroomStudent = await this.getById(ClassroomStudent,data.id_classroomStudent);
+        const enrollment = await this.getById(Enrollment,data.id_Enrollment);
 
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
-        if(!classroomStudent){
+        if(!enrollment){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
 
@@ -62,12 +62,12 @@ export class SubjectGradeModel extends Model {
 
     async calculateGrade(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const classroomStudent = await this.getById(ClassroomStudent,data.id_classroomStudent);
+        const enrollment = await this.getById(Enrollment,data.id_Enrollment);
         
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
-        if(!classroomStudent){
+        if(!enrollment){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         /*

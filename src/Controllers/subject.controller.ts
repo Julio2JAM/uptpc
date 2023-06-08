@@ -45,15 +45,18 @@ export class SubjectController{
         }
     }
 
-    async getByName(req:Request, res:Response):Promise<Response>{
+    async getByParams(req:Request, res:Response):Promise<Response>{
         try{
             
-            if(!req.params.name){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid name", status:HTTP_STATUS.BAD_RESQUEST});
+            const data = new Map(Object.entries(req.params));
+            const validateData = Array.from(data.values()).every(value => value == undefined || "");
+            
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.getByName(req.params.name);
+            const subject = await subjectModel.getByParams(data);
 
             if(!subject){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Subject not found", status:HTTP_STATUS.NOT_FOUND});
@@ -95,6 +98,7 @@ export class SubjectController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_RESQUEST});
             }
             
+            req.body.id = Number(id);
             const subjectModel = new SubjectModel();
             const subjectToUpdate = await subjectModel.getById(Subject,Number(id));
             
@@ -113,36 +117,5 @@ export class SubjectController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
-
-    async postOrUpdate(req: Request, res: Response):Promise<Response | undefined>{
-        try {
-            const {id, name} = req.body
-
-            if(!id && !name){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or id is requered","status":HTTP_STATUS.BAD_RESQUEST});
-            }
-            
-            const subjectModel = new SubjectModel();
-            const subjectToUpdate = (id !== undefined) ? await subjectModel.getById(Subject,Number(id)) : await subjectModel.getByName(name);
-            console.log(subjectToUpdate);
-
-            if(!subjectToUpdate){
-                const subjectController = new SubjectController();
-                const subject = await subjectController.post(req, res);
-                console.log(subject.req.body);
-                return;
-            }
-
-            for (const key in subjectToUpdate) {
-                subjectToUpdate[key] = req.body[key] ?? subjectToUpdate[key];
-            }
-
-            const subject = await subjectModel.create(Subject,subjectToUpdate);
-            console.log(subject);
-            return res.status(HTTP_STATUS.CREATED).json(subject);
-        } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
+    
 }

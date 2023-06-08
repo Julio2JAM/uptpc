@@ -1,17 +1,19 @@
 import { Model } from "../Base/model";
-import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral } from "typeorm"
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, ManyToOne, Index, JoinColumn } from "typeorm"
+import { IsNotEmpty } from 'class-validator';
 import AppDataSource from "../database/database";
+import { Level } from "./level.model";
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @Column({type:"tinyint", width: 3, nullable: false})
-    @IsNumber()
+    @ManyToOne(() => Level, {nullable: true})
     @IsNotEmpty({message: "Level is requiered"})
-    id_level!: number
+    @JoinColumn({name: "id_level"})
+    @Index("user_fk_1")
+    level!: Level
 
     @Column({type: 'varchar', length: 16, nullable: false, unique:true})
     @IsNotEmpty({message: "Please enter a username"})
@@ -24,7 +26,7 @@ export class User {
     id_status: number
 
     constructor(data:Map<any, any>) {
-        this.id_level = 1;//id_level;
+        this.level = data?.get("level");
         this.username = data?.get("username");
         this.password = data?.get("password");
         this.id_status = 1;
@@ -32,6 +34,27 @@ export class User {
 }
 
 export class UserModel extends Model {
+
+    async getByParams(data:Map<String,any>){
+        const query = AppDataSource.manager
+        .createQueryBuilder(User, "user")
+        .leftJoinAndSelect("user.level", "level");
+
+        if(data?.get("username")){
+            query.where("user.username LIKE :username", {username:`%${data?.get("username")}%`});
+        }
+
+        if(data?.get("level")){
+            query.andWhere("user.level = :level", {level: data?.get("level")});
+        }
+
+        if(data?.get("id_status")){
+            query.andWhere("user.id_status = :status", {status: data?.get("id_status")});
+        }
+
+        const user = query.getMany();
+        return user;
+    }
 
     async getByUsername(username:String):Promise<ObjectLiteral | null>{
         const user = await AppDataSource.manager

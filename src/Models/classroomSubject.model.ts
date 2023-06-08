@@ -1,5 +1,5 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ObjectLiteral, DeepPartial } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ObjectLiteral, DeepPartial, ManyToOne, JoinColumn, Index } from "typeorm";
 import { IsNotEmpty, IsInt } from "class-validator";
 import AppDataSource from "../database/database";
 //Models
@@ -14,31 +14,35 @@ export class ClassroomSubject{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type:"int", nullable: false})
+    @ManyToOne(() => Classroom, {nullable: false, createForeignKeyConstraints: true})
+    @JoinColumn({name:"id_classroom"})
+    @Index("classroomSubject_FK_1")
     @IsNotEmpty({message:"Please enter a classroom"})
     @IsInt({message: "The classroom is not available"})
-    id_classroom: number;
+    classroom: Classroom;
 
-    @Column({type:"int", nullable: false})
+    @ManyToOne(() => Employee, {nullable: true, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_professor"})
+    @Index("classroomSubject_FK_2")
     @IsNotEmpty({message:"Please enter a professor"})
     @IsInt({message: "The professor is not available"})
-    id_professor: number;
+    professor: Employee;
 
     @Column({type:"int", nullable: false})
     @IsNotEmpty({message:"Please enter a subject"})
     @IsInt({message: "The subject is not available"})
-    id_subject: number;
+    subject: Subject;
 
     @CreateDateColumn()
     datetime!: Date;
 
-    @Column({type:"tinyint", nullable:false, default:1})
+    @Column({type:"tinyint", nullable:false, width: 3, default:1})
     id_status!: number;
 
     constructor(data:Map<any, any>){
-        this.id_classroom = data?.get("id_classroom");
-        this.id_professor = data?.get("id_professor");
-        this.id_subject = data?.get("id_subject");
+        this.classroom = data?.get("classroom");
+        this.professor = data?.get("professor");
+        this.subject = data?.get("subject");
     }
 }
 

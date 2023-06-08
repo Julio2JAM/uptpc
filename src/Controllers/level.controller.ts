@@ -10,7 +10,7 @@ export class LevelController{
             const levelModel = new LevelModel();
             const level = await levelModel.get(Level);
 
-            if(!level){
+            if(level.length == 0){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Level not found", status: HTTP_STATUS.NOT_FOUND});
             }
             
@@ -54,7 +54,7 @@ export class LevelController{
             }
 
             const levelModel = new LevelModel();
-            const level = levelModel.create(Level,levelModel);
+            const level = await levelModel.create(Level,newLevel);
             return res.status(HTTP_STATUS.CREATED).json(level);
         } catch (error) {
             console.error(error);

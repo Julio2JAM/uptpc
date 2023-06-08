@@ -99,7 +99,7 @@ export class ClassroomController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            console.log("here");
+            req.body.id = Number(id);
             const classroomModel = new ClassroomModel();
             const classroomToUpdate = await classroomModel.getById(Classroom, Number(id));
 
@@ -109,39 +109,14 @@ export class ClassroomController{
 
             for(const key in classroomToUpdate){
                 classroomToUpdate[key] = req.body[key] ?? classroomToUpdate[key];
+
+                if(classroomToUpdate[key] === ""){
+                    classroomToUpdate[key] = null;
+                }
             }
 
             const classroom = await classroomModel.create(Classroom, classroomToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(classroom);
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async postOrUpdate(req: Request, res:Response):Promise<Response | undefined>{
-        try {
-            const {id, name} = req.body;
-            
-            if(!id && !name){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or id requiered"});
-            }
-
-            const classroomModel = new ClassroomModel();
-            const classroomToUpdate = (id !== undefined) 
-            ? await classroomModel.getById(Classroom, Number(id))
-            : await classroomModel.getByName(name);
-            
-            const classroomController = new ClassroomController();
-            if(!classroomToUpdate){
-                classroomController.post(req, res);
-                return;
-            }else{
-                req.body.id = classroomToUpdate.id;
-                classroomController.put(req, res);
-                return;
-            }
-
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
