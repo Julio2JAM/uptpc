@@ -2,7 +2,7 @@ import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateCol
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
 import { ClassroomSubject } from "./classroomSubject.model";
-import { Enrollment } from "./Enrollment.model";
+import { Enrollment } from "./enrollment.model";
 //import { AssignmentGrade } from "./assignmentGrade.model";
 //import AppDataSource from "../database/database";
 import { HTTP_STATUS } from "../Base/statusHttp";

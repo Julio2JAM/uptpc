@@ -1,4 +1,4 @@
-import { EnrollmentController } from "../Controllers/Enrollment.controller";
+import { EnrollmentController } from "../Controllers/enrollment.controller";
 import { Router } from "express";
 
 const router = Router();

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ObjectLiteral, DeepPartial } from "typeorm";
 import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
-import { Enrollment } from "./Enrollment.model";
+import { Enrollment } from "./enrollment.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()

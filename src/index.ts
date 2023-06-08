@@ -11,7 +11,7 @@ import assignmentRouter from './Routers/assignment.router';
 import assignmentGradeRouter from './Routers/assignmentGrade.router';
 //Classroom
 import classroomRouter from './Routers/classroom.router';
-import enrollmentRouter from './Routers/Enrollment.router';
+import enrollmentRouter from './Routers/enrollment.router';
 import classroomSubjectRouter from './Routers/classroomSubject.router';
 //Person
 import studentRouter from './Routers/student.router';

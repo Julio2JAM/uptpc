@@ -1,4 +1,4 @@
-import { Enrollment, EnrollmentModel } from "../Models/Enrollment.model";
+import { Enrollment, EnrollmentModel } from "../Models/enrollment.model";
 import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
