@@ -11,7 +11,7 @@ import assignmentRouter from './Routers/assignment.router';
 import assignmentGradeRouter from './Routers/assignmentGrade.router';
 //Classroom
 import classroomRouter from './Routers/classroom.router';
-import EnrollmentRouter from './Routers/Enrollment.router';
+import enrollmentRouter from './Routers/Enrollment.router';
 import classroomSubjectRouter from './Routers/classroomSubject.router';
 //Person
 import studentRouter from './Routers/student.router';
@@ -40,7 +40,7 @@ app.use("/api/employee", employeeRouter);
 app.use("/api/assignment", assignmentRouter);
 app.use("/api/assignmentGrade", assignmentGradeRouter);
 app.use("/api/classroom", classroomRouter);
-app.use("/api/Enrollment", EnrollmentRouter);
+app.use("/api/enrollment", enrollmentRouter);
 app.use('/api/classroomProfesor', classroomSubjectRouter);
 app.use('/api/subjectGrade', subjectGradeRouter);
 app.use('/api/level', levelRouter);

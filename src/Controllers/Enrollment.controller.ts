@@ -12,7 +12,7 @@ export class EnrollmentController{
     async get(_req: Request, res:Response):Promise<Response>{
         try {
             const enrollmentModel = new EnrollmentModel();
-            const enrollment = await enrollmentModel.get(Enrollment);
+            const enrollment = await enrollmentModel.getRelations(Enrollment,["student", "classroom"]);
 
             if(enrollment.length == 0){
                 console.log("No Enrollment found");
