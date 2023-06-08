@@ -47,12 +47,12 @@ export class SubjectGradeModel extends Model {
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const Enrollment = await this.getById(Enrollment,data.id_Enrollment);
+        const enrollment = await this.getById(Enrollment,data.id_Enrollment);
 
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
-        if(!Enrollment){
+        if(!enrollment){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
 
@@ -62,12 +62,12 @@ export class SubjectGradeModel extends Model {
 
     async calculateGrade(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral> {
         const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        const Enrollment = await this.getById(Enrollment,data.id_Enrollment);
+        const enrollment = await this.getById(Enrollment,data.id_Enrollment);
         
         if(!classroomSubject){
             return {error:"ClassroomSubject not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
-        if(!Enrollment){
+        if(!enrollment){
             return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         /*
