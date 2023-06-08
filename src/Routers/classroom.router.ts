@@ -8,6 +8,6 @@ router.get("/",controller.get);
 router.get("/:id",controller.getById);
 router.get("/name/:name",controller.getByName);
 router.post("/",controller.post);
-router.post("/postOrUpdate",controller.postOrUpdate);
+router.put("/",controller.put);
 
 export default router;

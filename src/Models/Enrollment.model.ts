@@ -5,20 +5,20 @@ import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
 
 @Entity()
-export class ClassroomStudent{
+export class Enrollment{
     @PrimaryGeneratedColumn()
     id!: number;
 
     @ManyToOne(() => Classroom, {nullable: false})
     @JoinColumn({name: "id_classroom"})
-    @Index("classroomStudent_FK_1")
+    @Index("Enrollment_FK_1")
     @IsNotEmpty({message: "Please enter a classroom"})
     @IsInt({message: "The classroom is not available"})
     classroom: Classroom;
 
     @ManyToOne(() => Student, {nullable:false})
     @JoinColumn({name:"id_student"})
-    @Index("classroomStudent_FK_2")
+    @Index("Enrollment_FK_2")
     @IsNotEmpty({message: "Please enter a student"})
     @IsInt({message: "The student is not available"})
     student!: Student;
@@ -38,6 +38,6 @@ export class ClassroomStudent{
     }
 }
 
-export class ClassroomStudentModel extends Model{
+export class EnrollmentModel extends Model{
 
 }

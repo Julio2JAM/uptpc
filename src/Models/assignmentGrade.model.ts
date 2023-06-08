@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ObjectLiteral, DeepPartial } from "typeorm";
 import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
-import { ClassroomStudent } from "./classroomStudent.model";
+import { Enrollment } from "./Enrollment.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()
@@ -38,7 +38,7 @@ export class AssignmentGradeModel extends Model{
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
         const assignment = await this.getById(Assignment,data.id_assignment);
-        const student = await this.getById(ClassroomStudent,data.id_student);
+        const student = await this.getById(Enrollment,data.id_student);
 
         if(!assignment){
             return {error:"Assignment not found", status: HTTP_STATUS.BAD_RESQUEST}

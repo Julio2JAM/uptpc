@@ -1,8 +1,8 @@
-import { ClassroomStudentController } from "../Controllers/classroomStudent.controller";
+import { EnrollmentController } from "../Controllers/Enrollment.controller";
 import { Router } from "express";
 
 const router = Router();
-const controller = new ClassroomStudentController();
+const controller = new EnrollmentController();
 
 router.get('/', controller.get);
 router.get('/', controller.getById);

@@ -1,4 +1,4 @@
-import { ClassroomStudent, ClassroomStudentModel } from "../Models/classroomStudent.model";
+import { Enrollment, EnrollmentModel } from "../Models/Enrollment.model";
 import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
@@ -7,19 +7,19 @@ import { Student } from "../Models/student.model";
 import { Model } from "../Base/model";
 import { ObjectLiteral } from "typeorm";
 
-export class ClassroomStudentController{
+export class EnrollmentController{
 
     async get(_req: Request, res:Response):Promise<Response>{
         try {
-            const csm = new ClassroomStudentModel();
-            const cs = await csm.get(ClassroomStudent);
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.get(Enrollment);
 
-            if(cs.length == 0){
-                console.log("No classroomStudent found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroomStudent found", status:HTTP_STATUS.NOT_FOUND});
+            if(enrollment.length == 0){
+                console.log("No Enrollment found");
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(HTTP_STATUS.OK).json(cs);
+            return res.status(HTTP_STATUS.OK).json(enrollment);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -34,14 +34,14 @@ export class ClassroomStudentController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const csm = new ClassroomStudentModel();
-            const cs = await csm.getById(ClassroomStudent, id);
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.getById(Enrollment, id);
 
-            if(!cs){
+            if(!enrollment){
                 console.log("No gradeStudent found");
                 res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
             }
-            return res.status(HTTP_STATUS.OK).json(cs);
+            return res.status(HTTP_STATUS.OK).json(enrollment);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -59,19 +59,19 @@ export class ClassroomStudentController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const dataClassroomStudent = new Map<String, ObjectLiteral>([
+            const dataEnrollment = new Map<String, ObjectLiteral>([
                 ["student", student],
                 ["classroom", classroom]
             ]);
 
-            const newCS = new ClassroomStudent(dataClassroomStudent);
-            const errors = await validation(newCS);
+            const newEnrollment = new Enrollment(dataEnrollment);
+            const errors = await validation(newEnrollment);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const cs = await model.create(ClassroomStudent,newCS);
-            return res.status(cs.status).json(cs);
+            const enrollment = await model.create(Enrollment,newEnrollment);
+            return res.status(enrollment.status).json(enrollment);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
