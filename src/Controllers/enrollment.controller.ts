@@ -48,6 +48,31 @@ export class EnrollmentController{
         }
     }
 
+    async getByParams(req: Request, res:Response):Promise<Response>{
+        try {
+            
+            const data = new Map(Object.entries(req.params));
+            const validateData = Array.from(data.values()).every(value => value == undefined || "");
+            
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.getByParams(data);
+
+            if(!enrollment || enrollment.length == 0){
+                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No enrollment found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(enrollment);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+
     async post(req:Request, res:Response):Promise<Response>{
         try {
             const {id_student, id_classroom} = req.body;

@@ -221,8 +221,13 @@ export class UserController{
                 
                 req.body.level = levelData;
             }
-
+            
             for (const key in userToUpdate) {
+                
+                if(typeof req?.body[key] == "string" && req?.body[key].length == 0){
+                    delete req?.body[key];
+                }
+
                 userToUpdate[key] = req?.body[key] ?? userToUpdate[key];
             }
             
