@@ -44,16 +44,16 @@ export class AssignmentController{
     }
 
 
-    async getByClassroomSubject(req: Request, res: Response):Promise<Response>{
+    async getByProgram(req: Request, res: Response):Promise<Response>{
         try {
 
-            const id_classroomSubject = Number(req.params.id);
-            if(!id_classroomSubject){
+            const id_program = Number(req.params.id);
+            if(!id_program){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const assignmentModel = new AssignmentModel();
-            const assignment = await assignmentModel.getByClassroomSubject(Number(id_classroomSubject))
+            const assignment = await assignmentModel.getByProgram(Number(id_program))
             return res.status(HTTP_STATUS.OK).json(assignment);
         } catch (error) {
             console.error(error);

@@ -10,20 +10,20 @@ import { Classroom } from "./classroom.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()
-export class ClassroomSubject{
+export class Program{
     @PrimaryGeneratedColumn()
     id!: number;
 
     @ManyToOne(() => Classroom, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name:"id_classroom"})
-    @Index("classroomSubject_FK_1")
+    @Index("program_FK_1")
     @IsNotEmpty({message:"Please enter a classroom"})
     @IsInt({message: "The classroom is not available"})
     classroom: Classroom;
 
     @ManyToOne(() => Employee, {nullable: true, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_professor"})
-    @Index("classroomSubject_FK_2")
+    @Index("program_FK_2")
     @IsNotEmpty({message:"Please enter a professor"})
     @IsInt({message: "The professor is not available"})
     professor: Employee;
@@ -46,14 +46,14 @@ export class ClassroomSubject{
     }
 }
 
-export class ClassroomSubjectModel extends Model{
+export class ProgramModel extends Model{
 
-    async post_validation(dataClassroomSubject:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
+    async post_validation(dataProgram:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
 
         const data: {[key:string]:ObjectLiteral|null} = {
-            employee:await this.getById(Employee,dataClassroomSubject.id_professor),
-            subject:await this.getById(Subject,dataClassroomSubject.id_subject),
-            classroom:await this.getById(Classroom,dataClassroomSubject.id_classroom)
+            employee:await this.getById(Employee,dataProgram.id_professor),
+            subject:await this.getById(Subject,dataProgram.id_subject),
+            classroom:await this.getById(Classroom,dataProgram.id_classroom)
         };
 
         for(let value in data){
@@ -63,8 +63,8 @@ export class ClassroomSubjectModel extends Model{
             }
         }
 
-        const classroomSubject = await this.create(ClassroomSubject, dataClassroomSubject);
-        return {classroomSubject, status: HTTP_STATUS.CREATED};
+        const program = await this.create(Program, dataProgram);
+        return {program, status: HTTP_STATUS.CREATED};
     }
 
     async getSubject(id_professor:number):Promise<ObjectLiteral>{
@@ -76,10 +76,10 @@ export class ClassroomSubjectModel extends Model{
         }
 
         const subject = await AppDataSource.manager
-            .createQueryBuilder(ClassroomSubject, "classroomSubject")
+            .createQueryBuilder(Program, "program")
             .select("subject.name")
-            .leftJoinAndSelect(Subject, "subject", "subject.id = classroomSubject.id_subject")
-            .where("classroomSubject.id_professor = :id", {"id":id_professor})
+            .leftJoinAndSelect(Subject, "subject", "subject.id = program.id_subject")
+            .where("program.id_professor = :id", {"id":id_professor})
             .groupBy("subject.id")
             .getMany();
 

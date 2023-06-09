@@ -1,8 +1,8 @@
-import { ClassroomSubjectController } from "../Controllers/classroomSubject.controller";
+import { ProgramController } from "../Controllers/program.controller";
 import { Router } from "express";
 
 const router = Router();
-const controller = new ClassroomSubjectController();
+const controller = new ProgramController();
 
 router.get('/',controller.get)
 router.get('/:id',controller.getById)
