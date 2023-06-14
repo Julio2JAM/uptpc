@@ -49,7 +49,7 @@ export class EnrollmentModel extends Model{
         }
 
         if(data?.get("student")){
-            query.where("enrollment.id_student = :student", {classroom: data?.get("student")});
+            query.andWhere("enrollment.id_student = :student", {student: data?.get("student")});
         }
 
         const enrollemnt = await query.leftJoinAndSelect('enrollment.student', 'student')

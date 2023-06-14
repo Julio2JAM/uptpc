@@ -35,11 +35,11 @@ export class EnrollmentController{
             }
 
             const enrollmentModel = new EnrollmentModel();
-            const enrollment = await enrollmentModel.getById(Enrollment, id);
+            const enrollment = await enrollmentModel.getByIdRelations(Enrollment, id, ["student", "classroom"]);
 
             if(!enrollment){
                 console.log("No gradeStudent found");
-                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
             }
             return res.status(HTTP_STATUS.OK).json(enrollment);
         } catch (error) {
