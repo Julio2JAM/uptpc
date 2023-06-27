@@ -61,4 +61,15 @@ export class EnrollmentModel extends Model{
         return enrollemnt;
 
     }
+
+    async getEnrollment(student: ObjectLiteral): Promise<ObjectLiteral | null> {
+        
+        const enrollemnt = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
+        .leftJoinAndSelect("program", "program", "enrollment.id_classroom = program.id_classroom")
+        .where("enrollment.student = :student", student)
+        .getMany();
+
+        return enrollemnt;
+
+    }
 }
