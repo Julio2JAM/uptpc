@@ -3,7 +3,7 @@ import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Classroom } from "../Models/classroom.model";
-import { Student, StudentModel } from "../Models/student.model";
+import { Student } from "../Models/student.model";
 import { Model } from "../Base/model";
 import { ObjectLiteral } from "typeorm";
 
@@ -71,10 +71,9 @@ export class EnrollmentController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
-
+/*
     async getEnrollment(req: Request, res: Response): Promise<Response> {
         try {
-         
             const id_student = Number(req.params.id_student);
 
             if(!id_student){
@@ -90,6 +89,32 @@ export class EnrollmentController{
 
             const enrollmentModel = new EnrollmentModel();
             const enrollment = await enrollmentModel.getEnrollment(student);
+            return res.status(HTTP_STATUS.OK).json(enrollment);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+*/
+    async getStudent(req: Request, res: Response): Promise<Response>{
+        try {
+            const id_classroom = Number(req.params.id_classroom);
+
+            if(!id_classroom){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Invalid id_classroom', status: HTTP_STATUS.BAD_RESQUEST});
+            }
+            
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.getStudent();
+
+            if(!enrollment){
+                return res.status(HTTP_STATUS.OK).send({message: 'Student not found', status:HTTP_STATUS.OK});
+            }
+
+            for (const key in enrollment) {
+                console.log(enrollment[key]);
+            }
+
             return res.status(HTTP_STATUS.OK).json(enrollment);
         } catch (error) {
             console.log(error);

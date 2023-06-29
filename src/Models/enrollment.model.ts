@@ -52,24 +52,34 @@ export class EnrollmentModel extends Model{
             query.andWhere("enrollment.id_student = :student", {student: data?.get("student")});
         }
 
-        const enrollemnt = await query.leftJoinAndSelect('enrollment.student', 'student')
+        const enrollment = await query.leftJoinAndSelect('enrollment.student', 'student')
         //.leftJoinAndMapOne("enrollment.student", Student, "student", "enrollment.id_student = student.id")
         .leftJoinAndSelect('enrollment.classroom', 'classroom')
         //.leftJoinAndMapOne("enrollment.classroom", Classroom, "classroom", "enrollment.id_classroom = classroom.id")
         .getMany();
 
-        return enrollemnt;
+        return enrollment;
 
     }
-
+/*
     async getEnrollment(student: ObjectLiteral): Promise<ObjectLiteral | null> {
         
-        const enrollemnt = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
+        const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
         .leftJoinAndSelect("program", "program", "enrollment.id_classroom = program.id_classroom")
-        .where("enrollment.student = :student", student)
+        //.where("enrollment.id_student = :student", {student: 1})
         .getMany();
 
-        return enrollemnt;
+        return enrollment;
+
+    }
+*/
+    async getStudent(): Promise<ObjectLiteral | null> {
+
+        const students = await AppDataSource.createQueryBuilder(Student, "student")
+        .leftJoinAndSelect("student.enrollments", "enrollment")
+        .getMany();
+
+        return students;
 
     }
 }

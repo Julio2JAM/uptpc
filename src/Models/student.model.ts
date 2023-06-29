@@ -1,8 +1,9 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral, OneToMany } from "typeorm"
 import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt} from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
+import { Enrollment } from "./enrollment.model";
 
 @Entity()
 export class Student {
@@ -44,6 +45,9 @@ export class Student {
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status!: number
+
+    @OneToMany(() => Enrollment, enrollment => enrollment.student)
+    enrollments!: Enrollment[];
 
     constructor(dataStudent:Map<any,any>) {
         this.cedule     = Number(dataStudent?.get('cedule'));
