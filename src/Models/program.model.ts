@@ -25,12 +25,10 @@ export class Program{
     @JoinColumn({name: "id_professor"})
     @Index("program_FK_2")
     @IsNotEmpty({message:"Please enter a professor"})
-    @IsInt({message: "The professor is not available"})
     professor: Employee;
 
     @Column({type:"int", nullable: false})
     @IsNotEmpty({message:"Please enter a subject"})
-    @IsInt({message: "The subject is not available"})
     subject: Subject;
 
     @CreateDateColumn()
@@ -85,5 +83,28 @@ export class ProgramModel extends Model{
 
         console.log(`${subject}`);
         return subject;
+    }
+
+    async getByParams(params:any): Promise<ObjectLiteral | null> {
+        const sql = AppDataSource.manager.createQueryBuilder(Program, "program");
+
+        if(params.classroom){
+            sql.where("program.id_classroom = :classroom", {classroom: params.classroom});
+        }
+
+        if(params.subject){
+            sql.andWhere("program.id_subject = :subject", {subject: params.subject});
+        }
+
+        if(params.professor){
+            sql.andWhere("program.id_professor = :professor", {professor: params.professor});
+        }
+
+        const program = await sql.leftJoinAndSelect("program.classroom", "classroom")
+            .leftJoinAndSelect("program.subject", "subject")
+            .leftJoinAndSelect("program.professor", "professor")
+            .getMany();
+
+        return program;
     }
 }

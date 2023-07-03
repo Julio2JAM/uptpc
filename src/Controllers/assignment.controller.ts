@@ -2,6 +2,7 @@ import { Assignment, AssignmentModel } from "../Models/assignment.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { validation } from "../Base/toolkit";
+import { Program, ProgramModel } from "../Models/program.model";
 
 export class AssignmentController{
 
@@ -43,17 +44,24 @@ export class AssignmentController{
         }
     }
 
-
     async getByProgram(req: Request, res: Response):Promise<Response>{
         try {
 
             const id_program = Number(req.params.id);
+
             if(!id_program){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
+            const programModel = new ProgramModel(); 
+            const program = programModel.getById(Program, id_program);
+
+            if(!program){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
             const assignmentModel = new AssignmentModel();
-            const assignment = await assignmentModel.getByProgram(Number(id_program))
+            const assignment = await assignmentModel.getByProgram(program);
             return res.status(HTTP_STATUS.OK).json(assignment);
         } catch (error) {
             console.error(error);
