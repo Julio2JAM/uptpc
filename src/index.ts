@@ -16,6 +16,7 @@ import programRouter from './Routers/program.router';
 //Person
 import studentRouter from './Routers/student.router';
 import employeeRouter from './Routers/employee.router';
+import student2Router from './Routers/student2.router';
 //cors
 import cors from 'cors';
 
@@ -36,6 +37,7 @@ app.use("/api/user", userRouter)
 app.use("/api/access", accessRouter)
 app.use("/api/subject", subjectRouter)
 app.use("/api/student", studentRouter);
+app.use('/api/student2', student2Router);
 app.use("/api/employee", employeeRouter);
 app.use("/api/assignment", assignmentRouter);
 app.use("/api/assignmentGrade", assignmentGradeRouter);
