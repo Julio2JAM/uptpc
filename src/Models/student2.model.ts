@@ -22,8 +22,8 @@ export class Student2{
     representative1!: Student;
     
     @OneToOne(() => Student, {createForeignKeyConstraints: true})
-    @JoinColumn({name: "id_representative_1"})
-    @Index("student_FK_2")
+    @JoinColumn({name: "id_representative_2"})
+    @Index("student_FK_3")
     @IsOptional()
     representative2!: Student;
     
@@ -35,6 +35,12 @@ export class Student2{
 
     @Column({type: "tinyint", nullable:false, default: 1, width: 3})
     id_status!: Number;
+
+    constructor(data:any){
+        this.student = data?.id_student;
+        this.representative1 = data?.representative1;
+        this.representative2 = data?.representative2;
+    }
 
 }
 

@@ -10,7 +10,7 @@ export class Student2Controller{
     async get(_req: Request, res: Response): Promise<Response>{
         try {
             const studentModel = new Student2Model();
-            const student = await studentModel.get(Student2);
+            const student = await studentModel.getRelations(Student2, ["student", "representative1", "representative2"]);
 
             if(student.length == 0){
                 console.log("No students found");
@@ -33,7 +33,7 @@ export class Student2Controller{
             }
 
             const studentModel = new Student2Model();
-            const student = await studentModel.getById(Student2, id);
+            const student = await studentModel.getByIdRelations(Student2, id, ["student", "representative1", "representative2"]);
 
             if(!student){
                 console.log("No students found");
@@ -50,10 +50,10 @@ export class Student2Controller{
     async post(req: Request, res: Response): Promise<Response> {
         try {
             const { idStudent, idRepresentative1, idRepresentative2 } = req.body;
-            const data:{[key: string]: number | string | ObjectLiteral | null} = {idStudent:idStudent, idRepresentative1:idRepresentative1, idRepresentative2:idRepresentative2};
+            const data:{[key: string]: number | string | ObjectLiteral | null} = {student:idStudent, representative1:idRepresentative1, representative2:idRepresentative2};
 
             const validateData = Object.values(data).every(value => !value);
-            if(!validateData){
+            if(validateData){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
             }
 

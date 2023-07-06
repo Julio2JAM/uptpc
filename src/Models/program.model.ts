@@ -1,5 +1,5 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ObjectLiteral, DeepPartial, ManyToOne, JoinColumn, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ObjectLiteral, ManyToOne, JoinColumn, Index } from "typeorm";
 import { IsNotEmpty, IsInt } from "class-validator";
 import AppDataSource from "../database/database";
 //Models
@@ -7,7 +7,6 @@ import { Model } from "../Base/model";
 import { Subject } from "./subject.model";
 import { Employee } from "./employee.model";
 import { Classroom } from "./classroom.model";
-import { HTTP_STATUS } from "../Base/statusHttp";
 
 @Entity()
 export class Program{
@@ -21,13 +20,15 @@ export class Program{
     @IsInt({message: "The classroom is not available"})
     classroom: Classroom;
 
-    @ManyToOne(() => Employee, {nullable: true, createForeignKeyConstraints: true})
+    @ManyToOne(() => Employee, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_professor"})
     @Index("program_FK_2")
     @IsNotEmpty({message:"Please enter a professor"})
     professor: Employee;
 
-    @Column({type:"int", nullable: false})
+    @ManyToOne(() => Subject, {nullable: false, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_subject"})
+    @Index("program_FK_2")
     @IsNotEmpty({message:"Please enter a subject"})
     subject: Subject;
 
@@ -46,7 +47,7 @@ export class Program{
 
 export class ProgramModel extends Model{
 
-    async post_validation(dataProgram:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
+    /*async post_validation(dataProgram:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
 
         const data: {[key:string]:ObjectLiteral|null} = {
             employee:await this.getById(Employee,dataProgram.id_professor),
@@ -63,27 +64,7 @@ export class ProgramModel extends Model{
 
         const program = await this.create(Program, dataProgram);
         return {program, status: HTTP_STATUS.CREATED};
-    }
-
-    async getSubject(id_professor:number):Promise<ObjectLiteral>{
-
-        const employee = await this.getById(Employee,id_professor);
-
-        if(!employee){
-            return {error:`Professor not found`, status: HTTP_STATUS.BAD_RESQUEST};
-        }
-
-        const subject = await AppDataSource.manager
-            .createQueryBuilder(Program, "program")
-            .select("subject.name")
-            .leftJoinAndSelect(Subject, "subject", "subject.id = program.id_subject")
-            .where("program.id_professor = :id", {"id":id_professor})
-            .groupBy("subject.id")
-            .getMany();
-
-        console.log(`${subject}`);
-        return subject;
-    }
+    }*/
 
     async getByParams(params:any): Promise<ObjectLiteral | null> {
         const sql = AppDataSource.manager.createQueryBuilder(Program, "program");
