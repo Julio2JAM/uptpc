@@ -5,7 +5,7 @@ import AppDataSource from "../database/database";
 //Models
 import { Model } from "../Base/model";
 import { Subject } from "./subject.model";
-import { Employee } from "./employee.model";
+import { Professor } from "./professor.model";
 import { Classroom } from "./classroom.model";
 
 @Entity()
@@ -20,11 +20,11 @@ export class Program{
     @IsInt({message: "The classroom is not available"})
     classroom: Classroom;
 
-    @ManyToOne(() => Employee, {nullable: false, createForeignKeyConstraints: true})
+    @ManyToOne(() => Professor, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_professor"})
     @Index("program_FK_2")
     @IsNotEmpty({message:"Please enter a professor"})
-    professor: Employee;
+    professor: Professor;
 
     @ManyToOne(() => Subject, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_subject"})
@@ -50,7 +50,7 @@ export class ProgramModel extends Model{
     /*async post_validation(dataProgram:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
 
         const data: {[key:string]:ObjectLiteral|null} = {
-            employee:await this.getById(Employee,dataProgram.id_professor),
+            professor:await this.getById(Professor,dataProgram.id_professor),
             subject:await this.getById(Subject,dataProgram.id_subject),
             classroom:await this.getById(Classroom,dataProgram.id_classroom)
         };

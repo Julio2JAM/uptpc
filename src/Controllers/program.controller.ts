@@ -4,7 +4,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 import { Model } from "../Base/model";
 import { Classroom } from "../Models/classroom.model";
 import { Subject } from "typeorm/persistence/Subject";
-import { Employee } from "../Models/employee.model";
+import { Professor } from "../Models/professor.model";
 import { ObjectLiteral } from "typeorm";
 
 export class ProgramController{
@@ -100,7 +100,7 @@ export class ProgramController{
 
             let professor: ObjectLiteral | null = null;
             if(idProfessor){
-                professor = model.getById(Employee, Number(idProfessor));
+                professor = model.getById(Professor, Number(idProfessor));
             }
 
             if(!classroom && !subject && !professor) {

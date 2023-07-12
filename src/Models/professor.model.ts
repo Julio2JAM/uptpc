@@ -30,9 +30,9 @@ export class Professor{
     id_status!: Number;
 
     constructor(data:any){
-        this.person = data["person"];
-        this.profession = data["profession"];
-        this.profession = data["id_status"] ?? 1;
+        this.person = data?.person;
+        this.profession = data?.profession;
+        this.profession = data?.id_status ?? 1;
     }
 }
 
