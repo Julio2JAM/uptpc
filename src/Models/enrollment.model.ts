@@ -19,13 +19,13 @@ export class Enrollment{
 
     @ManyToOne(() => Classroom, {nullable: false})
     @JoinColumn({name: "id_classroom"})
-    @Index("Enrollment_FK_1")
+    @Index("enrollment_FK_1")
     @IsNotEmpty({message: "Please enter a classroom"})
     classroom: Classroom;
 
     @ManyToOne(() => Student, {nullable:false})
     @JoinColumn({name:"id_student"})
-    @Index("Enrollment_FK_2")
+    @Index("enrollment_FK_2")
     @IsNotEmpty({message: "Please enter a person"})
     student: Student;
 

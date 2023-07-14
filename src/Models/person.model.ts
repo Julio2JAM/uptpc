@@ -1,6 +1,6 @@
 //import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
-import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive} from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
@@ -21,8 +21,9 @@ export class Person {
     id!: number
 
     @Column({ type: 'int', unique:true, nullable: false, width: 12})
-    @IsNotEmpty({"message": "The C.I is obligatory"})
+    @IsNotEmpty({message: "The C.I is obligatory"})
     @IsNumber()
+    @IsPositive({message: "The C.I must be positive"})
     @IsInt({message:"The C.I is not available"})
     cedule: number
 
