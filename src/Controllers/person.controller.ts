@@ -85,7 +85,7 @@ export class PersonController{
     }
 
 
-    async post(req:Request,res:Response, child?:Record<string, any>):Promise<any>{
+    async post(req:Request,res:Response):Promise<any>{
         try {
             const { name, lastname } = req.body;
 
@@ -93,8 +93,14 @@ export class PersonController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or Lastname is required", status:HTTP_STATUS.BAD_RESQUEST})
             }
 
-            const dataPerson = new Map(Object.entries(req.body));
-            const newPerson = new Person(dataPerson);
+            for (const key in req.body) {
+                if(typeof req.body[key] !== "string") {
+                    continue;
+                }
+
+                req.body[key] = req.body[key].toUpperCase();
+            }
+            const newPerson = new Person(req.body);
             
             const errors = await validation(newPerson);
             if(errors) {
@@ -103,7 +109,7 @@ export class PersonController{
 
             const personModel = new PersonModel();
             const person = await personModel.create(Person,newPerson);
-            return (!child) ? res.status(HTTP_STATUS.CREATED).json(person) : undefined;
+            return res.status(HTTP_STATUS.CREATED).json(person);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

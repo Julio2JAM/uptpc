@@ -4,6 +4,17 @@ import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt} fro
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
+interface StudentI{
+    id?: number,
+    cedule?: number,
+    name: string,
+    lastName: string,
+    phone: string,
+    email: string,
+    birthday: Date,
+    id_status: number
+}
+
 @Entity()
 export class Person {
     @PrimaryGeneratedColumn()
@@ -45,13 +56,13 @@ export class Person {
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status!: number
 
-    constructor(dataPerson:Map<any,any>) {
-        this.cedule     = Number(dataPerson?.get('cedule'));
-        this.name       = dataPerson?.get("name");
-        this.lastName   = dataPerson?.get("lastName");
-        this.phone      = dataPerson?.get("phone");
-        this.email      = dataPerson?.get("email");
-        this.birthday   = new Date(dataPerson?.get("birthday"));
+    constructor(data:StudentI) {
+        this.cedule     = Number(data?.cedule);
+        this.name       = data?.name;
+        this.lastName   = data?.lastName;
+        this.phone      = String(parseInt(data?.phone));
+        this.email      = data?.email;
+        this.birthday   = new Date(data?.birthday);
         this.id_status  = 1;
     }
 }

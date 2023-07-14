@@ -12,7 +12,7 @@ export class SubjectController{
 
             if(subject.length == 0){
                 console.log("no data found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not users found',"status":HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not subject found',"status":HTTP_STATUS.NOT_FOUND});
             }
 
             return res.status(HTTP_STATUS.OK).json(subject);
@@ -72,10 +72,9 @@ export class SubjectController{
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
-            const {name, description} = req.body;
-            const newSubject = new Subject(name, description);
-
+            const newSubject = new Subject(req.body);
             const errors = await validation(newSubject);
+
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
             }

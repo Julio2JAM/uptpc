@@ -5,7 +5,6 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 import { Classroom } from "../Models/classroom.model";
 import { Student } from "../Models/student.model";
 import { Model } from "../Base/model";
-import { ObjectLiteral } from "typeorm";
 
 export class EnrollmentController{
 
@@ -114,12 +113,12 @@ export class EnrollmentController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const dataEnrollment = new Map<String, ObjectLiteral>([
-                ["student", student],
-                ["classroom", classroom]
-            ]);
+            const data = {
+                "student": student,
+                "classroom": classroom
+            };
 
-            const newEnrollment = new Enrollment(dataEnrollment);
+            const newEnrollment = new Enrollment(data);
             const errors = await validation(newEnrollment);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});

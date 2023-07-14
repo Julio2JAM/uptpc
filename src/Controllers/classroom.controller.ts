@@ -66,8 +66,8 @@ export class ClassroomController{
     }
     async post(req: Request, res: Response):Promise<Response>{
         try {
-            const dataClassroom = new Map(Object.entries(req.body));
-            const newClassroom = new Classroom(dataClassroom);
+            
+            const newClassroom = new Classroom(req.body);
 
             if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});

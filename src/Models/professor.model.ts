@@ -2,7 +2,12 @@ import { Entity, OneToOne, Column, PrimaryGeneratedColumn, CreateDateColumn, Upd
 import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
 import { Person } from "./person.model";
-import { Profession } from "./profession.model";
+
+interface ProfessorI{
+    id: Number,
+    person: Person,
+    id_status: Number
+}
 
 @Entity()
 export class Professor{
@@ -15,10 +20,10 @@ export class Professor{
     @IsNotEmpty({message: "Person must be send"})
     person!: Person;
 
-    @OneToOne(() => Profession, {nullable: true, createForeignKeyConstraints: true})
+    /*@OneToOne(() => Profession, {nullable: true, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_profession"})
     @Index("professor_FK_2")
-    profession!: Profession;
+    profession!: Profession;*/
 
     @CreateDateColumn()
     datetime!: Date;
@@ -29,10 +34,10 @@ export class Professor{
     @Column({name: "id_status", type: "tinyint", width: 3, default: 1, nullable: false})
     id_status!: Number;
 
-    constructor(data:any){
+    constructor(data:ProfessorI){
         this.person = data?.person;
-        this.profession = data?.profession;
-        this.profession = data?.id_status ?? 1;
+        //this.profession = data?.profession;
+        this.id_status = data?.id_status ?? 1;
     }
 }
 
