@@ -14,7 +14,7 @@ export class UserController{
             const user = await userModel.getRelations(User,["level"]);
 
             if(user.length === 0){
-                console.log("no data found");
+                console.log("no users found");
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not users found', status:HTTP_STATUS.NOT_FOUND});
             }
             
@@ -137,8 +137,7 @@ export class UserController{
             }
 
             //Se obtienen los datos del req y se usa el constructor para asignarlos
-            const dataUser = new Map(Object.entries(req.body));
-            const newUser = new User(dataUser);
+            const newUser = new User(req.body);
             
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validation(newUser);
@@ -167,15 +166,12 @@ export class UserController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Data for person not found", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const child: Record<string, any> = {
-                bool:true
-            };
             const user = req.body.user;
             const person = req.body.person;
 
             const personController = new PersonController();//new PersonController();
             req.body = person;
-            const newPerson = await personController.post(req, res, child);
+            const newPerson = await personController.post(req, res);
             
             if(newPerson){
                 return;
@@ -183,7 +179,7 @@ export class UserController{
             
             req.body = user;
             const userController = new UserController();
-            const newUser = await userController.post(req, res, child);
+            const newUser = await userController.post(req, res);
               
             if(newUser){
                 return;

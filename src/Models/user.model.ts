@@ -4,6 +4,14 @@ import { IsNotEmpty } from 'class-validator';
 import AppDataSource from "../database/database";
 import { Level } from "./level.model";
 
+interface LevelI{
+    id: number,
+    level: Level,
+    username: string,
+    password: string,
+    id_status: number
+}
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
@@ -25,10 +33,10 @@ export class User {
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status: number
 
-    constructor(data:Map<any, any>) {
-        this.level = data?.get("level");
-        this.username = data?.get("username");
-        this.password = data?.get("password");
+    constructor(data:LevelI) {
+        this.level = data?.level;
+        this.username = data?.username;
+        this.password = data?.password;
         this.id_status = 1;
     }
 }

@@ -2,10 +2,8 @@ import { Request, Response } from "express";
 import { Professor, ProfessorModel } from "../Models/professor.model";
 //import { validation } from "../Base/toolkit";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { Model } from "../Base/model";
-import { Person } from "../Models/person.model";
-import { Profession } from "../Models/profession.model";
-import { ObjectLiteral } from "typeorm";
+import { Person, PersonModel } from "../Models/person.model";
+import { validation } from "../Base/toolkit";
 
 export class ProfessorController{
     async get(_req: Request, res: Response): Promise<Response>{
@@ -48,25 +46,23 @@ export class ProfessorController{
 
     async post(req: Request, res: Response): Promise<Response> {
         try {
-            const { idPerson, idProfession } = req.body;
-            const data:{[key: string]: number | string | ObjectLiteral | null} = {person:idPerson, profession:idProfession};
 
-            const validateData = Object.values(data).every(data => !data);
-            if(validateData){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: ""});
+            if(!req.body.idPerson){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
             }
 
-            const model = new Model();
-            data["idPerson"] = await model.getById(Person, Number(data["idPerson"]));
+            const personModel = new PersonModel();
+            req.body.idPerson = await personModel.getById(Person, Number(req.body.idPerson));
 
-            if(data["idProfession"]){
-                data["idProfession"] = await model.getById(Profession, Number(data["idProfession"]));
-            }
-
-            //const newProfessor = new Professor(data);
             const professorModel = new ProfessorModel();
-            //const professor = await professorModel.create(Professor, newProfessor);
-            const professor = await professorModel.create(Professor, data);
+            const newProfessor = new Professor(req.body.idPerson);
+
+            const errors = await validation(newProfessor);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const professor = await professorModel.create(Professor, newProfessor);
             return res.status(HTTP_STATUS.CREATED).json(professor);
         } catch (error) {
             console.log(error);

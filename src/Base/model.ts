@@ -14,12 +14,12 @@ export class Model{
         return await AppDataSource.manager.find(entity, {relations: relationData});
     }
 
-    async getById(entity:EntityTarget<ObjectLiteral>, id:Number):Promise<ObjectLiteral | null>{
+    async getById(entity:EntityTarget<ObjectLiteral>, id:Number):Promise<any>{
         console.log("get by id");
         return await AppDataSource.manager.findOneBy(entity,{"id":Number(id)});
     }
 
-    async getByIdRelations(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral):Promise<ObjectLiteral | null>{
+    async getByIdRelations(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral):Promise<any>{
         console.log("get by id relations");
         return await AppDataSource.manager.findOne(entity, { where: { id: Number(id)}, relations: relationData });
     }

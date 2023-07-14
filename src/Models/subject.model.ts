@@ -3,6 +3,14 @@ import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, CreateDateColumn
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
+
+interface SubjectI{
+    id: number,
+    name: string,
+    description: string,
+    id_status: number
+}
+
 @Entity()
 export class Subject {
     @PrimaryGeneratedColumn()
@@ -25,10 +33,10 @@ export class Subject {
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status: number
 
-    constructor(name: string, description: string) {
-        this.name = name;
-        this.description = description;
-        this.id_status = 1;
+    constructor(data:SubjectI) {
+        this.name = data?.name;
+        this.description = data?.description;
+        this.id_status = data?.id_status ?? 1;
     }
 }
 

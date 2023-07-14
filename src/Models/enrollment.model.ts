@@ -5,6 +5,13 @@ import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
+interface EnrollmentI{
+    id?: number,
+    classroom: Classroom,
+    student: Student,
+    id_status?: number
+}
+
 @Entity()
 export class Enrollment{
     @PrimaryGeneratedColumn()
@@ -14,13 +21,13 @@ export class Enrollment{
     @JoinColumn({name: "id_classroom"})
     @Index("Enrollment_FK_1")
     @IsNotEmpty({message: "Please enter a classroom"})
-    classroom!: Classroom;
+    classroom: Classroom;
 
     @ManyToOne(() => Student, {nullable:false})
     @JoinColumn({name:"id_student"})
     @Index("Enrollment_FK_2")
     @IsNotEmpty({message: "Please enter a person"})
-    student!: Student;
+    student: Student;
 
     @CreateDateColumn()
     datetime!: Date;
@@ -29,12 +36,12 @@ export class Enrollment{
     datetime_update!: Date;
 
     @Column({type:"tinyint", nullable:false, width:3, default:1})
-    id_status!: number;
+    id_status: number;
 
-    constructor(data:Map<any, any>) {
-        this.classroom = data?.get("classroom");
-        this.student = data?.get("student");
-        this.id_status = data?.get("is_status") ?? 1;
+    constructor(data:EnrollmentI) {
+        this.classroom = data?.classroom;
+        this.student = data?.student;
+        this.id_status = data?.id_status ?? 1;
     }
 }
 
