@@ -1,19 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ObjectLiteral, DeepPartial } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, Index } from "typeorm";
 import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
 import { Enrollment } from "./enrollment.model";
-import { HTTP_STATUS } from "../Base/statusHttp";
+import { IsNotEmpty } from "class-validator";
 
 @Entity()
 export class AssignmentGrade{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type:"int", nullable:false})
-    id_assignment: number;
+    @OneToOne(() => Assignment, {nullable: false, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_assignment"})
+    @Index("assignment_grade_FK_1")
+    @IsNotEmpty({message: "The assignment is required"})
+    assignment!: Assignment;
 
-    @Column({type:"int", nullable:false})
-    id_student: number;
+    @OneToOne(() => Enrollment, {nullable: false, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_enrollment"})
+    @Index("assignment_grade_FK_2")
+    @IsNotEmpty({message: "The assignment is required"})
+    enrollment: Enrollment;
 
     @Column({type:"int", nullable:false})
     grade: number;
@@ -28,27 +34,12 @@ export class AssignmentGrade{
     id_status!: number;
 
     constructor(data:Map<any, any>) {
-        this.id_assignment = data?.get("id_assignment");
-        this.id_student = data?.get("id_student");
-        this.grade = data?.get("grade");;
+        //this.assignment = data?.get("id_assignment");
+        this.enrollment = data?.get("id_person");
+        this.grade = data?.get("grade");
     }
 }
 
 export class AssignmentGradeModel extends Model{
-
-    async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
-        const assignment = await this.getById(Assignment,data.id_assignment);
-        const student = await this.getById(Enrollment,data.id_student);
-
-        if(!assignment){
-            return {error:"Assignment not found", status: HTTP_STATUS.BAD_RESQUEST}
-        }
-        if(!student){
-            return {error:"Student not found", status: HTTP_STATUS.BAD_RESQUEST}
-        }
-
-        const assignmentGrade = await this.create(AssignmentGrade,data);
-        return {assignmentGrade, status: HTTP_STATUS.CREATED}
-    }
 
 }

@@ -28,7 +28,7 @@ export class Program{
 
     @ManyToOne(() => Subject, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_subject"})
-    @Index("program_FK_2")
+    @Index("program_FK_3")
     @IsNotEmpty({message:"Please enter a subject"})
     subject: Subject;
 

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { validation, hashPassword } from "../Base/toolkit";
-import { StudentController } from "./student.controller";
+import { PersonController } from "./person.controller";
 import { Level, LevelModel } from "../Models/level.model";
 import { Model } from "../Base/model";
 
@@ -173,7 +173,7 @@ export class UserController{
             const user = req.body.user;
             const person = req.body.person;
 
-            const personController = new StudentController();//new PersonController();
+            const personController = new PersonController();//new PersonController();
             req.body = person;
             const newPerson = await personController.post(req, res, child);
             

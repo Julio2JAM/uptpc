@@ -1,7 +1,7 @@
 import { Entity, OneToOne, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, Index } from "typeorm";
 import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
-import { Student } from "./student.model";
+import { Person } from "./person.model";
 import { Profession } from "./profession.model";
 
 @Entity()
@@ -9,11 +9,11 @@ export class Professor{
     @PrimaryGeneratedColumn()
     id!: Number;
 
-    @OneToOne(() => Student, {nullable: false, createForeignKeyConstraints: true})
+    @OneToOne(() => Person, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_person"})
     @Index("professor_FK_1")
     @IsNotEmpty({message: "Person must be send"})
-    person!: Student;
+    person!: Person;
 
     @OneToOne(() => Profession, {nullable: true, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_profession"})

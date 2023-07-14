@@ -19,7 +19,7 @@ export class Enrollment{
     @ManyToOne(() => Student, {nullable:false})
     @JoinColumn({name:"id_student"})
     @Index("Enrollment_FK_2")
-    @IsNotEmpty({message: "Please enter a student"})
+    @IsNotEmpty({message: "Please enter a person"})
     student!: Student;
 
     @CreateDateColumn()
@@ -53,7 +53,7 @@ export class EnrollmentModel extends Model{
         }
 
         const enrollment = await query.leftJoinAndSelect('enrollment.student', 'student')
-        //.leftJoinAndMapOne("enrollment.student", Student, "student", "enrollment.id_student = student.id")
+        //.leftJoinAndMapOne("enrollment.student", student, "student", "enrollment.id_student = student.id")
         .leftJoinAndSelect('enrollment.classroom', 'classroom')
         //.leftJoinAndMapOne("enrollment.classroom", Classroom, "classroom", "enrollment.id_classroom = classroom.id")
         .getMany();
@@ -75,11 +75,11 @@ export class EnrollmentModel extends Model{
 */
     async getStudent(): Promise<ObjectLiteral | null> {
 
-        const students = await AppDataSource.createQueryBuilder(Student, "student")
-        .leftJoinAndSelect("student.enrollments", "enrollment")
+        const Students = await AppDataSource.createQueryBuilder(Student, "Student")
+        .leftJoinAndSelect("Student.enrollments", "enrollment")
         .getMany();
 
-        return students;
+        return Students;
 
     }
 }

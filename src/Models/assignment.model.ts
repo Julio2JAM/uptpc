@@ -5,7 +5,7 @@ import AppDataSource from "../database/database";
 //Models
 import { Program } from "./program.model";
 import { AssignmentGrade } from "./assignmentGrade.model";
-import { Student } from "./student.model";
+import { Person } from "./person.model";
 import { Model } from "../Base/model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -79,7 +79,7 @@ export class AssignmentModel extends Model {
         const assignment = await AppDataSource.manager
             .createQueryBuilder(Assignment, "assignment")
             .leftJoinAndSelect(AssignmentGrade, "assignmentGrade", "assignmentGrade.id_assignment = assignment.id")
-            .leftJoinAndSelect(Student, "student", "assignmentGrade.id_student = student.id")
+            .leftJoinAndSelect(Person, "person", "assignmentGrade.id_person = person.id")
             .where("assignment.program = :program", {"program":program})
             //.printSql()
             .getRawMany();

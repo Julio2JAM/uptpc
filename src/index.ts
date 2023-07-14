@@ -14,8 +14,8 @@ import classroomRouter from './Routers/classroom.router';
 import enrollmentRouter from './Routers/enrollment.router';
 import programRouter from './Routers/program.router';
 //Person
+import personRouter from './Routers/person.router';
 import studentRouter from './Routers/student.router';
-import student2Router from './Routers/student2.router';
 import professorRouter from './Routers/professor.router';
 //cors
 import cors from 'cors';
@@ -36,8 +36,8 @@ const PORT = 3000;
 app.use("/api/user", userRouter)
 app.use("/api/access", accessRouter)
 app.use("/api/subject", subjectRouter)
-app.use("/api/student", studentRouter);
-app.use('/api/student2', student2Router);
+app.use("/api/person", personRouter);
+app.use('/api/student', studentRouter);
 app.use('/api/professor', professorRouter);
 app.use("/api/assignment", assignmentRouter);
 app.use("/api/assignmentGrade", assignmentGradeRouter);

@@ -14,7 +14,7 @@ const AppDataSource = new DataSource({
     type: 'mariadb',
     host: DATABASE.HOST,
     port: Number(DATABASE.PORT),
-    database: 'sstest',//DATABASE.NAME,
+    database: 'sstest2',//DATABASE.NAME,
     username: DATABASE.USER,
     password: DATABASE.PASS,
     entities: ['**/*.model.ts'],

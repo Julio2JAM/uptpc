@@ -18,9 +18,9 @@ export class SubjectGrade{
     id_program: number;
 
     @Column({type:"int", nullable:false})
-    @IsNotEmpty({message: "The student is required"})
+    @IsNotEmpty({message: "The enrollment is required"})
     @IsInt()
-    id_Enrollment: number;
+    id_enrollment: number;
 
     @Column({type:"tinyint", nullable:true, width:3})
     @IsNotEmpty({message: "The grade is required"})
@@ -38,7 +38,7 @@ export class SubjectGrade{
 
     constructor(data:Map<any, any>) {
         this.id_program = data?.get("id_program");
-        this.id_Enrollment = data?.get("id_Enrollment");
+        this.id_enrollment = data?.get("id_Enrollment");
         this.grade = data?.get("grade");
     }
 }
@@ -53,7 +53,7 @@ export class SubjectGradeModel extends Model {
             return {error:"Program not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         if(!enrollment){
-            return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
+            return {error:"Enrollment not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
 
         const subjectGrade = await this.create(SubjectGrade,data);
@@ -68,7 +68,7 @@ export class SubjectGradeModel extends Model {
             return {error:"Program not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         if(!enrollment){
-            return {error:"Student not found", status:HTTP_STATUS.BAD_RESQUEST}
+            return {error:"Enrollment not found", status:HTTP_STATUS.BAD_RESQUEST}
         }
         /*
         const assignment = await AppDataSource.createQueryBuilder(Program,"program")

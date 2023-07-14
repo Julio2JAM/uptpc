@@ -3,7 +3,7 @@ import { Professor, ProfessorModel } from "../Models/professor.model";
 //import { validation } from "../Base/toolkit";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Model } from "../Base/model";
-import { Student } from "../Models/student.model";
+import { Person } from "../Models/person.model";
 import { Profession } from "../Models/profession.model";
 import { ObjectLiteral } from "typeorm";
 
@@ -11,10 +11,10 @@ export class ProfessorController{
     async get(_req: Request, res: Response): Promise<Response>{
         try {
             const professorModel = new ProfessorModel();
-            const professor = await professorModel.getRelations(Professor, ["student", "profession"]);
+            const professor = await professorModel.getRelations(Professor, ["person", "profession"]);
 
             if(!professor){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Student not found", status: HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Person not found", status: HTTP_STATUS.NOT_FOUND});
             }
 
             return res.status(HTTP_STATUS.OK).json(professor);
@@ -57,7 +57,7 @@ export class ProfessorController{
             }
 
             const model = new Model();
-            data["idPerson"] = await model.getById(Student, Number(data["idPerson"]));
+            data["idPerson"] = await model.getById(Person, Number(data["idPerson"]));
 
             if(data["idProfession"]){
                 data["idProfession"] = await model.getById(Profession, Number(data["idProfession"]));
