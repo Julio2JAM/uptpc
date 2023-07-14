@@ -1,137 +1,82 @@
-import { validation } from "../Base/toolkit";
-import { Request, Response } from "express";
 import { Student, StudentModel } from "../Models/student.model";
+import { Response, Request } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { Model } from "../Base/model";
+import { Person } from "../Models/person.model";
+import { ObjectLiteral } from "typeorm";
 
 export class StudentController{
 
-    async get(_req:Request, res:Response):Promise<Response>{
+    async get(_req: Request, res: Response): Promise<Response>{
         try {
-            const studentModel = new StudentModel();
-            const students = await studentModel.get(Student);
+            const personModel = new StudentModel();
+            const person = await personModel.getRelations(Student, ["person", "representative1", "representative2"]);
 
-            if(students.length == 0){
-                console.log("no data found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No student found", status:HTTP_STATUS.NOT_FOUND});
+            if(person.length == 0){
+                console.log("No persons found");
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No persons found.", status:HTTP_STATUS.NOT_FOUND});
             }
-            return res.status(HTTP_STATUS.OK).json(students);
+
+            return res.status(HTTP_STATUS.OK).json(person);
         } catch (error) {
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getById(req:Request,res:Response):Promise<Response>{
-        try {
-            
-            const id = Number(req.params.id);
-            if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const studentModel = new StudentModel();
-            const student = await studentModel.getById(Student,id);
-
-            if(!student){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No student found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(student);
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getByParams(req: Request, res: Response): Promise<Response>{
-        try {
-            const { cedule } = req.params;
-            
-            if(!cedule){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid cedule", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const studentModel = new StudentModel();
-            const student = await studentModel.getByCedule(Number(cedule));
-
-            if(!student){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Student not found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(student);
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async validateCedule(req: Request, res: Response): Promise<Response>{
-        try {
-        
-            const { cedule } = req.params;
-            if(!cedule){
-                console.log("No cedule send");
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No cedule send.", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-            
-            const studentModel = new StudentModel();
-            const student = await studentModel.getByCedule(Number(cedule));
-            
-            return res.status(HTTP_STATUS.OK).send({message: student ? true : false, status:HTTP_STATUS.OK});
-
-        }catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-
-    async post(req:Request,res:Response, child?:Record<string, any>):Promise<any>{
-        try {
-            const { name, lastname } = req.body;
-
-            if(!name && !lastname){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or Lastname is required", status:HTTP_STATUS.BAD_RESQUEST})
-            }
-
-            const dataStudent = new Map(Object.entries(req.body));
-            const newStudent = new Student(dataStudent);
-            
-            const errors = await validation(newStudent);
-            if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const studentModel = new StudentModel();
-            const student = await studentModel.create(Student,newStudent);
-            return (!child) ? res.status(HTTP_STATUS.CREATED).json(student) : undefined;
-        } catch (error) {
-            console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
-    async update(req: Request, res: Response):Promise<Response>{
+    async getById(req: Request, res: Response): Promise<Response> {
         try {
-            const { id } = req.params;
+            const id = Number(req.params.id);
 
             if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "id is required", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_RESQUEST});
             }
-            if(typeof id !== "number"){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"The id is not a number", status:HTTP_STATUS.BAD_RESQUEST});
+
+            const personModel = new StudentModel();
+            const person = await personModel.getByIdRelations(Student, id, ["person", "representative1", "representative2"]);
+
+            if(!person){
+                console.log("No persons found");
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No persons found.", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(person);
+        } catch (error) {
+            console.error(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async post(req: Request, res: Response): Promise<Response> {
+        try {
+            const { idPerson, idRepresentative1, idRepresentative2 } = req.body;
+            const data:{[key: string]: number | string | ObjectLiteral | null} = {person:idPerson, representative1:idRepresentative1, representative2:idRepresentative2};
+
+            const validateData = Object.values(data).every(value => !value);
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const model = new Model();
+            for (const key in data) {
+
+                if(!data[key]){
+                    continue;
+                }
+
+                data[key] = await model.getById(Person,Number(data[key]));
+
+                if(!data[key]){
+                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
+                }
+
             }
 
             const studentModel = new StudentModel();
-            const student = await studentModel.getById(Student,id);
-
-            if(!student){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Student not found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            //no terminado
+            const student = await studentModel.create(Student, data);
             return res.status(HTTP_STATUS.CREATED).json(student);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }

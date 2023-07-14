@@ -1,71 +1,53 @@
-//import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
-import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt} from 'class-validator';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, Index, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
+import { IsNotEmpty, IsOptional } from "class-validator";
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
+import { Person } from "./person.model";
+import { Enrollment } from "./enrollment.model";
 
 @Entity()
-export class Student {
+export class Student{
+
     @PrimaryGeneratedColumn()
-    id!: number
+    id!: number;
 
-    @Column({ type: 'int', unique:true, nullable: false, width: 12})
-    @IsNotEmpty({"message": "The C.I is obligatory"})
-    @IsNumber()
-    @IsInt({message:"The C.I is not available"})
-    cedule: number
+    @OneToOne(() => Person, {nullable: false, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_person"})
+    @Index("student_FK_1")
+    @IsNotEmpty({message: "Person is required"})
+    person!: Person;
 
-    @Column({ type: 'varchar', nullable: true, length: 60})
-    @IsString()
+    @ManyToOne(() => Person, {nullable: false, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_representative_1"})
+    @Index("student_FK_2")
+    @IsNotEmpty({message: "Representative is required"})
+    representative1!: Person;
+    
+    @ManyToOne(() => Person, {createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_representative_2"})
+    @Index("student_FK_3")
     @IsOptional()
-    name: string
-
-    @Column({ type: 'varchar', nullable: true, length: 60})
-    @IsString()
-    @IsOptional()
-    lastName: string
-
-    @Column({ type: 'varchar', nullable: true, length: 14})
-    @IsString()
-    @IsOptional()
-    phone: string
-
-    @Column({ type: 'varchar', nullable: true, length: 60})
-    @IsEmail()
-    @IsOptional()
-    email: string
-
-    @Column({ type: 'date', default: null})
-    @IsDate()
-    birthday: Date
-
+    representative2!: Person;
+    
     @CreateDateColumn()
-    datetime!: Date
+    datetime!: Date;
 
-    @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
-    id_status!: number
+    @UpdateDateColumn()
+    datetime_updated!: Date;
 
-    constructor(dataStudent:Map<any,any>) {
-        this.cedule     = Number(dataStudent?.get('cedule'));
-        this.name       = dataStudent?.get("name");
-        this.lastName   = dataStudent?.get("lastName");
-        this.phone      = dataStudent?.get("phone");
-        this.email      = dataStudent?.get("email");
-        this.birthday   = new Date(dataStudent?.get("birthday"));
-        this.id_status  = 1;
+    @Column({type: "tinyint", nullable:false, default: 1, width: 3})
+    id_status!: Number;
+
+    @OneToMany(() => Enrollment, enrollment => enrollment.student)
+    enrollments!: Enrollment[];
+
+    constructor(data:any){
+        this.person = data?.id_person;
+        this.representative1 = data?.representative1;
+        this.representative2 = data?.representative2;
     }
+
 }
 
-export class StudentModel extends Model {
-
-    async getByCedule(cedule:Number):Promise<ObjectLiteral | null> {
-        const student = await AppDataSource.manager
-        .createQueryBuilder(Student, "student")
-        .where("student.cedule = :cedule", {cedule:cedule})
-        //.where("student.cedule LIKE :cedule", {cedule:`%${cedule}%`})
-        .getOne();
-
-        return student;
-    }
+export class StudentModel extends Model{
 
 }

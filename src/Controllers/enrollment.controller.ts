@@ -35,12 +35,62 @@ export class EnrollmentController{
             }
 
             const enrollmentModel = new EnrollmentModel();
-            const enrollment = await enrollmentModel.getById(Enrollment, id);
+            const enrollment = await enrollmentModel.getByIdRelations(Enrollment, id, ["student", "classroom"]);
 
             if(!enrollment){
                 console.log("No gradeStudent found");
-                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No gradeStudent found", status:HTTP_STATUS.NOT_FOUND});
             }
+            return res.status(HTTP_STATUS.OK).json(enrollment);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async getByParams(req: Request, res:Response):Promise<Response>{
+        try {
+            
+            const data = new Map(Object.entries(req.params));
+            const validateData = Array.from(data.values()).every(value => value == undefined || "");
+            
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.getByParams(data);
+
+            if(!enrollment || enrollment.length == 0){
+                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No enrollment found", status:HTTP_STATUS.NOT_FOUND});
+            }
+
+            return res.status(HTTP_STATUS.OK).json(enrollment);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async getStudent(req: Request, res: Response): Promise<Response>{
+        try {
+            const id_classroom = Number(req.params.id_classroom);
+
+            if(!id_classroom){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Invalid id_classroom', status: HTTP_STATUS.BAD_RESQUEST});
+            }
+            
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.getStudent();
+
+            if(!enrollment){
+                return res.status(HTTP_STATUS.OK).send({message: 'Student not found', status:HTTP_STATUS.OK});
+            }
+
+            for (const key in enrollment) {
+                console.log(enrollment[key]);
+            }
+
             return res.status(HTTP_STATUS.OK).json(enrollment);
         } catch (error) {
             console.log(error);
@@ -76,7 +126,6 @@ export class EnrollmentController{
             }
 
             const enrollment = await model.create(Enrollment,newEnrollment);
-
             return res.status(HTTP_STATUS.CREATED).json(enrollment);
         } catch (error) {
             console.log(error);

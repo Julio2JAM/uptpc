@@ -1,11 +1,11 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral, ManyToOne, JoinColumn, Index } from "typeorm";
 import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
 import AppDataSource from "../database/database";
 //Models
-import { ClassroomSubject } from "./classroomSubject.model";
+import { Program } from "./program.model";
 import { AssignmentGrade } from "./assignmentGrade.model";
-import { Student } from "./student.model";
+import { Person } from "./person.model";
 import { Model } from "../Base/model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -14,11 +14,11 @@ export class Assignment{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type: "int", nullable: false})
+    @ManyToOne(() => Program, {nullable: false})
+    @JoinColumn({name: "id_classroom"})
+    @Index("assignment_FK_1")
     @IsNotEmpty({message:"Please enter a classroom, professor and subject"})
-    @IsNumber()
-    @IsInt({message:"The classroom is not available"})
-    id_classroomSubject: number;
+    program!: Program;
 
     @Column({type:'varchar', length:60, nullable:false})
     @IsNotEmpty({message:"The name of the assignment is not specified"})
@@ -54,7 +54,7 @@ export class Assignment{
     id_status!: number
 
     constructor(dataAssignment:Map<any,any>){
-        this.id_classroomSubject = dataAssignment?.get('id_classroomSubject');
+        this.program = dataAssignment?.get('program');
         this.name = dataAssignment?.get('name');
         this.description = dataAssignment?.get('description');
         this.porcentage = dataAssignment?.get('porcentage');
@@ -66,30 +66,25 @@ export class Assignment{
 export class AssignmentModel extends Model {
 
     async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
-        const classroomSubject = await this.getById(ClassroomSubject,data.id_classroomSubject);
-        if(!classroomSubject){
+        const program = await this.getById(Program,data.id_program);
+        if(!program){
             return {error: "The classroom, professor and subject was not found", status: HTTP_STATUS.BAD_RESQUEST};
         }
         const assignment = await this.create(Assignment, data);
         return {assignment, status: HTTP_STATUS.CREATED};
     }
 
-    async getByClassroomSubject(id_classroomSubject:number):Promise<any> /*:Promise<Object>*/{
-        const classroomSubject = await this.getById(ClassroomSubject,id_classroomSubject);
-
-        if(!classroomSubject){
-            return {error:"Not found", status: HTTP_STATUS.BAD_RESQUEST}
-        }
+    async getByProgram(program:ObjectLiteral):Promise<ObjectLiteral | null>{
 
         const assignment = await AppDataSource.manager
             .createQueryBuilder(Assignment, "assignment")
-            .select("assignment.name, assignmentGrade.grade, student.name")
             .leftJoinAndSelect(AssignmentGrade, "assignmentGrade", "assignmentGrade.id_assignment = assignment.id")
-            .leftJoinAndSelect(Student, "student", "assignmentGrade.id_student = student.id")
-            .where("assignment.id_classroomSubject = :id", {"id":id_classroomSubject})
+            .leftJoinAndSelect(Person, "person", "assignmentGrade.id_person = person.id")
+            .where("assignment.program = :program", {"program":program})
             //.printSql()
             .getRawMany();
 
-        console.log(assignment);
+        return assignment
+
     }
 }

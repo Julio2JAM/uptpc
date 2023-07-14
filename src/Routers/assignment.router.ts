@@ -6,7 +6,7 @@ const controller = new AssignmentController();
 
 router.get('/', controller.get)
 router.get('/:id', controller.getById)
-router.get('/classroomSubject/:id', controller.getByClassroomSubject)
+router.get('/program/:id', controller.getByProgram)
 router.post('/', controller.post)
 
 export default router;
