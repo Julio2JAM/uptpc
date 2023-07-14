@@ -8,6 +8,14 @@ import { Subject } from "./subject.model";
 import { Professor } from "./professor.model";
 import { Classroom } from "./classroom.model";
 
+interface ProgramI{
+    id: number,
+    classroom: Classroom,
+    professor: Professor,
+    subject: Subject,
+    id_status: number
+}
+
 @Entity()
 export class Program{
     @PrimaryGeneratedColumn()
@@ -38,10 +46,10 @@ export class Program{
     @Column({type:"tinyint", nullable:false, width: 3, default:1})
     id_status!: number;
 
-    constructor(data:Map<any, any>){
-        this.classroom = data?.get("classroom");
-        this.professor = data?.get("professor");
-        this.subject = data?.get("subject");
+    constructor(data:ProgramI){
+        this.classroom = data?.classroom;
+        this.professor = data?.professor;
+        this.subject = data?.subject;
     }
 }
 
