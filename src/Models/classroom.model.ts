@@ -29,7 +29,7 @@ export class Classroom{
     @CreateDateColumn()
     datetime!:Date
 
-    @Column({type:"tinyint", default: "1", nullable: false})
+    @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!:number;
 
     constructor(data:ClassroomI){

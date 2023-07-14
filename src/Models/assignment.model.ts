@@ -50,7 +50,7 @@ export class Assignment{
     @CreateDateColumn()
     datetime!: Date;
 
-    @Column({type:'tinyint', width:2 ,default:1})
+    @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: number
 
     constructor(dataAssignment:Map<any,any>){

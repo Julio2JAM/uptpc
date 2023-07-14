@@ -3,7 +3,6 @@ import { Response, Request } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Model } from "../Base/model";
 import { Person } from "../Models/person.model";
-import { ObjectLiteral } from "typeorm";
 import { validation } from "../Base/toolkit";
 
 export class StudentController{
@@ -50,8 +49,8 @@ export class StudentController{
 
     async post(req: Request, res: Response): Promise<Response> {
         try {
-            
-            if(req.body.idPerson){
+
+            if(!req.body.person){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
@@ -79,7 +78,6 @@ export class StudentController{
             }
 
             const student = await studentModel.create(Student, newStudent);
-
             return res.status(HTTP_STATUS.CREATED).json(student);
         } catch (error) {
             console.error(error);
@@ -87,32 +85,4 @@ export class StudentController{
         }
     }
 
-    async put(req: Request, res: Response): Promise<Response> {
-        try {
-            
-            const data:{[key: string]: number | string | ObjectLiteral | null} = { 
-                person: req.body.person, 
-                representative1: req.body.representative1,
-                representative2: req.body.representative2
-            };
-
-            const validateData = Object.values(data).every(value => !value);
-            if(validateData){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            for (const key in data) {
-
-                if(!data[key]){
-                    continue;
-                }
-
-            }
-
-            return res.status(HTTP_STATUS.OK);
-        } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
 }

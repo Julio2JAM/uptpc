@@ -1,8 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, Index, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, Index, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { IsNotEmpty, IsOptional } from "class-validator";
 import { Model } from "../Base/model";
 import { Person } from "./person.model";
-import { Enrollment } from "./enrollment.model";
 
 interface StudentI{
     id: number,
@@ -24,13 +23,13 @@ export class Student{
     @IsNotEmpty({message: "Person is required"})
     person: Person;
 
-    @ManyToOne(() => Person, {nullable: false, createForeignKeyConstraints: true})
+    @ManyToOne(() => Person, {nullable: true, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_representative_1"})
     @Index("student_FK_2")
-    @IsNotEmpty({message: "Representative is required"})
+    @IsOptional()
     representative1: Person;
     
-    @ManyToOne(() => Person, {createForeignKeyConstraints: true})
+    @ManyToOne(() => Person, {nullable: true, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_representative_2"})
     @Index("student_FK_3")
     @IsOptional()
@@ -44,9 +43,6 @@ export class Student{
 
     @Column({type: "tinyint", nullable:false, default: 1, width: 3})
     id_status!: Number;
-
-    @OneToMany(() => Enrollment, enrollment => enrollment.student)
-    enrollments!: Enrollment[];
 
     constructor(data:StudentI){
         this.person = data?.person;

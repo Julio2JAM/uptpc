@@ -35,7 +35,7 @@ export class Enrollment{
     @UpdateDateColumn()
     datetime_update!: Date;
 
-    @Column({type:"tinyint", nullable:false, width:3, default:1})
+    @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status: number;
 
     constructor(data:EnrollmentI) {
