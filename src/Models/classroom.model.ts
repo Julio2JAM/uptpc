@@ -42,11 +42,18 @@ export class Classroom{
 
 export class ClassroomModel extends Model{
 
-    async getByName(name:String):Promise<ObjectLiteral | null>{
-        const classroom = AppDataSource.createQueryBuilder(Classroom, "classroom")
-        .where("classroom.name = :name", {name:name})
-        .getOne();
+    async getByParams(data:Partial<ClassroomI>):Promise<ObjectLiteral | null>{
+        const query = AppDataSource.createQueryBuilder(Classroom, "classroom");
 
+        if(data?.name){
+            query.where("classroom.name = :name", {name: data?.name});
+        }
+
+        if(data?.id_status){
+            query.andWhere("classroom.id_status = :id_status", {id_status: data?.id_status});
+        }
+        
+        const classroom = await query.getMany();
         return classroom;
     }
 

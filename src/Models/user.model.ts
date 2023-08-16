@@ -1,6 +1,6 @@
 import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, ManyToOne, Index, JoinColumn } from "typeorm"
-import { IsNotEmpty, MinLength, minLength } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
 import AppDataSource from "../database/database";
 import { Level } from "./level.model";
 

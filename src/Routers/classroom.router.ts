@@ -6,7 +6,7 @@ const controller = new ClassroomController();
 
 router.get("/",controller.get);
 router.get("/:id",controller.getById);
-router.get("/name/:name",controller.getByName);
+router.get("/name/:name?/status/:status?",controller.getByParams);
 router.post("/",controller.post);
 router.put("/",controller.put);
 
