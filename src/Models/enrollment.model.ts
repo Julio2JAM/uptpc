@@ -62,6 +62,7 @@ export class EnrollmentModel extends Model{
         const enrollment = await query.leftJoinAndSelect('enrollment.student', 'student')
         //.leftJoinAndMapOne("enrollment.student", student, "student", "enrollment.id_student = student.id")
         .leftJoinAndSelect('enrollment.classroom', 'classroom')
+        .leftJoinAndSelect('student.person', 'person')
         //.leftJoinAndMapOne("enrollment.classroom", Classroom, "classroom", "enrollment.id_classroom = classroom.id")
         .getMany();
 

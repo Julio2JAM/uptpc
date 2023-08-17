@@ -5,6 +5,12 @@ import { validation } from "../Base/toolkit";
 
 export class SubjectController{
     
+    /**
+     * Function to retrieve all records from the database.
+     * @param {Request} _req request object
+     * @param {Response} res res object
+     * @returns {Promise<Response>}
+     */
     async get(_req:Request, res:Response):Promise<Response>{
         try {
             const subjectModel = new SubjectModel();
@@ -22,6 +28,12 @@ export class SubjectController{
         }
     }
 
+    /**
+     * Function to retrieve a specific record from the database.
+     * @param req request object
+     * @param res res object to send
+     * @returns res object sent
+     */
     async getById(req:Request, res:Response):Promise<Response>{
         try{
             
@@ -48,15 +60,13 @@ export class SubjectController{
     async getByParams(req:Request, res:Response):Promise<Response>{
         try{
             
-            const data = new Map(Object.entries(req.params));
-            const validateData = Array.from(data.values()).every(value => value == undefined || "");
-            
+            const validateData = Array.from(Object.entries(req.params)).every(value => !value);
             if(validateData){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.getByParams(data);
+            const subject = await subjectModel.getByParams(req.params);
 
             if(!subject){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Subject not found", status:HTTP_STATUS.NOT_FOUND});

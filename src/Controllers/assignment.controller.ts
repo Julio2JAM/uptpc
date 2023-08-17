@@ -71,16 +71,26 @@ export class AssignmentController{
 
     async post(req: Request, res: Response):Promise<Response>{
         try {
-            const dataAssignment = new Map(Object.entries(req.body));
-            const newAssignment = new Assignment(dataAssignment);
+            
+            if(!req.body.program || typeof req.body.program != "number"){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No program send", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
 
+            const programModel = new ProgramModel();
+            req.body.program = await programModel.getById(Program, Number(req.body.program));
+
+            if(!req.body.program){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid program", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const newAssignment = new Assignment(req.body);
             const errors = await validation(newAssignment);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const assignmentModel = new AssignmentModel();
-            const acitvity = await assignmentModel.post_validation(newAssignment);
+            const acitvity = await assignmentModel.create(Assignment,newAssignment);
             return res.status(HTTP_STATUS.CREATED).json(acitvity)
         } catch (error) {
             console.log(error);

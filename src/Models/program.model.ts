@@ -28,6 +28,7 @@ export class Program{
     @IsInt({message: "The classroom is not available"})
     classroom: Classroom;
 
+    //* SE PUEDE CAMBIAR, TENIENDO SOLO CLASSROOM Y SUBJECT, Y DESPUES UNA TABLA APARTE DONDE SE ASIGNEN LOS PROFESORES
     @ManyToOne(() => Professor, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_professor"})
     @Index("program_FK_2")
@@ -74,7 +75,7 @@ export class ProgramModel extends Model{
         return {program, status: HTTP_STATUS.CREATED};
     }*/
 
-    async getByParams(params:any): Promise<ObjectLiteral | null> {
+    async getByParams(params:Partial<ProgramI>): Promise<ObjectLiteral | null> {
         const sql = AppDataSource.manager.createQueryBuilder(Program, "program");
 
         if(params.classroom){

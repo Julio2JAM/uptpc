@@ -1,5 +1,5 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeepPartial, ObjectLiteral, ManyToOne, JoinColumn, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral, ManyToOne, JoinColumn, Index } from "typeorm";
 import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
 import AppDataSource from "../database/database";
 //Models
@@ -7,7 +7,16 @@ import { Program } from "./program.model";
 import { AssignmentGrade } from "./assignmentGrade.model";
 import { Person } from "./person.model";
 import { Model } from "../Base/model";
-import { HTTP_STATUS } from "../Base/statusHttp";
+
+interface AssignmentI{
+    program: Program,
+    name: string,
+    description: string,
+    porcentage: number,
+    quantity: number,
+    datetime_end: Date,
+    status: number,
+}
 
 @Entity()
 export class Assignment{
@@ -53,26 +62,17 @@ export class Assignment{
     @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: number
 
-    constructor(dataAssignment:Map<any,any>){
-        this.program = dataAssignment?.get('program');
-        this.name = dataAssignment?.get('name');
-        this.description = dataAssignment?.get('description');
-        this.porcentage = dataAssignment?.get('porcentage');
-        this.quantity = dataAssignment?.get('quantity');
-        this.datetime_end = dataAssignment?.get('datetime_end');
+    constructor(data:AssignmentI){
+        this.program = data?.program;
+        this.name = data?.name;
+        this.description = data?.description;
+        this.porcentage = data?.porcentage;
+        this.quantity = data?.quantity;
+        this.datetime_end = data?.datetime_end;
     }
 }
 
 export class AssignmentModel extends Model {
-
-    async post_validation(data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
-        const program = await this.getById(Program,data.id_program);
-        if(!program){
-            return {error: "The classroom, professor and subject was not found", status: HTTP_STATUS.BAD_RESQUEST};
-        }
-        const assignment = await this.create(Assignment, data);
-        return {assignment, status: HTTP_STATUS.CREATED};
-    }
 
     async getByProgram(program:ObjectLiteral):Promise<ObjectLiteral | null>{
 
