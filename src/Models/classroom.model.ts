@@ -1,13 +1,13 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ObjectLiteral } from "typeorm";
-import { IsNotEmpty,  } from "class-validator";
+import { IsDateString, IsNotEmpty, IsOptional,  } from "class-validator";
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
 interface ClassroomI{
     id: number,
     name: string,
-    datetime_start:Date,
-    datetime_end:Date,
+    datetime_start:Date | null,
+    datetime_end:Date | null,
     id_status:number
 }
 
@@ -21,10 +21,14 @@ export class Classroom{
     name: string;
 
     @Column({type:"date", nullable: true})
-    datetime_start:Date;
+    @IsDateString()
+    @IsOptional()
+    datetime_start:Date|null;
     
     @Column({type:"date", nullable: true})
-    datetime_end:Date;
+    @IsDateString()
+    @IsOptional()
+    datetime_end:Date|null;
     
     @CreateDateColumn()
     datetime!:Date
@@ -34,8 +38,8 @@ export class Classroom{
 
     constructor(data:ClassroomI){
         this.name = data?.name;
-        this.datetime_start = data?.datetime_start;
-        this.datetime_end = data?.datetime_end;
+        this.datetime_start = !data?.datetime_start ? null : data?.datetime_start;
+        this.datetime_end = !data?.datetime_end ? null : data?.datetime_end;
         this.id_status = data?.id_status;
     }
 }

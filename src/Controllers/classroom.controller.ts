@@ -5,6 +5,9 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomController{
     async get(_req: Request, res: Response):Promise<Response>{
+        //console.log("query: ", _req.query);
+        //console.log("params: ", _req.params);
+
         try {
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.get(Classroom);
@@ -71,7 +74,7 @@ export class ClassroomController{
             
             const newClassroom = new Classroom(req.body);
 
-            if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
+            if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
@@ -97,7 +100,7 @@ export class ClassroomController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
+            if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 

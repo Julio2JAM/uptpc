@@ -48,6 +48,7 @@ export class ProgramController{
         }
     }
 
+    //! FIXEAR, BUSCAR EL CLASSROOM, el SUBJECT y el PROFESSOR antes de hacer la consulta
     async getByParams(req: Request, res: Response): Promise<Response> {
         try {
 
@@ -57,7 +58,7 @@ export class ProgramController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const params = {
+            const params:object = {
                 classroom: idClassroom,
                 subject: idSubject,
                 professor: idProfessor,

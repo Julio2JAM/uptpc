@@ -75,7 +75,8 @@ export class ProgramModel extends Model{
         return {program, status: HTTP_STATUS.CREATED};
     }*/
 
-    async getByParams(params:Partial<ProgramI>): Promise<ObjectLiteral | null> {
+    //async getByParams(params:Partial<ProgramI>): Promise<ObjectLiteral | null> {
+    async getByParams(params:any): Promise<ObjectLiteral | null> {
         const sql = AppDataSource.manager.createQueryBuilder(Program, "program");
 
         if(params.classroom){
