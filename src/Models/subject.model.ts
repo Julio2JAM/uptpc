@@ -1,10 +1,10 @@
 //import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Allow, IsInt, IsNotEmpty, IsOptional, IsString, } from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
-interface SubjectI{
+export interface SubjectI{
     id: number,
     name: string,
     description: string,
@@ -14,29 +14,34 @@ interface SubjectI{
 @Entity()
 export class Subject {
     @PrimaryGeneratedColumn()
-    id!: number
+    @Allow() //* Permite que el validador lo tome como valido, ya que es decorador para cuando no se tienen otros decoradores
+    id!: number;
 
     @Column({type: 'varchar', length: 16, nullable: false})
-    @IsNotEmpty({message: "Please enter a name"})
-    name: string
+    @IsString()
+    @IsNotEmpty({message: "Name is not specified"})
+    name: string;
     
     @Column({type: 'varchar', length:255, nullable: true})
+    @IsString()
     @IsOptional()
-    description: string
+    description: string;
 
     @CreateDateColumn()
-    datetime!: Date
+    datetime!: Date;
 
     @UpdateDateColumn()
-    datetime_update!: Date
+    datetime_update!: Date;
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
-    id_status: number
+    @IsInt()
+    @IsOptional()
+    id_status: number;
 
     constructor(data:SubjectI) {
         this.name = data?.name;
         this.description = data?.description;
-        this.id_status = data?.status ?? 1;
+        this.id_status = data?.status;
     }
 }
 
