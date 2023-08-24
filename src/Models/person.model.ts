@@ -1,6 +1,6 @@
 //import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
-import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
@@ -18,44 +18,46 @@ interface StudentI{
 @Entity()
 export class Person {
     @PrimaryGeneratedColumn()
-    id!: number
+    @Allow()
+    id!: number;
 
     @Column({ type: 'int', unique:true, nullable: false, width: 12})
     @IsNotEmpty({message: "The C.I is obligatory"})
     @IsNumber()
     @IsPositive({message: "The C.I must be positive"})
     @IsInt({message:"The C.I is not available"})
-    cedule: number
+    cedule: number;
 
-    @Column({ type: 'varchar', nullable: true, length: 60})
+    @Column({ type: 'varchar', default: null, nullable: true, length: 60})
     @IsString()
     @IsOptional()
-    name: string
+    name: string;
 
-    @Column({ type: 'varchar', nullable: true, length: 60})
+    @Column({ type: 'varchar', default: null, nullable: true, length: 60})
     @IsString()
     @IsOptional()
-    lastName: string
+    lastName: string;
 
-    @Column({ type: 'varchar', nullable: true, length: 14})
+    @Column({ type: 'varchar', default: null, nullable: true, length: 14})
     @IsString()
     @IsOptional()
-    phone: string
+    phone: string;
 
-    @Column({ type: 'varchar', nullable: true, length: 60})
+    @Column({ type: 'varchar', default: null, nullable: true, length: 60})
     @IsEmail()
     @IsOptional()
-    email: string
+    email: string;
 
-    @Column({ type: 'date', default: null})
+    @Column({ type: 'date', default: null, nullable: true})
     @IsDate()
-    birthday: Date
+    @IsOptional()
+    birthday: Date | null;
 
     @CreateDateColumn()
-    datetime!: Date
+    datetime!: Date;
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
-    id_status!: number
+    id_status!: number;
 
     constructor(data:StudentI) {
         this.cedule     = Number(data?.cedule);
@@ -63,7 +65,7 @@ export class Person {
         this.lastName   = data?.lastName;
         this.phone      = String(parseInt(data?.phone));
         this.email      = data?.email;
-        this.birthday   = new Date(data?.birthday);
+        this.birthday   = data?.birthday ? new Date(data?.birthday) : null;
         this.id_status  = 1;
     }
 }

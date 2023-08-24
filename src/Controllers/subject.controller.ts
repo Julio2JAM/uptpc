@@ -1,7 +1,6 @@
 import { Subject, SubjectModel } from "../Models/subject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation } from "../Base/toolkit";
 
 export class SubjectController{
     
@@ -82,13 +81,8 @@ export class SubjectController{
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
+
             const newSubject = new Subject(req.body);
-            const errors = await validation(newSubject);
-
-            if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.create(Subject, newSubject);
             return res.status(HTTP_STATUS.CREATED).json(subject);
