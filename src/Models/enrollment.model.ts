@@ -19,13 +19,13 @@ export class Enrollment{
 
     @ManyToOne(() => Classroom, {nullable: false})
     @JoinColumn({name: "id_classroom"})
-    @Index("Enrollment_FK_1")
+    @Index("enrollment_FK_1")
     @IsNotEmpty({message: "Please enter a classroom"})
     classroom: Classroom;
 
     @ManyToOne(() => Student, {nullable:false})
     @JoinColumn({name:"id_student"})
-    @Index("Enrollment_FK_2")
+    @Index("enrollment_FK_2")
     @IsNotEmpty({message: "Please enter a person"})
     student: Student;
 
@@ -35,7 +35,7 @@ export class Enrollment{
     @UpdateDateColumn()
     datetime_update!: Date;
 
-    @Column({type:"tinyint", nullable:false, width:3, default:1})
+    @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status: number;
 
     constructor(data:EnrollmentI) {
@@ -62,24 +62,25 @@ export class EnrollmentModel extends Model{
         const enrollment = await query.leftJoinAndSelect('enrollment.student', 'student')
         //.leftJoinAndMapOne("enrollment.student", student, "student", "enrollment.id_student = student.id")
         .leftJoinAndSelect('enrollment.classroom', 'classroom')
+        .leftJoinAndSelect('student.person', 'person')
         //.leftJoinAndMapOne("enrollment.classroom", Classroom, "classroom", "enrollment.id_classroom = classroom.id")
         .getMany();
 
         return enrollment;
 
     }
-/*
-    async getEnrollment(student: ObjectLiteral): Promise<ObjectLiteral | null> {
+
+    async assigment(classroom:Classroom): Promise<ObjectLiteral | null> {
         
         const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
-        .leftJoinAndSelect("program", "program", "enrollment.id_classroom = program.id_classroom")
-        //.where("enrollment.id_student = :student", {student: 1})
-        .getMany();
+            .leftJoinAndSelect("asigmentGrade", "asigmentGrade", "asigmentGrade.id_enrollment = enrollment.id")
+            .where("enrollment.id_classroom = :classroom", {classroom: classroom})
+            .getMany();
 
         return enrollment;
 
     }
-*/
+
     async getStudent(): Promise<ObjectLiteral | null> {
 
         const Students = await AppDataSource.createQueryBuilder(Student, "Student")

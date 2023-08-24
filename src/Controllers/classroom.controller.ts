@@ -5,6 +5,9 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomController{
     async get(_req: Request, res: Response):Promise<Response>{
+        //console.log("query: ", _req.query);
+        //console.log("params: ", _req.params);
+
         try {
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.get(Classroom);
@@ -44,21 +47,23 @@ export class ClassroomController{
         }
     }
 
-    async getByName(req: Request, res: Response):Promise<Response>{
+    async getByParams(req: Request, res: Response):Promise<Response>{
         try {
-            const {name} = req.params;
-            
-            if(!name){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid name", status:HTTP_STATUS.BAD_RESQUEST});
+
+            const validateData = Array.from(Object.values(req.params)).every(value => !value)
+
+            if(validateData){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "no data send", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const classroomModel = new ClassroomModel();
-            const classroom = await classroomModel.getByName(name);
+            const classroom = await classroomModel.getByParams(req.params);
 
             if(!classroom){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroom found", status:HTTP_STATUS.NOT_FOUND});
             }
             return res.status(HTTP_STATUS.OK).json(classroom);
+
         } catch (error) {    
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});            
@@ -69,7 +74,7 @@ export class ClassroomController{
             
             const newClassroom = new Classroom(req.body);
 
-            if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
+            if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
@@ -95,7 +100,7 @@ export class ClassroomController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            if(new Date(req.body.datetime_start) > new Date(req.body.datetime_end)){
+            if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 

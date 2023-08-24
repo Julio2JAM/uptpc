@@ -31,7 +31,7 @@ export class Professor{
     @UpdateDateColumn()
     datetime_update!: Date;
 
-    @Column({name: "id_status", type: "tinyint", width: 3, default: 1, nullable: false})
+    @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: Number;
 
     constructor(data:ProfessorI){

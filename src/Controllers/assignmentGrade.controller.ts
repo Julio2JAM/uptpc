@@ -44,20 +44,18 @@ export class AssignmentGradeController{
         }
     }
 
-    //! TO FINISH
     async post(req: Request, res: Response): Promise<Response> {
         try {
-            const dataAssignmentGrade = new Map(Object.entries(req.body));
-            const newAssignmentGrade = new AssignmentGrade(dataAssignmentGrade);
 
+            const newAssignmentGrade = new AssignmentGrade(req.body);
             const errors = await validation(newAssignmentGrade);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
-
+ 
             const assignmentGradeModel = new AssignmentGradeModel();
-            //const assignmentGrade = await assignmentGradeModel.post_validation(newAssignmentGrade);
-            return res.status(HTTP_STATUS.CREATED).json(assignmentGradeModel);
+            const assignmentGrade = await assignmentGradeModel.create(AssignmentGrade,newAssignmentGrade);
+            return res.status(HTTP_STATUS.CREATED).json(assignmentGrade);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

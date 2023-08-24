@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeepPartial, ObjectLiteral/*, OneToOne, ManyToMany */} from "typeorm";
+import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, DeepPartial, ObjectLiteral, OneToOne, JoinColumn, Index} from "typeorm";
 import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
 import { Program } from "./program.model";
@@ -7,20 +7,30 @@ import { Enrollment } from "./enrollment.model";
 //import AppDataSource from "../database/database";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
+interface  SubjectGradeI{
+    id: number,
+    program: Program,
+    enrollment: Enrollment,
+    grade: number,
+    id_status: number
+}
+
 @Entity()
 export class SubjectGrade{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type:"int", nullable:false})
+    @OneToOne(() => Program, { nullable: false, createForeignKeyConstraints: true })
+    @JoinColumn({name: "id_program"})
+    @Index("subject_grade_FK_1")
     @IsNotEmpty({message: "Subject, professor and classroom are required"})
-    @IsInt()
-    id_program: number;
+    program: Program;
 
-    @Column({type:"int", nullable:false})
+    @OneToOne(() => Enrollment, { nullable: false, createForeignKeyConstraints: true })
+    @JoinColumn({name: "id_enrollment"})
+    @Index("subject_grade_FK_2")
     @IsNotEmpty({message: "The enrollment is required"})
-    @IsInt()
-    id_enrollment: number;
+    enrollment: Enrollment;
 
     @Column({type:"tinyint", nullable:true, width:3})
     @IsNotEmpty({message: "The grade is required"})
@@ -36,10 +46,11 @@ export class SubjectGrade{
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status!: number;
 
-    constructor(data:Map<any, any>) {
-        this.id_program = data?.get("id_program");
-        this.id_enrollment = data?.get("id_Enrollment");
-        this.grade = data?.get("grade");
+    constructor(data:SubjectGradeI) {
+        this.program = data?.program;
+        this.enrollment = data?.enrollment;
+        this.grade = data?.grade;
+        this.id_status = data?.id_status;
     }
 }
 

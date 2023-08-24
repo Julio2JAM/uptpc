@@ -8,6 +8,14 @@ import { Subject } from "./subject.model";
 import { Professor } from "./professor.model";
 import { Classroom } from "./classroom.model";
 
+interface ProgramI{
+    id: number,
+    classroom: Classroom,
+    professor: Professor,
+    subject: Subject,
+    id_status: number
+}
+
 @Entity()
 export class Program{
     @PrimaryGeneratedColumn()
@@ -20,6 +28,7 @@ export class Program{
     @IsInt({message: "The classroom is not available"})
     classroom: Classroom;
 
+    //* SE PUEDE CAMBIAR, TENIENDO SOLO CLASSROOM Y SUBJECT, Y DESPUES UNA TABLA APARTE DONDE SE ASIGNEN LOS PROFESORES
     @ManyToOne(() => Professor, {nullable: false, createForeignKeyConstraints: true})
     @JoinColumn({name: "id_professor"})
     @Index("program_FK_2")
@@ -38,10 +47,10 @@ export class Program{
     @Column({type:"tinyint", nullable:false, width: 3, default:1})
     id_status!: number;
 
-    constructor(data:Map<any, any>){
-        this.classroom = data?.get("classroom");
-        this.professor = data?.get("professor");
-        this.subject = data?.get("subject");
+    constructor(data:ProgramI){
+        this.classroom = data?.classroom;
+        this.professor = data?.professor;
+        this.subject = data?.subject;
     }
 }
 
@@ -66,6 +75,7 @@ export class ProgramModel extends Model{
         return {program, status: HTTP_STATUS.CREATED};
     }*/
 
+    //async getByParams(params:Partial<ProgramI>): Promise<ObjectLiteral | null> {
     async getByParams(params:any): Promise<ObjectLiteral | null> {
         const sql = AppDataSource.manager.createQueryBuilder(Program, "program");
 

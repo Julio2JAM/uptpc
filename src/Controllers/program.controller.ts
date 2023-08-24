@@ -5,7 +5,7 @@ import { Model } from "../Base/model";
 import { Classroom } from "../Models/classroom.model";
 import { Subject } from "typeorm/persistence/Subject";
 import { Professor } from "../Models/professor.model";
-import { ObjectLiteral } from "typeorm";
+import { validation } from "../Base/toolkit";
 
 export class ProgramController{
     async get(_req: Request, res: Response):Promise<Response>{
@@ -48,6 +48,7 @@ export class ProgramController{
         }
     }
 
+    //! FIXEAR, BUSCAR EL CLASSROOM, el SUBJECT y el PROFESSOR antes de hacer la consulta
     async getByParams(req: Request, res: Response): Promise<Response> {
         try {
 
@@ -57,7 +58,7 @@ export class ProgramController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const params = {
+            const params:object = {
                 classroom: idClassroom,
                 subject: idSubject,
                 professor: idProfessor,
@@ -80,42 +81,30 @@ export class ProgramController{
     async post(req:Request, res:Response):Promise<Response>{
         try {
 
-            const {idClassroom, idSubject, idProfessor} = req.params;
-
-            if(!idClassroom && !idSubject && !idProfessor) {
+            if(!req.params.classroom && !req.params.subject && !req.params.professor) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const model = new Model();
 
-            let classroom: ObjectLiteral | null = null;
-            if(idClassroom){
-                classroom = model.getById(Classroom, Number(idClassroom));
-            }
+            req.params.classroom = await model.getById(Classroom, Number(req.params.classroom));
+            req.params.subject = await model.getById(Subject, Number(req.params.subject));
+            req.params.professor = await model.getById(Professor, Number(req.params.professor));
 
-            let subject: ObjectLiteral | null = null;
-            if(idSubject){
-                subject = model.getById(Subject, Number(idSubject));
+            if(!req.params.classroom && !req.params.subject && !req.params.professor) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
             }
-
-            let professor: ObjectLiteral | null = null;
-            if(idProfessor){
-                professor = model.getById(Professor, Number(idProfessor));
-            }
-
-            if(!classroom && !subject && !professor) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Invalid data', status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const data = {
-                classroom: classroom,
-                subject: subject,
-                professor: professor,
-            };
 
             const programModel = new ProgramModel();
-            const program = await programModel.create(Program,data);
-            return res.status(program.status).json(program);
+            const newProgram = programModel.getById(Program, req.body);
+
+            const errors = await validation(newProgram);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const program = await programModel.create(Program,newProgram);
+            return res.status(HTTP_STATUS.CREATED).json(program);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

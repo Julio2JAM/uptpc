@@ -1,6 +1,6 @@
 import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, ManyToOne, Index, JoinColumn } from "typeorm"
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
 import AppDataSource from "../database/database";
 import { Level } from "./level.model";
 
@@ -25,6 +25,7 @@ export class User {
 
     @Column({type: 'varchar', length: 16, nullable: false, unique:true})
     @IsNotEmpty({message: "Please enter a username"})
+    @MinLength(4)
     username: string
 
     @Column({type: 'varchar', length: 80, nullable: false})
