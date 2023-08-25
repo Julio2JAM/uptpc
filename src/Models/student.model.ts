@@ -45,7 +45,7 @@ export class Student{
     id_status!: Number;
 
     constructor(data:StudentI){
-        this.person = data?.person;
+        this.person = typeof data?.person === "string" ? JSON.parse(data?.person) : data?.person;
         this.representative1 = data?.representative1;
         this.representative2 = data?.representative2;
     }

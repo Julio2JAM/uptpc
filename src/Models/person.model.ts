@@ -1,12 +1,12 @@
 //import AppDataSource from "../database/database"
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
-import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
+import { IsNotEmpty, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 
 interface StudentI{
-    id?: number,
-    cedule?: number,
+    id: number,
+    cedule: number,
     name: string,
     lastName: string,
     phone: string,
@@ -18,14 +18,14 @@ interface StudentI{
 @Entity()
 export class Person {
     @PrimaryGeneratedColumn()
+    @IsInt()
     @Allow()
     id!: number;
 
     @Column({ type: 'int', unique:true, nullable: false, width: 12})
-    @IsNotEmpty({message: "The C.I is obligatory"})
-    @IsNumber()
-    @IsPositive({message: "The C.I must be positive"})
-    @IsInt({message:"The C.I is not available"})
+    @IsNotEmpty({message: "The identification is obligatory"})
+    @IsPositive({message: "The identification must be positive"})
+    @IsInt({message:"The identification is not available"})
     cedule: number;
 
     @Column({ type: 'varchar', default: null, nullable: true, length: 60})
@@ -57,15 +57,17 @@ export class Person {
     datetime!: Date;
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
+    @IsInt()
     id_status!: number;
 
     constructor(data:StudentI) {
-        this.cedule     = Number(data?.cedule);
+        this.id         = data?.id ? Number(data?.id) : data?.id;
+        this.cedule     = data?.cedule ? Number(data?.cedule) : data?.cedule;
         this.name       = data?.name;
         this.lastName   = data?.lastName;
-        this.phone      = String(parseInt(data?.phone));
+        this.phone      = data?.phone ? String(parseInt(data?.phone)) : data?.phone;
         this.email      = data?.email;
-        this.birthday   = data?.birthday ? new Date(data?.birthday) : null;
+        this.birthday   = data?.birthday ? new Date(data?.birthday) : data?.birthday;
         this.id_status  = 1;
     }
 }

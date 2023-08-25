@@ -6,10 +6,11 @@ import { Person } from "../Models/person.model";
 
 export class StudentController{
 
-    async get(_req: Request, res: Response): Promise<Response>{
+    async get(req: Request, res: Response): Promise<Response>{
         try {
+
             const personModel = new StudentModel();
-            const person = await personModel.getRelations(Student, ["person", "representative1", "representative2"]);
+            const person = await personModel.getRelations2(Student, req.query, ["person", "representative1", "representative2"]);
 
             if(person.length == 0){
                 console.log("No students found");
