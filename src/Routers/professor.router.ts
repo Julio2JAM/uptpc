@@ -5,6 +5,7 @@ const router = Router();
 const controller = new ProfessorController();
 
 router.get('/', controller.get);
+router.put('/', controller.put);
 router.post('/', controller.post);
 
 export default router;

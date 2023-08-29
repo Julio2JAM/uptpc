@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { Professor, ProfessorModel } from "../Models/professor.model";
-//import { validation } from "../Base/toolkit";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Person, PersonModel } from "../Models/person.model";
 import { validation } from "../Base/toolkit";
@@ -17,6 +16,44 @@ export class ProfessorController{
             }
 
             return res.status(HTTP_STATUS.OK).json(professor);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async put(req: Request, res: Response): Promise<Response> {
+        try {
+
+            if(!req.body.person && !req.body.idPerson || !req.body.id){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
+            }
+
+            const professorModel = new ProfessorModel();
+            const professorToUpdate = await professorModel.getByIdRelations(Professor, req.body.id, ["person"]);
+
+            if(!professorToUpdate){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+            
+            const personModel = new PersonModel();
+
+            if(req.body.idPerson){
+                professorToUpdate.person = await personModel.getById(Person, req.body.idPerson);
+            }else if(professorToUpdate.person?.id){
+                professorToUpdate.person = Object.assign(professorToUpdate.person, req.body.person);
+            }else{
+                professorToUpdate.person = new Person(req.body.person);
+            }
+            
+            const errors = await validation(professorToUpdate);
+            if(errors) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const professor = await professorModel.create(Professor, professorToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(professor);
+
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
