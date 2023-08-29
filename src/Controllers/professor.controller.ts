@@ -6,35 +6,14 @@ import { Person, PersonModel } from "../Models/person.model";
 import { validation } from "../Base/toolkit";
 
 export class ProfessorController{
-    async get(_req: Request, res: Response): Promise<Response>{
+
+    async get(req: Request, res: Response): Promise<Response>{
         try {
             const professorModel = new ProfessorModel();
-            const professor = await professorModel.getRelations(Professor, ["person", "profession"]);
+            const professor = await professorModel.getByParams(req.query);
 
-            if(!professor){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Person not found", status: HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(professor);
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getById(req: Request, res: Response): Promise<Response> {
-        try {
-            const id = Number(req.params.id);
-
-            if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Id is required", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const professorModel = new ProfessorModel();
-            const professor = await professorModel.getById(Professor, id);
-
-            if(!professor){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Professor not found", status:HTTP_STATUS.NOT_FOUND});
+            if(professor.length == 0){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Professors not found", status: HTTP_STATUS.NOT_FOUND});
             }
 
             return res.status(HTTP_STATUS.OK).json(professor);
@@ -47,23 +26,23 @@ export class ProfessorController{
     async post(req: Request, res: Response): Promise<Response> {
         try {
 
-            if(!req.body.idPerson){
+            if(!req.body.person && !req.body.idPerson){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
             }
 
             const personModel = new PersonModel();
-            req.body.idPerson = await personModel.getById(Person, Number(req.body.idPerson));
+            const newPerson = new Person(req.body.idPerson ? await personModel.getById(Person, Number(req.body.idPerson)) : req.body.person);
 
-            const professorModel = new ProfessorModel();
-            const newProfessor = new Professor(req.body.idPerson);
-
-            const errors = await validation(newProfessor);
+            const errors = await validation(newPerson);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
+            const professorModel = new ProfessorModel();
+            const newProfessor = new Professor(req.body);
             const professor = await professorModel.create(Professor, newProfessor);
             return res.status(HTTP_STATUS.CREATED).json(professor);
+
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});

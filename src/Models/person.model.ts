@@ -1,8 +1,7 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
 import { IsNotEmpty, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
 
 interface StudentI{
     id: number,
@@ -18,7 +17,6 @@ interface StudentI{
 @Entity()
 export class Person {
     @PrimaryGeneratedColumn()
-    @IsInt()
     @Allow()
     id!: number;
 
@@ -61,7 +59,6 @@ export class Person {
     id_status!: number;
 
     constructor(data:StudentI) {
-        this.id         = data?.id ? Number(data?.id) : data?.id;
         this.cedule     = data?.cedule ? Number(data?.cedule) : data?.cedule;
         this.name       = data?.name;
         this.lastName   = data?.lastName;
@@ -73,15 +70,5 @@ export class Person {
 }
 
 export class PersonModel extends Model {
-
-    async getByCedule(cedule:Number):Promise<ObjectLiteral | null> {
-        const person = await AppDataSource.manager
-        .createQueryBuilder(Person, "person")
-        .where("person.cedule = :cedule", {cedule:cedule})
-        //.where("person.cedule LIKE :cedule", {cedule:`%${cedule}%`})
-        .getOne();
-
-        return person;
-    }
 
 }

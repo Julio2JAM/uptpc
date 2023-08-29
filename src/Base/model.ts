@@ -17,7 +17,7 @@ export class Model{
      */
     async getRelations(entity:EntityTarget<ObjectLiteral>, relationData:ObjectLiteral): Promise<any>{ // ObjectLiteral | Null
         console.log("get relations");
-        return await AppDataSource.manager.find(entity, {relations: relationData});
+        return await AppDataSource.getRepository(entity).find({relations: relationData});
     }
 
     /**

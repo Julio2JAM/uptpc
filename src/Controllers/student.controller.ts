@@ -11,7 +11,6 @@ export class StudentController{
 
             const personModel = new StudentModel();
             const person = await personModel.getRelations2(Student, req.query, ["person", "representative1", "representative2"]);
-
             if(person.length == 0){
                 console.log("No students found");
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No students found.", status:HTTP_STATUS.NOT_FOUND});

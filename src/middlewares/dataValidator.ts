@@ -5,7 +5,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 export async function dataValidator(entity:any, req: Request, res: Response, next: NextFunction){
 
     //! QUERY NO PARAM!!!!!!!!
-    const dataToValidate = new entity(req.method === 'GET' ? req.query : req.body);
+    const dataToValidate = Object.assign(new entity, req.method === 'GET' ? req.query : req.body);
     req.method === 'GET' ? req.query = dataToValidate : req.body = dataToValidate;
     const errors = await validate(dataToValidate, {
         skipMissingProperties: req.method === 'GET', 
