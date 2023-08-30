@@ -59,12 +59,12 @@ export class Person {
     id_status!: number;
 
     constructor(data:StudentI) {
-        this.cedule     = data?.cedule ? Number(data?.cedule) : data?.cedule;
-        this.name       = data?.name;
-        this.lastName   = data?.lastName;
-        this.phone      = data?.phone ? String(parseInt(data?.phone)) : data?.phone;
+        this.cedule     = data?.cedule && Number(data?.cedule);
+        this.name       = data?.name && data?.name.toUpperCase();
+        this.lastName   = data?.lastName && data?.lastName.toUpperCase();
+        this.phone      = data?.phone && String(parseInt(data?.phone));
         this.email      = data?.email;
-        this.birthday   = data?.birthday ? new Date(data?.birthday) : data?.birthday;
+        this.birthday   = data?.birthday && new Date(data?.birthday);
         this.id_status  = 1;
     }
 }

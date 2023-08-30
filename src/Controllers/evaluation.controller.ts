@@ -1,4 +1,4 @@
-import { AssignmentGrade, AssignmentGradeModel } from "../Models/assignmentGrade.model";
+import { Evaluation, EvaluationModel } from "../Models/evaluation.model";
 import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
@@ -7,14 +7,14 @@ export class AssignmentGradeController{
 
     async get(_req: Request, res:Response):Promise<Response>{
         try {
-            const assignmentGradeModel = new AssignmentGradeModel();
-            const assignmentGrade = await assignmentGradeModel.get(AssignmentGrade);
+            const evaluationModel = new EvaluationModel();
+            const evaluation = await evaluationModel.get(Evaluation);
 
-            if(!assignmentGrade){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No AssignmentGrade found."});
+            if(!evaluation){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No evaluation found."});
             }
 
-            return res.status(HTTP_STATUS.OK).json(assignmentGrade);
+            return res.status(HTTP_STATUS.OK).json(evaluation);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -29,15 +29,15 @@ export class AssignmentGradeController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const assignmentGradeModel = new AssignmentGradeModel();
-            const assignmentGrade = assignmentGradeModel.getById(AssignmentGrade, id);
+            const evaluationModel = new EvaluationModel();
+            const evaluation = evaluationModel.getById(Evaluation, id);
 
-            if(!assignmentGrade){
-                console.log("No assignmentGrade found");
-                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No assignmentGrade found", status:HTTP_STATUS.NOT_FOUND});
+            if(!evaluation){
+                console.log("No evaluation found");
+                res.status(HTTP_STATUS.NOT_FOUND).send({message:"No evaluation found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            return res.status(HTTP_STATUS.OK).json(assignmentGrade);
+            return res.status(HTTP_STATUS.OK).json(evaluation);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -47,15 +47,15 @@ export class AssignmentGradeController{
     async post(req: Request, res: Response): Promise<Response> {
         try {
 
-            const newAssignmentGrade = new AssignmentGrade(req.body);
-            const errors = await validation(newAssignmentGrade);
+            const newEvaluation = new Evaluation(req.body);
+            const errors = await validation(newEvaluation);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
  
-            const assignmentGradeModel = new AssignmentGradeModel();
-            const assignmentGrade = await assignmentGradeModel.create(AssignmentGrade,newAssignmentGrade);
-            return res.status(HTTP_STATUS.CREATED).json(assignmentGrade);
+            const evaluationModel = new EvaluationModel();
+            const evaluation = await evaluationModel.create(Evaluation,newEvaluation);
+            return res.status(HTTP_STATUS.CREATED).json(evaluation);
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

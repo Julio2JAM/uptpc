@@ -5,13 +5,28 @@ import { validation, hashPassword } from "../Base/toolkit";
 import { PersonController } from "./person.controller";
 import { Level, LevelModel } from "../Models/level.model";
 import { Model } from "../Base/model";
+import { Like } from "typeorm";
 
 export class UserController{
 
-    async get(_req:Request, res:Response):Promise<Response>{
+    async get(req:Request, res:Response):Promise<Response>{
         try {
+            const findData = {
+                relations:{
+                    level: true
+                },
+                where: {
+                    id: req.query?.id,
+                    username: Like(`%${req.query?.username}%`),
+                    level: {
+                        id: req.query?.idLevel
+                    },
+                    id_status: req.query?.id_status,
+                }
+            }
+
             const userModel = new UserModel();
-            const user = await userModel.getRelations(User,["level"]);
+            const user = await userModel.get(User,findData);
 
             if(user.length === 0){
                 console.log("no users found");
@@ -25,91 +40,18 @@ export class UserController{
         }
     }
 
-    async getById(req: Request, res: Response):Promise<Response>{
-        try {
-            
-            const id = Number(req.params.id);
-            if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const userModel = new UserModel();
-            const user = await userModel.getByIdRelations(User,id,["level"]);
-
-            if(!user){
-                console.log("no data found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Users not found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(user);
-        } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getByParams(req: Request, res: Response):Promise<Response>{
-        try {
-            
-            const data = new Map(Object.entries(req.params));
-            const validateData = Array.from(data.values()).every(value => value == undefined || "");
-            
-            if(validateData){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"No data send", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const userModel = new UserModel();
-            const user = await userModel.getByParams(data);
-
-            if(!user){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No user found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(user);
-        } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
     async validateUsername(req: Request, res: Response):Promise<Response>{
         try {
         
-            const { username } = req.params;
-            if(!username){
+            if(!req.query.username){
                 console.log("No username send");
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_RESQUEST});    
             }
             
             const userModel = new UserModel();
-            const user = await userModel.getByUsername(username);
+            const user = await userModel.get(User, {where:{username: req.query.username}});
             
-            return res.status(HTTP_STATUS.OK).send({message: user ? true : false, status:HTTP_STATUS.OK});
-
-        }catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getByUsername(req: Request, res: Response):Promise<Response>{
-        try {
-        
-            const { username } = req.params;
-            if(!username){
-                console.log("No username send");
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_RESQUEST});    
-            }
-            
-            const userModel = new UserModel();
-            const user = await userModel.getByUsername(username);
-
-            if(!user){
-                console.log("no data found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Users not found", status:HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(user);
+            return res.status(HTTP_STATUS.OK).send({message: user[0] ? true : false, status:HTTP_STATUS.OK});
 
         }catch (error) {
             console.error(error);
@@ -202,7 +144,7 @@ export class UserController{
 
             req.body.id = Number(id);
             const model = new Model();
-            const userToUpdate = await model.getByIdRelations(User,Number(id),["level"]);
+            const userToUpdate = await model.getById(User,Number(id),["level"]);
             
             if(!userToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});

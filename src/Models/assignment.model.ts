@@ -4,7 +4,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "c
 import AppDataSource from "../database/database";
 //Models
 import { Program } from "./program.model";
-import { AssignmentGrade } from "./assignmentGrade.model";
+import { Evaluation } from "./evaluation.model";
 import { Person } from "./person.model";
 import { Model } from "../Base/model";
 
@@ -78,8 +78,8 @@ export class AssignmentModel extends Model {
 
         const assignment = await AppDataSource.manager
             .createQueryBuilder(Assignment, "assignment")
-            .leftJoinAndSelect(AssignmentGrade, "assignmentGrade", "assignmentGrade.id_assignment = assignment.id")
-            .leftJoinAndSelect(Person, "person", "assignmentGrade.id_person = person.id")
+            .leftJoinAndSelect(Evaluation, "Evaluation", "Evaluation.id_assignment = assignment.id")
+            .leftJoinAndSelect(Person, "person", "Evaluation.id_person = person.id")
             .where("assignment.program = :program", {"program":program})
             //.printSql()
             .getRawMany();

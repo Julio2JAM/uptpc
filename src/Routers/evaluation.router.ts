@@ -1,4 +1,4 @@
-import { AssignmentGradeController } from "../Controllers/assignmentGrade.controller";
+import { AssignmentGradeController } from "../Controllers/evaluation.controller";
 import { Router } from "express";
 
 const router = Router();

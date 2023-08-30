@@ -44,27 +44,6 @@ export class User {
 
 export class UserModel extends Model {
 
-    async getByParams(data:Map<String,any>){
-        const query = AppDataSource.manager
-        .createQueryBuilder(User, "user")
-        .leftJoinAndSelect("user.level", "level");
-
-        if(data?.get("username")){
-            query.where("user.username LIKE :username", {username:`%${data?.get("username")}%`});
-        }
-
-        if(data?.get("level")){
-            query.andWhere("user.level = :level", {level: data?.get("level")});
-        }
-
-        if(data?.get("id_status")){
-            query.andWhere("user.id_status = :status", {status: data?.get("id_status")});
-        }
-
-        const user = query.getMany();
-        return user;
-    }
-
     async getByUsername(username:String):Promise<ObjectLiteral | null>{
         const user = await AppDataSource.manager
             .createQueryBuilder(User, "user")

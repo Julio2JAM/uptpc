@@ -3,7 +3,7 @@ import { IsNotEmpty, IsInt } from "class-validator";
 import { Model } from "../Base/model";
 import { Program } from "./program.model";
 import { Enrollment } from "./enrollment.model";
-//import { AssignmentGrade } from "./assignmentGrade.model";
+//import { Evaluation } from "./Evaluation.model";
 //import AppDataSource from "../database/database";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
@@ -83,8 +83,8 @@ export class SubjectGradeModel extends Model {
         }
         /*
         const assignment = await AppDataSource.createQueryBuilder(Program,"program")
-        //.leftJoinAndSelect(AssignmentGrade, "assignment", "AssignmentGrade.id_program = program.id")
-        .leftJoinAndSelect(AssignmentGrade, "assignment", "AssignmentGrade.id_program = program.id")
+        //.leftJoinAndSelect(Evaluation, "assignment", "Evaluation.id_program = program.id")
+        .leftJoinAndSelect(Evaluation, "assignment", "Evaluation.id_program = program.id")
         .getMany();
         //const assignment = await this.getById(Assignment, program.id);
         */

@@ -47,35 +47,10 @@ export class Enrollment{
 
 export class EnrollmentModel extends Model{
 
-    async getByParams(data:any): Promise<Enrollment[]> {
-
-        const params = {
-            id : data.id && Number(data.id),
-            student: {
-                id: data.idStudent
-            },
-            classroom: {
-                id: data.idClassroom
-            },
-        }
-
-        const relations = {
-            classroom: true,
-            student: {
-                person:true,
-                representative1:true,
-                representative2:true,
-            },
-        }
-
-        return AppDataSource.getRepository(Enrollment).find({relations:relations, where:params});
-
-    }
-
     async assigment(classroom:Classroom): Promise<ObjectLiteral | null> {
         
         const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
-            .leftJoinAndSelect("asigmentGrade", "asigmentGrade", "asigmentGrade.id_enrollment = enrollment.id")
+            .leftJoinAndSelect("asigmentGrade", "asigmentGrade", "asigmentGrade.id_enrollment = enrollment.id") 
             .where("enrollment.id_classroom = :classroom", {classroom: classroom})
             .getMany();
 
@@ -83,10 +58,14 @@ export class EnrollmentModel extends Model{
 
     }
 
-    async getStudent(): Promise<ObjectLiteral | null> {
+    async studentNoClassroom(): Promise<ObjectLiteral | null> {
 
-        const Students = await AppDataSource.createQueryBuilder(Student, "Student")
-        .leftJoinAndSelect("Student.enrollments", "enrollment")
+        const Students = await AppDataSource.createQueryBuilder(Student, "student")
+        .leftJoinAndSelect("student.person", "person")
+        .leftJoinAndSelect("student.representative1", "representative1")
+        .leftJoinAndSelect("student.representative2", "representative2")
+        .leftJoinAndSelect("enrollment", "enrollment", "enrollment.id_student = student.id")
+        .where("enrollment.id IS NULL")
         .getMany();
 
         return Students;

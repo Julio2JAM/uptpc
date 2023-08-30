@@ -3,13 +3,33 @@ import { Professor, ProfessorModel } from "../Models/professor.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Person, PersonModel } from "../Models/person.model";
 import { validation } from "../Base/toolkit";
+import { Like } from "typeorm";
 
 export class ProfessorController{
 
     async get(req: Request, res: Response): Promise<Response>{
         try {
+
+            const findData = {
+                relations : {
+                    person:true,
+                },
+                where:{
+                    id          : req.query.id,
+                    person      : {
+                        cedule      : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
+                        name        : req.query?.name && Like(`%${req.query?.name}%`),
+                        lastName    : req.query?.lastName && Like(`%${req.query?.lastName}%`),
+                        phone       : req.query?.phone && Like(`%${req.query?.phone}%`),
+                        email       : req.query?.email && Like(`%${req.query?.email}%`),
+                        birthday    : typeof req.query?.birthday === "string" ? new Date(req.query.birthday) : undefined,
+                    },
+                    id_status   : req.query.id_status
+                }
+            }
+    
             const professorModel = new ProfessorModel();
-            const professor = await professorModel.getByParams(req.query);
+            const professor = await professorModel.get(Professor,findData);
 
             if(professor.length == 0){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Professors not found", status: HTTP_STATUS.NOT_FOUND});
@@ -30,12 +50,11 @@ export class ProfessorController{
             }
 
             const professorModel = new ProfessorModel();
-            const professorToUpdate = await professorModel.getByIdRelations(Professor, req.body.id, ["person"]);
+            const professorToUpdate = await professorModel.getById(Professor, req.body.id);
 
             if(!professorToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_RESQUEST});
             }
-            
             const personModel = new PersonModel();
 
             if(req.body.idPerson){
@@ -46,7 +65,7 @@ export class ProfessorController{
                 professorToUpdate.person = new Person(req.body.person);
             }
             
-            const errors = await validation(professorToUpdate);
+            const errors = await validation(professorToUpdate[0]);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }

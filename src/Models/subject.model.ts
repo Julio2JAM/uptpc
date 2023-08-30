@@ -1,8 +1,7 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Like } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { Allow, IsInt, IsNotEmpty, IsOptional, IsString, } from 'class-validator';
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
 
 export interface SubjectI{
     id: number,
@@ -46,18 +45,5 @@ export class Subject {
 }
 
 export class SubjectModel extends Model{
-
-    async getByParams(data:any): Promise<Subject[]>{
-
-        const params = {
-            id : data.id && Number(data.id),
-            name : data.name && Like(`%${data.name}%`),
-            description : data.description && Like(`%${data.description}%`),
-            id_status : data.id_status && Number(data.id_status),
-        };
-        
-        return await AppDataSource.getRepository(Subject).find({where: params});
-
-    }
 
 }

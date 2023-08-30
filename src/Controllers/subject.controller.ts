@@ -1,6 +1,7 @@
 import { Subject, SubjectModel } from "../Models/subject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { Like } from "typeorm";
 
 export class SubjectController{
     
@@ -12,8 +13,17 @@ export class SubjectController{
      */
     async get(req:Request, res:Response):Promise<Response>{
         try {
+
+            const data = {
+                id          : req.query?.id,
+                name        : req.query?.name && Like(`%${req.query?.name}%`),
+                description : req.query?.description && Like(`%${req.query?.description}%`),
+                id_status   : req.query?.id_status,
+            };
+            const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
+
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.getByParams(req.query);
+            const subject = await subjectModel.get(Subject, {where:whereOptions});
 
             if(subject.length == 0){
                 console.log("no data found");
