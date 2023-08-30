@@ -1,8 +1,7 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, ObjectLiteral, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { Allow, IsInt, IsNotEmpty, IsOptional, IsString, } from 'class-validator';
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
 
 export interface SubjectI{
     id: number,
@@ -46,24 +45,5 @@ export class Subject {
 }
 
 export class SubjectModel extends Model{
-
-    async getByParams(data:Partial<SubjectI>):Promise<ObjectLiteral | null> {
-        const query = AppDataSource.createQueryBuilder(Subject,"subject");
-
-        if(data?.name){
-            query.where("subject.name LIKE :name",{name:`%${data?.name}%`});
-        }
-
-        if(data?.description){
-            query.andWhere("subject.description LIKE :status",{status:`%${data?.description}%`});
-        }
-
-        if(data?.status){
-            query.andWhere("subject.id_status = :status",{status:data?.status});
-        }
-
-        const subject = await query.getMany();
-        return subject;
-    }
 
 }

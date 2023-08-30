@@ -8,10 +8,36 @@ import { Professor } from "../Models/professor.model";
 import { validation } from "../Base/toolkit";
 
 export class ProgramController{
-    async get(_req: Request, res: Response):Promise<Response>{
+    async get(req: Request, res: Response):Promise<Response>{
         try {
+            const findData = {
+                relations: {
+                    classroom: true, 
+                    professor: {
+                        person: true
+                    }, 
+                    subject: true
+                },
+                where:{
+                    classroom: {
+                        id: req.query?.idClassroom,
+                        name: req.query?.classroomName,
+                    },
+                    subject: {
+                        id: req.query?.idSubject,
+                        name: req.query?.subjectName,
+                    },
+                    professor: {
+                        id: req.query?.idProfessor,
+                        person: {
+                            name: req.query?.professorName,
+                        }
+                    },
+                }
+            }
+
             const programModel = new ProgramModel();
-            const program = await programModel.getRelations(Program, ["classroom", "professor", "subject"]);
+            const program = await programModel.get(Program, findData);
 
             if(program.length == 0){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No program found", status: HTTP_STATUS.NOT_FOUND});
@@ -21,60 +47,6 @@ export class ProgramController{
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getById(req: Request, res:Response):Promise<Response>{
-        try {
-            
-            const id = Number(req.params.id);
-
-            if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const programModel = new ProgramModel();
-            const program = await programModel.getByIdRelations(Program, id, ["classroom", "professor", "subject"]);
-
-            if(!program){
-                console.log("No program found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No program found", status:HTTP_STATUS.NOT_FOUND});
-            }
-            
-            return res.status(HTTP_STATUS.OK).json(program);
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    //! FIXEAR, BUSCAR EL CLASSROOM, el SUBJECT y el PROFESSOR antes de hacer la consulta
-    async getByParams(req: Request, res: Response): Promise<Response> {
-        try {
-
-            const {idClassroom, idSubject, idProfessor} = req.params;
-
-            if(!idClassroom && !idSubject && !idProfessor) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const params:object = {
-                classroom: idClassroom,
-                subject: idSubject,
-                professor: idProfessor,
-            }
-
-            const programModel = new ProgramModel();
-            const program = programModel.getByParams(params);
-
-            if(!program){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No program found", status: HTTP_STATUS.NOT_FOUND});
-            }
-
-            return res.status(HTTP_STATUS.OK).json(program);
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
@@ -95,14 +67,13 @@ export class ProgramController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const programModel = new ProgramModel();
-            const newProgram = programModel.getById(Program, req.body);
-
+            const newProgram = new Program(req.body);
             const errors = await validation(newProgram);
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
             }
 
+            const programModel = new ProgramModel();
             const program = await programModel.create(Program,newProgram);
             return res.status(HTTP_STATUS.CREATED).json(program);
         } catch (error) {

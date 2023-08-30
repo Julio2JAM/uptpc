@@ -1,12 +1,11 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral } from "typeorm"
-import { IsNotEmpty, IsNumber, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
+import { IsNotEmpty, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
 
 interface StudentI{
-    id?: number,
-    cedule?: number,
+    id: number,
+    cedule: number,
     name: string,
     lastName: string,
     phone: string,
@@ -22,10 +21,9 @@ export class Person {
     id!: number;
 
     @Column({ type: 'int', unique:true, nullable: false, width: 12})
-    @IsNotEmpty({message: "The C.I is obligatory"})
-    @IsNumber()
-    @IsPositive({message: "The C.I must be positive"})
-    @IsInt({message:"The C.I is not available"})
+    @IsNotEmpty({message: "The identification is obligatory"})
+    @IsPositive({message: "The identification must be positive"})
+    @IsInt({message:"The identification is not available"})
     cedule: number;
 
     @Column({ type: 'varchar', default: null, nullable: true, length: 60})
@@ -57,29 +55,20 @@ export class Person {
     datetime!: Date;
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
+    @IsInt()
     id_status!: number;
 
     constructor(data:StudentI) {
-        this.cedule     = Number(data?.cedule);
-        this.name       = data?.name;
-        this.lastName   = data?.lastName;
-        this.phone      = String(parseInt(data?.phone));
+        this.cedule     = data?.cedule && Number(data?.cedule);
+        this.name       = data?.name && data?.name.toUpperCase();
+        this.lastName   = data?.lastName && data?.lastName.toUpperCase();
+        this.phone      = data?.phone && String(parseInt(data?.phone));
         this.email      = data?.email;
-        this.birthday   = data?.birthday ? new Date(data?.birthday) : null;
+        this.birthday   = data?.birthday && new Date(data?.birthday);
         this.id_status  = 1;
     }
 }
 
 export class PersonModel extends Model {
-
-    async getByCedule(cedule:Number):Promise<ObjectLiteral | null> {
-        const person = await AppDataSource.manager
-        .createQueryBuilder(Person, "person")
-        .where("person.cedule = :cedule", {cedule:cedule})
-        //.where("person.cedule LIKE :cedule", {cedule:`%${cedule}%`})
-        .getOne();
-
-        return person;
-    }
 
 }

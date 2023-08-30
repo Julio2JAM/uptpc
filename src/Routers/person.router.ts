@@ -5,9 +5,7 @@ const router = Router();
 const controller = new PersonController();
 
 router.get('/',controller.get);
-//router.get('/cedule/:cedule/name/:name/',controller.get);
-router.get('/:id',controller.getById);
-router.get('/cedule/:cedule',controller.validateCedule);
 router.post('/',controller.post);
+router.put('/',controller.put);
 
 export default router;

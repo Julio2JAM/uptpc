@@ -3,8 +3,10 @@ import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 
 export async function dataValidator(entity:any, req: Request, res: Response, next: NextFunction){
-    
-    const dataToValidate = Object.assign(new entity, req.method === 'GET' ? req.params : req.body);
+
+    //! QUERY NO PARAM!!!!!!!!
+    const dataToValidate = Object.assign(new entity, req.method === 'GET' ? req.query : req.body);
+    req.method === 'GET' ? req.query = dataToValidate : req.body = dataToValidate;
     const errors = await validate(dataToValidate, {
         skipMissingProperties: req.method === 'GET', 
         whitelist: true, 

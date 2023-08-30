@@ -5,7 +5,6 @@ const router = Router();
 const controller = new StudentController();
 
 router.get('/', controller.get);
-router.get('/:id', controller.getById);
 router.post('/', controller.post);
 router.put('/', controller.put);
 

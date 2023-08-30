@@ -1,7 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ObjectLiteral } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 import { IsDateString, IsNotEmpty, IsOptional,  } from "class-validator";
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
 
 interface ClassroomI{
     id: number,
@@ -45,20 +44,5 @@ export class Classroom{
 }
 
 export class ClassroomModel extends Model{
-
-    async getByParams(data:Partial<ClassroomI>):Promise<ObjectLiteral | null>{
-        const query = AppDataSource.createQueryBuilder(Classroom, "classroom");
-
-        if(data?.name){
-            query.where("classroom.name = :name", {name: data?.name});
-        }
-
-        if(data?.id_status){
-            query.andWhere("classroom.id_status = :id_status", {id_status: data?.id_status});
-        }
-        
-        const classroom = await query.getMany();
-        return classroom;
-    }
 
 }

@@ -47,33 +47,10 @@ export class Enrollment{
 
 export class EnrollmentModel extends Model{
 
-    async getByParams(data: Map<string, any>): Promise<ObjectLiteral> {
-
-        const query = AppDataSource.createQueryBuilder(Enrollment, "enrollment");
-
-        if(data?.get("classroom")){
-            query.where("enrollment.id_classroom = :classroom", {classroom: data?.get("classroom")});
-        }
-
-        if(data?.get("student")){
-            query.andWhere("enrollment.id_student = :student", {student: data?.get("student")});
-        }
-
-        const enrollment = await query.leftJoinAndSelect('enrollment.student', 'student')
-        //.leftJoinAndMapOne("enrollment.student", student, "student", "enrollment.id_student = student.id")
-        .leftJoinAndSelect('enrollment.classroom', 'classroom')
-        .leftJoinAndSelect('student.person', 'person')
-        //.leftJoinAndMapOne("enrollment.classroom", Classroom, "classroom", "enrollment.id_classroom = classroom.id")
-        .getMany();
-
-        return enrollment;
-
-    }
-
     async assigment(classroom:Classroom): Promise<ObjectLiteral | null> {
         
         const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
-            .leftJoinAndSelect("asigmentGrade", "asigmentGrade", "asigmentGrade.id_enrollment = enrollment.id")
+            .leftJoinAndSelect("asigmentGrade", "asigmentGrade", "asigmentGrade.id_enrollment = enrollment.id") 
             .where("enrollment.id_classroom = :classroom", {classroom: classroom})
             .getMany();
 
@@ -81,10 +58,14 @@ export class EnrollmentModel extends Model{
 
     }
 
-    async getStudent(): Promise<ObjectLiteral | null> {
+    async studentNoClassroom(): Promise<ObjectLiteral | null> {
 
-        const Students = await AppDataSource.createQueryBuilder(Student, "Student")
-        .leftJoinAndSelect("Student.enrollments", "enrollment")
+        const Students = await AppDataSource.createQueryBuilder(Student, "student")
+        .leftJoinAndSelect("student.person", "person")
+        .leftJoinAndSelect("student.representative1", "representative1")
+        .leftJoinAndSelect("student.representative2", "representative2")
+        .leftJoinAndSelect("enrollment", "enrollment", "enrollment.id_student = student.id")
+        .where("enrollment.id IS NULL")
         .getMany();
 
         return Students;

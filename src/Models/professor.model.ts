@@ -14,7 +14,7 @@ export class Professor{
     @PrimaryGeneratedColumn()
     id!: Number;
 
-    @OneToOne(() => Person, {nullable: false, createForeignKeyConstraints: true})
+    @OneToOne(() => Person, {nullable: false, createForeignKeyConstraints: true, cascade: true})
     @JoinColumn({name: "id_person"})
     @Index("professor_FK_1")
     @IsNotEmpty({message: "Person must be send"})
@@ -42,5 +42,5 @@ export class Professor{
 }
 
 export class ProfessorModel extends Model{
-    
+
 }

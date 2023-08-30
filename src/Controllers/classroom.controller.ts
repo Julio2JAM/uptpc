@@ -2,15 +2,23 @@ import { Classroom, ClassroomModel } from "../Models/classroom.model";
 import { Request, Response } from "express";
 import { validation } from "../Base/toolkit";
 import { HTTP_STATUS } from "../Base/statusHttp";
+import { Like } from "typeorm";
 
 export class ClassroomController{
-    async get(_req: Request, res: Response):Promise<Response>{
-        //console.log("query: ", _req.query);
-        //console.log("params: ", _req.params);
-
+    async get(req: Request, res: Response):Promise<Response>{
         try {
+
+            const data = {
+                id              : req.query?.id,
+                name            : req.query?.name && Like(`%${req.query?.name}%`),
+                datetime_start  : req.query?.datetime_start,
+                datetime_end    : req.query?.datetime_end,
+                id_status       : req.query?.id_status,
+            }
+            const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
+
             const classroomModel = new ClassroomModel();
-            const classroom = await classroomModel.get(Classroom);
+            const classroom = await classroomModel.get(Classroom, {where: whereOptions});
 
             if(classroom.length == 0){
                 console.log("No classroom found");
@@ -23,52 +31,7 @@ export class ClassroomController{
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
-
-    async getById(req: Request, res: Response):Promise<Response>{
-        try {
-
-            const id = Number(req.params.id);
-            if(!id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({ message:"Invalid ID", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const classroomModel = new ClassroomModel();
-            const classroom = await classroomModel.getById(Classroom, id);
-
-            if(!classroom){
-                console.log("No classroom found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No classroom founds", status: HTTP_STATUS.NOT_FOUND});
-            }
-            return res.status(HTTP_STATUS.OK).json(classroom);
-
-        } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
-    async getByParams(req: Request, res: Response):Promise<Response>{
-        try {
-
-            const validateData = Array.from(Object.values(req.params)).every(value => !value)
-
-            if(validateData){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "no data send", status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const classroomModel = new ClassroomModel();
-            const classroom = await classroomModel.getByParams(req.params);
-
-            if(!classroom){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No classroom found", status:HTTP_STATUS.NOT_FOUND});
-            }
-            return res.status(HTTP_STATUS.OK).json(classroom);
-
-        } catch (error) {    
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});            
-        }
-    }
+    
     async post(req: Request, res: Response):Promise<Response>{
         try {
             

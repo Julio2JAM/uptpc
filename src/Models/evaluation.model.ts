@@ -4,7 +4,7 @@ import { Assignment } from "./assignment.model";
 import { Enrollment } from "./enrollment.model";
 import { IsInt, IsNotEmpty } from "class-validator";
 
-interface AssignmentGradeI{
+interface EvaluationI{
     id: number,
     assignment: Assignment,
     enrollment: Enrollment,
@@ -13,7 +13,7 @@ interface AssignmentGradeI{
 }
 
 @Entity()
-export class AssignmentGrade{
+export class Evaluation{
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -43,13 +43,13 @@ export class AssignmentGrade{
     @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: number;
 
-    constructor(data:AssignmentGradeI) {
+    constructor(data:EvaluationI) {
         this.assignment = data?.assignment;
         this.enrollment = data?.enrollment;
         this.grade = data?.grade;
     }
 }
 
-export class AssignmentGradeModel extends Model{
+export class EvaluationModel extends Model{
 
 }
