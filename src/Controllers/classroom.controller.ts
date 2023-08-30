@@ -5,9 +5,6 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 
 export class ClassroomController{
     async get(_req: Request, res: Response):Promise<Response>{
-        //console.log("query: ", _req.query);
-        //console.log("params: ", _req.params);
-
         try {
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.get(Classroom);

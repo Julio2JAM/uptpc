@@ -1,7 +1,8 @@
-import { Entity, OneToOne, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, Index } from "typeorm";
+import { Entity, OneToOne, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, Index, Like } from "typeorm";
 import { IsNotEmpty } from "class-validator";
 import { Model } from "../Base/model";
 import { Person } from "./person.model";
+import AppDataSource from "../database/database";
 
 interface ProfessorI{
     id: Number,
@@ -14,7 +15,7 @@ export class Professor{
     @PrimaryGeneratedColumn()
     id!: Number;
 
-    @OneToOne(() => Person, {nullable: false, createForeignKeyConstraints: true})
+    @OneToOne(() => Person, {nullable: false, createForeignKeyConstraints: true, cascade: true})
     @JoinColumn({name: "id_person"})
     @Index("professor_FK_1")
     @IsNotEmpty({message: "Person must be send"})
@@ -42,5 +43,22 @@ export class Professor{
 }
 
 export class ProfessorModel extends Model{
-    
+    async getByParams(data:any): Promise<Professor[]>{
+
+        const relations = {
+            person:true,
+        }
+
+        const params:any = {
+            id : data.id && Number(data.id),
+            person : {
+                name : data.name && Like(`%${data?.name}%`),
+                lastName : data.lastName && Like(`%${data?.lastName}%`),
+                cedule : data.cedule && Like(`%${data?.cedule}%`),
+            },
+            id_status : data.id_status && Like(`%${data?.id_status}%`)
+        };
+
+        return AppDataSource.getRepository(Professor).find({relations:relations, where:params});
+    }
 }

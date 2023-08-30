@@ -17,7 +17,17 @@ export class Model{
      */
     async getRelations(entity:EntityTarget<ObjectLiteral>, relationData:ObjectLiteral): Promise<any>{ // ObjectLiteral | Null
         console.log("get relations");
-        return await AppDataSource.manager.find(entity, {relations: relationData});
+        return await AppDataSource.getRepository(entity).find({relations: relationData});
+    }
+
+    /**
+     * Searches for an entity in the database and returns the results as an array of objects with the properties found in the database.
+     * @param {EntityTarget<ObjectLiteral>} entity - The entity from which to retrieve the data from the database
+     * @param {ObjectLiteral} relationData - The relation of the entity from which retrieve the data from the database
+     * @returns {Promise<any>} - The promise returned from the server when the data are retrieved from the database
+     */
+    async getRelations2(entity:EntityTarget<ObjectLiteral>, params:ObjectLiteral, relationData:ObjectLiteral): Promise<any>{ // ObjectLiteral | Null
+        return await AppDataSource.getRepository(entity).find({where:params, relations: relationData});
     }
 
     /**

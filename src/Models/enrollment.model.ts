@@ -47,26 +47,28 @@ export class Enrollment{
 
 export class EnrollmentModel extends Model{
 
-    async getByParams(data: Map<string, any>): Promise<ObjectLiteral> {
+    async getByParams(data:any): Promise<Enrollment[]> {
 
-        const query = AppDataSource.createQueryBuilder(Enrollment, "enrollment");
-
-        if(data?.get("classroom")){
-            query.where("enrollment.id_classroom = :classroom", {classroom: data?.get("classroom")});
+        const params = {
+            id : data.id && Number(data.id),
+            student: {
+                id: data.idStudent
+            },
+            classroom: {
+                id: data.idClassroom
+            },
         }
 
-        if(data?.get("student")){
-            query.andWhere("enrollment.id_student = :student", {student: data?.get("student")});
+        const relations = {
+            classroom: true,
+            student: {
+                person:true,
+                representative1:true,
+                representative2:true,
+            },
         }
 
-        const enrollment = await query.leftJoinAndSelect('enrollment.student', 'student')
-        //.leftJoinAndMapOne("enrollment.student", student, "student", "enrollment.id_student = student.id")
-        .leftJoinAndSelect('enrollment.classroom', 'classroom')
-        .leftJoinAndSelect('student.person', 'person')
-        //.leftJoinAndMapOne("enrollment.classroom", Classroom, "classroom", "enrollment.id_classroom = classroom.id")
-        .getMany();
-
-        return enrollment;
+        return AppDataSource.getRepository(Enrollment).find({relations:relations, where:params});
 
     }
 
