@@ -53,26 +53,22 @@ export class SubjectController{
 
     async put(req: Request, res: Response):Promise<Response>{
         try {
-            const {id} = req.body
 
-            if(!id){
+            if(!req.body.id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_RESQUEST});
             }
             
-            req.body.id = Number(id);
             const subjectModel = new SubjectModel();
-            const subjectToUpdate = await subjectModel.getById(Subject,Number(id));
+            let subjectToUpdate = await subjectModel.getById(Subject,req.body.id);
             
             if(!subjectToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            for (const key in subjectToUpdate) {
-                subjectToUpdate[key] = req.body[key] ?? subjectToUpdate[key];
-            }
-
+            subjectToUpdate = Object.assign(subjectToUpdate, req.body);
             const subject = await subjectModel.create(Subject,subjectToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(subject);
+
         } catch (error) {
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

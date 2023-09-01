@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
 import { Enrollment } from "./enrollment.model";
-import { IsInt, IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 interface EvaluationI{
     id: number,
@@ -29,9 +29,7 @@ export class Evaluation{
     @IsNotEmpty({message: "The assignment is required"})
     enrollment: Enrollment;
 
-    @Column({type:"int", nullable:false, width:4})
-    @IsNotEmpty({message: "The grade is required"})
-    @IsInt({message:"The quantity is not numeric"})
+    @Column({type:"int", nullable:true, width:4})
     grade: number;
 
     @CreateDateColumn()
@@ -46,7 +44,8 @@ export class Evaluation{
     constructor(data:EvaluationI) {
         this.assignment = data?.assignment;
         this.enrollment = data?.enrollment;
-        this.grade = data?.grade;
+        this.grade = Number(data?.grade);
+        this.id_status = data?.id_status;
     }
 }
 

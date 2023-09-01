@@ -5,37 +5,37 @@ import { Model } from "../Base/model";
 import { Classroom } from "../Models/classroom.model";
 import { Subject } from "typeorm/persistence/Subject";
 import { Professor } from "../Models/professor.model";
-import { validation } from "../Base/toolkit";
+import { removeFalsyFromObject } from "../Base/toolkit";
 
 export class ProgramController{
     async get(req: Request, res: Response):Promise<Response>{
         try {
-            const findData = {
-                relations: {
-                    classroom: true, 
-                    professor: {
-                        person: true
-                    }, 
-                    subject: true
+            const relations = {
+                classroom: true, 
+                professor: {
+                    person: true
+                }, 
+                subject: true
+            };
+            const where = {
+                id              : req.query?.id,
+                classroom: {
+                    id          : req.query?.idClassroom,
+                    name        : req.query?.classroomName,
                 },
-                where:{
-                    classroom: {
-                        id: req.query?.idClassroom,
-                        name: req.query?.classroomName,
-                    },
-                    subject: {
-                        id: req.query?.idSubject,
-                        name: req.query?.subjectName,
-                    },
-                    professor: {
-                        id: req.query?.idProfessor,
-                        person: {
-                            name: req.query?.professorName,
-                        }
-                    },
-                }
+                subject: {
+                    id          : req.query?.idSubject,
+                    name        : req.query?.subjectName,
+                },
+                professor: {
+                    id          : req.query?.idProfessor,
+                    person: {
+                        name    : req.query?.professorName,
+                    }
+                },
             }
-
+            
+            const findData = {relations:relations, where: removeFalsyFromObject(where)}
             const programModel = new ProgramModel();
             const program = await programModel.get(Program, findData);
 
@@ -68,14 +68,10 @@ export class ProgramController{
             }
 
             const newProgram = new Program(req.body);
-            const errors = await validation(newProgram);
-            if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
             const programModel = new ProgramModel();
             const program = await programModel.create(Program,newProgram);
             return res.status(HTTP_STATUS.CREATED).json(program);
+
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

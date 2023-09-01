@@ -5,7 +5,7 @@ import levelRouter from './Routers/level.router';
 import accessRouter from './Routers/access.router';
 //Subject
 import subjectRouter from './Routers/subject.router';
-import subjectGradeRouter from './Routers/subjectGrade.router';
+import subjectGradeRouter from './Routers/calification.router';
 //Assignment
 import assignmentRouter from './Routers/assignment.router';
 import assignmentGradeRouter from './Routers/evaluation.router';
@@ -44,7 +44,7 @@ app.use("/api/Evaluation", assignmentGradeRouter);
 app.use("/api/classroom", classroomRouter);
 app.use("/api/enrollment", enrollmentRouter);
 app.use('/api/program', programRouter);
-app.use('/api/subjectGrade', subjectGradeRouter);
+app.use('/api/calification', subjectGradeRouter);
 app.use('/api/level', levelRouter);
 
 app.listen(PORT,() => {

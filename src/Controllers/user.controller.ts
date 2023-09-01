@@ -11,20 +11,20 @@ export class UserController{
 
     async get(req:Request, res:Response):Promise<Response>{
         try {
-            const findData = {
-                relations:{
-                    level: true
+
+            const relations = {
+                level: true
+            }
+            const where = {
+                id          : req.query?.id,
+                username    : Like(`%${req.query?.username}%`),
+                id_status   : req.query?.id_status,
+                level   : {
+                    id      : req.query?.idLevel
                 },
-                where: {
-                    id: req.query?.id,
-                    username: Like(`%${req.query?.username}%`),
-                    level: {
-                        id: req.query?.idLevel
-                    },
-                    id_status: req.query?.id_status,
-                }
             }
 
+            const findData = {relations: relations, where: where}
             const userModel = new UserModel();
             const user = await userModel.get(User,findData);
 
