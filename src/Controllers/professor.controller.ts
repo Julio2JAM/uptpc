@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Professor, ProfessorModel } from "../Models/professor.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Person, PersonModel } from "../Models/person.model";
-import { validation } from "../Base/toolkit";
+import { removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Like } from "typeorm";
 
 export class ProfessorController{
@@ -10,24 +10,23 @@ export class ProfessorController{
     async get(req: Request, res: Response): Promise<Response>{
         try {
 
-            const findData = {
-                relations : {
-                    person:true,
+            const relations = {
+                person:true,
+            };
+            const where = {
+                id              : req.query.id,
+                id_status       : req.query.id_status,
+                person : {
+                    cedule      : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
+                    name        : req.query?.name && Like(`%${req.query?.name}%`),
+                    lastName    : req.query?.lastName && Like(`%${req.query?.lastName}%`),
+                    phone       : req.query?.phone && Like(`%${req.query?.phone}%`),
+                    email       : req.query?.email && Like(`%${req.query?.email}%`),
+                    birthday    : typeof req.query?.birthday === "string" ? new Date(req.query.birthday) : undefined,
                 },
-                where:{
-                    id          : req.query.id,
-                    person      : {
-                        cedule      : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
-                        name        : req.query?.name && Like(`%${req.query?.name}%`),
-                        lastName    : req.query?.lastName && Like(`%${req.query?.lastName}%`),
-                        phone       : req.query?.phone && Like(`%${req.query?.phone}%`),
-                        email       : req.query?.email && Like(`%${req.query?.email}%`),
-                        birthday    : typeof req.query?.birthday === "string" ? new Date(req.query.birthday) : undefined,
-                    },
-                    id_status   : req.query.id_status
-                }
-            }
-    
+            };
+
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
             const professorModel = new ProfessorModel();
             const professor = await professorModel.get(Professor,findData);
 
@@ -45,16 +44,17 @@ export class ProfessorController{
     async put(req: Request, res: Response): Promise<Response> {
         try {
 
-            if(!req.body.person && !req.body.idPerson || !req.body.id){
+            if(!req.body.id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
             }
 
             const professorModel = new ProfessorModel();
-            const professorToUpdate = await professorModel.getById(Professor, req.body.id);
+            const professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"]);
 
             if(!professorToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_RESQUEST});
             }
+
             const personModel = new PersonModel();
 
             if(req.body.idPerson){
@@ -64,12 +64,7 @@ export class ProfessorController{
             }else{
                 professorToUpdate.person = new Person(req.body.person);
             }
-            
-            const errors = await validation(professorToUpdate[0]);
-            if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
-            }
-
+        
             const professor = await professorModel.create(Professor, professorToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(professor);
 

@@ -1,37 +1,45 @@
 import { Enrollment, EnrollmentModel } from "../Models/enrollment.model";
-import { validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Classroom } from "../Models/classroom.model";
 import { Student } from "../Models/student.model";
 import { Model } from "../Base/model";
+import { Like } from "typeorm";
 
 export class EnrollmentController{
 
     async get(req: Request, res:Response):Promise<Response>{
         try {
 
-            const findData = {
-                where: {
-                    id : req.query?.id,
-                    student: {
-                        id: req.query?.idStudent,
-                    },
-                    classroom: {
-                        id: req.query?.idClassroom,
-                    },
-                    id_status: req.query?.idStatus,
+            const relations = {
+                classroom           : true,
+                student: {
+                    person          : true,
+                    representative1 : true,
+                    representative2 : true,
                 },
-                relations: {
-                    classroom: true,
-                    student: {
-                        person:true,
-                        representative1:true,
-                        representative2:true,
-                    },
-                }
             }
-
+            const where = {
+                id                  : req.query?.id,
+                id_status           : req.query?.idStatus,
+                student: {
+                    id              : req.query?.idStudent,
+                    person:{
+                        id          : req.query?.personId && Number(req.query.personId),
+                        name        : req.query?.personName && Like(`%${req.query?.personName}%`),
+                        lastName    : req.query?.personLastName && Like(`%${req.query?.personLastName}%`),
+                        cedule      : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
+                        phone       : req.query?.personPhone && Like(`%${req.query?.personPhone}%`),
+                    }
+                },
+                classroom: {
+                    id              : req.query?.idClassroom,
+                    name            : req.query?.name && Like(`%${req.query?.name}%`),
+                    datetime_start  : req.query?.datetime_start,
+                    datetime_end    : req.query?.datetime_end,
+                },
+            };
+            const findData = {relations: relations, where: where}
             const enrollmentModel = new EnrollmentModel();
             const enrollment = await enrollmentModel.get(Enrollment, findData);
 
@@ -60,33 +68,44 @@ export class EnrollmentController{
         }
     }
 
+    async put(req: Request, res: Response): Promise<Response> {
+        try {
+
+            if(!req.body.id){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const enrollmentModel = new EnrollmentModel();
+            const enrollmentToUpdate = await enrollmentModel.getById(Enrollment, req.body.id, ["student", "classroom"])
+            return res.status(HTTP_STATUS.CREATED).json(enrollmentToUpdate);
+
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
     async post(req:Request, res:Response):Promise<Response>{
         try {
-            const {id_student, id_classroom} = req.body;
 
-            if(!id_student && !id_classroom){
+            const data = {
+                student: req.body?.student?.id,
+                classroom: req.body?.classroom?.id,
+            }
+
+            if(!data.classroom || !data.student){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const model = new Model();
-            const student = await model.getById(Student, id_student);
-            const classroom = await model.getById(Classroom, id_classroom);
+            data.student = await model.getById(Student, data.student);
+            data.classroom = await model.getById(Classroom, data.classroom);
 
-            if(!student || !classroom) {
+            if(!data.student || !data.classroom) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const data = {
-                "student": student,
-                "classroom": classroom
-            };
-
             const newEnrollment = new Enrollment(data);
-            const errors = await validation(newEnrollment);
-            if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
-            }
-
             const enrollment = await model.create(Enrollment,newEnrollment);
             return res.status(HTTP_STATUS.CREATED).json(enrollment);
         } catch (error) {

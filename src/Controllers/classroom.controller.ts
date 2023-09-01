@@ -57,9 +57,8 @@ export class ClassroomController{
 
     async put(req: Request, res: Response):Promise<Response>{
         try {
-            const {id} = req.body;
             
-            if(!id){
+            if(!req.body.id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
@@ -67,9 +66,8 @@ export class ClassroomController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            req.body.id = Number(id);
             const classroomModel = new ClassroomModel();
-            const classroomToUpdate = await classroomModel.getById(Classroom, Number(id));
+            const classroomToUpdate = await classroomModel.getById(Classroom, req.body.id);
 
             if(!classroomToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Classroom not found", "status": HTTP_STATUS.BAD_RESQUEST});

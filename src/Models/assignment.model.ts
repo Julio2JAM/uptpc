@@ -1,12 +1,10 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ObjectLiteral, ManyToOne, JoinColumn, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm";
 import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
-import AppDataSource from "../database/database";
 //Models
 import { Program } from "./program.model";
-import { Evaluation } from "./evaluation.model";
-import { Person } from "./person.model";
 import { Model } from "../Base/model";
+import AppDataSource from "../database/database";
 
 interface AssignmentI{
     program: Program,
@@ -74,17 +72,20 @@ export class Assignment{
 
 export class AssignmentModel extends Model {
 
-    async getByProgram(program:ObjectLiteral):Promise<ObjectLiteral | null>{
+    /**
+     * Al colocarle el porcentaje a una actividad, entre todas las que se han creado, solo debe dar como maximo
+     * 100%, esta funcion retorna el porcentaje que aun se le puede asignar a una nueva actividad
+     * @param id_program program identifier
+     * @returns porcentage
+     */
+    async calculatePorcentage(id_program: number){
+        const query = await AppDataSource.createQueryBuilder(Assignment, "assignment")
+        .leftJoinAndSelect("assignment.program", "program")
+        .where("program.id = :id_program", {id_program: id_program})
+        .groupBy("program.id")
+        .select("(SUM(assignment.porcentage) - 100) AS porcentage")
+        .getOne();
 
-        const assignment = await AppDataSource.manager
-            .createQueryBuilder(Assignment, "assignment")
-            .leftJoinAndSelect(Evaluation, "Evaluation", "Evaluation.id_assignment = assignment.id")
-            .leftJoinAndSelect(Person, "person", "Evaluation.id_person = person.id")
-            .where("assignment.program = :program", {"program":program})
-            //.printSql()
-            .getRawMany();
-
-        return assignment
-
+        return query;
     }
 }
