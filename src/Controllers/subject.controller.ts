@@ -60,6 +60,7 @@ export class SubjectController{
             
             const subjectModel = new SubjectModel();
             let subjectToUpdate = await subjectModel.getById(Subject,req.body.id);
+            delete req.body.id;
             
             if(!subjectToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});

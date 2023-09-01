@@ -47,6 +47,28 @@ export class Enrollment{
 
 export class EnrollmentModel extends Model{
 
+    async programRelation(classroom:number){
+        const query = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
+        .leftJoinAndSelect("enrollment.classroom", "classroom")
+        .leftJoinAndSelect("enrollment.student", "student")
+        .leftJoinAndSelect("program.classroom", "classroom")
+        .where("classroom.id = :classroom", {classroom:classroom})
+        .getMany();
+
+        /*const query2 = await AppDataSource.createQueryBuilder(Classroom, "classroom")
+        .leftJoinAndSelect("program.classroom", "classroom")
+        .leftJoinAndSelect("program.professor", "professor")
+        .leftJoinAndSelect("program.subject", "subject")
+        .leftJoinAndSelect("enrollment.classroom", "classroom")
+        .leftJoinAndSelect("enrollment.student", "student")
+        .where("classroom.id = :classroom", {classroom:classroom})
+        //.where("student.id = :student", {student:student})
+        //.where("professor.id = :professor", {professor:professor})
+        .getMany();*/
+
+        return query;
+    }
+
     async assigment(classroom:Classroom): Promise<ObjectLiteral | null> {
         
         const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")

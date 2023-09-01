@@ -10,18 +10,31 @@ export class AssignmentController{
     async get(req:Request, res:Response):Promise<Response>{
         try {
             const relations = {
-                program:true
+                program:{
+                    classroom   : true,
+                    professor   : true,
+                    subject     : true,
+                }
             }
             const where = {
                 program: {
-                    id:req.query.idProgram,
+                    id          : req.query.idProgram,
+                    classroom: {
+                        id      : req.query.idClassroom
+                    },
+                    professor: {
+                        id      : req.query.idProfessor
+                    },
+                    subject: {
+                        id      : req.query.idSubject
+                    },
                 },
-                name: req.query?.name && Like(`%${req.query.name}%`),
-                description: req.query?.description && Like(`%${req.query.description}%`),
-                porcentage: req.query?.porcentage && Number(req.query.porcentage),
-                quantity: req.query?.quantity && Number(req.query.quantity),
-                datetime_end: req.query?.datetime_end,
-                id_status: req.query?.id_status,
+                name            : req.query?.name && Like(`%${req.query.name}%`),
+                description     : req.query?.description && Like(`%${req.query.description}%`),
+                porcentage      : req.query?.porcentage && Number(req.query.porcentage),
+                quantity        : req.query?.quantity && Number(req.query.quantity),
+                datetime_end    : req.query?.datetime_end,
+                id_status       : req.query?.id_status,
             }
 
             const findData = {relations:relations, where: removeFalsyFromObject(where)}
