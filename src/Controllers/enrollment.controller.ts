@@ -5,6 +5,8 @@ import { Classroom } from "../Models/classroom.model";
 import { Student } from "../Models/student.model";
 import { Model } from "../Base/model";
 import { Like } from "typeorm";
+import { Program } from "../Models/program.model";
+import { removeFalsyFromObject } from "../Base/toolkit";
 
 export class EnrollmentController{
 
@@ -68,6 +70,50 @@ export class EnrollmentController{
         }
     }
 
+    async getProgram(req: Request, res: Response): Promise<Response> {
+        try {
+
+            if(!req.query.enrollment){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Enrollment is required", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const model = new Model();
+            const enrollment = await model.getById(Enrollment,Number(req.query.enrollment),["student","classroom"]);
+
+            if(!enrollment){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid enrollment", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const relations =  { 
+                classroom: true, 
+                subject: true, 
+                professor: { 
+                    person: true
+                }
+            }
+            const where = { 
+                classroom: { 
+                    id: enrollment.classroom.id
+                },
+                subject: {
+                    name: req.query.subjectName
+                },
+                professor: {
+                    name: req.query.professorName,
+                }
+            }
+
+            const program = model.get(Program, {
+                relations: relations,
+                where: removeFalsyFromObject(where)
+            });
+            return res.status(HTTP_STATUS.OK).json(program);
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+    
     async put(req: Request, res: Response): Promise<Response> {
         try {
 

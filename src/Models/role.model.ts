@@ -3,7 +3,7 @@ import { Model } from "../Base/model";
 import { IsNotEmpty } from "class-validator";
 
 @Entity()
-export class Level{
+export class Role{
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -19,6 +19,6 @@ export class Level{
     }
 }
 
-export class LevelModel extends Model {
+export class RoleModel extends Model {
 
 }

@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { validation, hashPassword } from "../Base/toolkit";
-import { PersonController } from "./person.controller";
-import { Level, LevelModel } from "../Models/level.model";
+import { validation, hashPassword, removeFalsyFromObject } from "../Base/toolkit";
+import { Role, RoleModel } from "../Models/role.model";
 import { Model } from "../Base/model";
 import { Like } from "typeorm";
+import { Student } from "../Models/student.model";
+import { Professor } from "../Models/professor.model";
 
 export class UserController{
 
@@ -13,18 +14,18 @@ export class UserController{
         try {
 
             const relations = {
-                level: true
+                role: true
             }
             const where = {
                 id          : req.query?.id,
-                username    : Like(`%${req.query?.username}%`),
+                username    : req.query?.username && Like(`%${req.query?.username}%`),
                 id_status   : req.query?.id_status,
-                level   : {
-                    id      : req.query?.idLevel
+                role   : {
+                    id      : req.query?.idRole
                 },
             }
 
-            const findData = {relations: relations, where: where}
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
             const userModel = new UserModel();
             const user = await userModel.get(User,findData);
 
@@ -59,23 +60,23 @@ export class UserController{
         }
     }
     
-    async post(req: Request, res: Response, child?:Record<string, any>):Promise<any>{
+    async post(req: Request, res: Response):Promise<any>{
         try {
             //Se valida que se haya enviado una password para procedeser a hashearse
             if(!req.body.password || req.body.password.length < 8 || req.body.password.length > 16){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: " Invalid password", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid password", "status": HTTP_STATUS.BAD_RESQUEST});
             }
             req.body.password = await hashPassword(req.body.password);
             
-            if(!req.body.level){
-                const levelModel = new LevelModel();
-                const idLevel = levelModel.getById(Level,req.body.level);
+            if(req.body.role){
+                const roleModel = new RoleModel();
+                const role = roleModel.getById(Role,req.body.role);
 
-                if(!idLevel){
-                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No level found for that level", "status": HTTP_STATUS.BAD_RESQUEST});
+                if(!role){
+                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid role id", "status": HTTP_STATUS.BAD_RESQUEST});
                 }
 
-                req.body.level = idLevel;
+                req.body.role = role;
             }
 
             //Se obtienen los datos del req y se usa el constructor para asignarlos
@@ -89,86 +90,57 @@ export class UserController{
 
             const userModel = new UserModel();
             const user = await userModel.create(User,newUser);
-            
-            return child == undefined ? res.status(HTTP_STATUS.CREATED).json(user) : undefined;
+            return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {
             console.error(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 
-    async register(req: Request, res: Response):Promise<Response | undefined>{
-        try {
-            
-            if(!req.body.user){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Data for user not found", status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            if(!req.body.person){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Data for person not found", status: HTTP_STATUS.BAD_RESQUEST});
-            }
-
-            const user = req.body.user;
-            const person = req.body.person;
-
-            const personController = new PersonController();//new PersonController();
-            req.body = person;
-            const newPerson = await personController.post(req, res);
-            
-            if(newPerson){
-                return;
-            }
-            
-            req.body = user;
-            const userController = new UserController();
-            const newUser = await userController.post(req, res);
-              
-            if(newUser){
-                return;
-            }
-            
-            return res.status(HTTP_STATUS.OK).send({person:newPerson, user:newUser});
-        }catch(error){
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something was wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
-        }
-    }
-
     async update(req: Request, res: Response):Promise<Response>{
         try {
-            const {id, level} = req.body;
             
-            if(!id){
+            if(!req.body.id){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            req.body.id = Number(id);
+            if(req.body.student && req.body.professor){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
             const model = new Model();
-            const userToUpdate = await model.getById(User,Number(id),["level"]);
+            const userToUpdate = await model.getById(User,req.body.id,["role"]);
             
             if(!userToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            if(level){
-                const levelData = await model.getById(Level,Number(level));
+            if(req.body.student){
+                const student = await model.getById(Student,req.body.student);
+                userToUpdate.student = student;
+            }else if(req.body.professor){
+                const professor = await model.getById(Professor,req.body.professor);
+                userToUpdate.professor = professor;
+            }
 
-                if(!levelData){
-                    res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Level not found", status:HTTP_STATUS.BAD_RESQUEST});
+            if(!userToUpdate.student && req.body.student || !userToUpdate.professor && req.body.professor){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            if(req.body.role){
+                const role = await model.getById(Role,req.body.id);
+
+                if(!role){
+                    res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_RESQUEST});
                 }
                 
-                req.body.level = levelData;
+                userToUpdate.role = role;
             }
             
-            for (const key in userToUpdate) {
-                
-                if(typeof req?.body[key] == "string" && req?.body[key].length == 0){
-                    delete req?.body[key];
-                }
+            if(req.body.password){
+                userToUpdate.password = await hashPassword(req.body.password);
+            }
 
-                userToUpdate[key] = req?.body[key] ?? userToUpdate[key];
-            }
-            
             const user = await model.create(User,userToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {
