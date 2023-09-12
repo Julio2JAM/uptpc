@@ -2,16 +2,14 @@ import { Model } from "../Base/model";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, JoinColumn, OneToOne } from "typeorm"
 import { IsNotEmpty, MinLength } from 'class-validator';
 import { Role } from "./role.model";
-import { Student } from "./student.model";
-import { Professor } from "./professor.model";
+import { Person } from "./person.model";
 
 interface LevelI{
     id: number,
     role: Role,
     username: string,
     password: string,
-    student: Student;
-    professor: Professor;
+    person: Person;
     id_status: number
 }
 
@@ -33,15 +31,10 @@ export class User {
     @Column({type: 'varchar', length: 80, nullable: false})
     password: string
 
-    @OneToOne(() => Student, {nullable: true, createForeignKeyConstraints: true})
-    @JoinColumn({name: "id_student"})
+    @OneToOne(() => Person, {nullable: true, createForeignKeyConstraints: true})
+    @JoinColumn({name: "id_person"})
     @Index("user_FK_2")
-    student: Student
-
-    @OneToOne(() => Professor, {nullable: true, createForeignKeyConstraints: true})
-    @JoinColumn({name: "id_professor"})
-    @Index("user_FK_3")
-    professor: Professor
+    person: Person
 
     @Column({type: 'tinyint', width: 2, default: 1, nullable: false})
     id_status: number
@@ -50,8 +43,7 @@ export class User {
         this.role = data?.role;
         this.username = data?.username;
         this.password = data?.password;
-        this.student = data?.student;
-        this.professor = data?.professor;
+        this.person = data?.person;
         this.id_status = 1;
     }
 }

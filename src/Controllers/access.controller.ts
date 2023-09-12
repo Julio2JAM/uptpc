@@ -23,7 +23,6 @@ export class AccessController{
         }
     }
 
-    
     async post(req: Request, res: Response):Promise<Response>{
         try {
 
@@ -70,23 +69,28 @@ export class AccessController{
             const { token } = req.params;
             
             if(!token){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Token no send", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message:"Token no send", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
             const validateToken = verifyToken(token);
 
-            if(!validateToken){
-                return res.status(HTTP_STATUS.OK).send({token:false});
+            if(!validateToken.token){
+                return res.status(HTTP_STATUS.UNAUTHORIZED).json(token);
+            }
+            
+            const userModel = new UserModel();
+            const user = userModel.getById(User, validateToken.user, ["role", "person"])
+
+            if(!user){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: "Corrupt user", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const currentTime = Math.floor(Date.now() / 1000);
-            //const currentTime = new Date(validateToken.exp * 1000);
-            //const currentTimeString = currentTime.toLocaleDateString() + ' ' + currentTime.toLocaleTimeString()
-            return res.status(HTTP_STATUS.OK).send({token:(currentTime < validateToken.exp)});
+            validateToken.user = user;
+            return res.status(HTTP_STATUS.OK).json(validateToken);
 
         } catch (error) {
             console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }

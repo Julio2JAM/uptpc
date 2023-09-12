@@ -4,20 +4,25 @@ import jwt from 'jsonwebtoken';
 
 const secret = "LaPromesa-JustinQuiles";
 
-export function generateToken(payload: any): string{
-    return jwt.sign(payload, secret, {expiresIn: '8h'});
+export function generateToken(payload: any): string {
+  return jwt.sign(payload, secret, { expiresIn: '8h' });
 }
 
-export function verifyToken(token: string): any{
-    try {
-        // Verificar el token JWT
-        const decoded = jwt.verify(token, secret) as { [key: string]: any };
-        console.log(decoded);
-        return decoded;
-      } catch (error) {
-        console.log(error);
-        return null;
-      }
+export function verifyToken(token: string): any {
+  try {
+    const decoded = jwt.verify(token, secret) as { [key: string]: any };
+    return decoded;
+  } catch (error) {
+    const response: { token: null, expiredAt: any } = {
+      token: null,
+      expiredAt: null
+    }
+
+    if (error && typeof error === "object" && "expiredAt" in error) {
+      response.expiredAt = error.expiredAt;
+    }
+    return response
+  }
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {

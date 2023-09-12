@@ -8,14 +8,14 @@ export class RoleController{
 
     async get(req: Request, res: Response):Promise<Response>{
         try {
+
             const where = {
-                name: req.query?.name && Like(`%${req.query.name}%`),
-                id_status: req.query?.id_status
+                name        : req.query?.name && Like(`%${req.query.name}%`),
+                id_status   : req.query?.id_status
             }
 
-            const findOption = {where: removeFalsyFromObject(where)}
             const roleModel = new RoleModel();
-            const role = await roleModel.get(Role, findOption);
+            const role = await roleModel.get(Role, {where: removeFalsyFromObject(where)});
 
             if(role.length == 0){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Role not found", status: HTTP_STATUS.NOT_FOUND});

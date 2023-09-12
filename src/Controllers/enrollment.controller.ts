@@ -78,12 +78,19 @@ export class EnrollmentController{
             }
 
             const model = new Model();
-            const enrollment = await model.getById(Enrollment,Number(req.query.enrollment),["student","classroom"]);
+            const enrollment = await model.getById(Enrollment,Number(req.query.enrollment),{
+                classroom:true,
+                student:{
+                    person          : true,
+                    representative1 : true,
+                    representative2 : true,
+                }
+            });
 
             if(!enrollment){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid enrollment", status: HTTP_STATUS.BAD_RESQUEST});
             }
-
+            
             const relations =  { 
                 classroom: true, 
                 subject: true, 
@@ -103,7 +110,7 @@ export class EnrollmentController{
                 }
             }
 
-            const program = model.get(Program, {
+            const program = await model.get(Program, {
                 relations: relations,
                 where: removeFalsyFromObject(where)
             });

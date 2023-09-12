@@ -5,8 +5,7 @@ import { validation, hashPassword, removeFalsyFromObject } from "../Base/toolkit
 import { Role, RoleModel } from "../Models/role.model";
 import { Model } from "../Base/model";
 import { Like } from "typeorm";
-import { Student } from "../Models/student.model";
-import { Professor } from "../Models/professor.model";
+import { Person } from "../Models/person.model";
 
 export class UserController{
 
@@ -20,9 +19,12 @@ export class UserController{
                 id          : req.query?.id,
                 username    : req.query?.username && Like(`%${req.query?.username}%`),
                 id_status   : req.query?.id_status,
-                role   : {
+                role: {
                     id      : req.query?.idRole
                 },
+                person: {
+                    id      : req.query?.person,
+                }
             }
 
             const findData = {relations: relations, where: removeFalsyFromObject(where)}
@@ -104,36 +106,28 @@ export class UserController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            if(req.body.student && req.body.professor){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
-            }
-
             const model = new Model();
-            const userToUpdate = await model.getById(User,req.body.id,["role"]);
+            const userToUpdate = await model.getById(User,req.body.id,["role", "person"]);
             
             if(!userToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-            if(req.body.student){
-                const student = await model.getById(Student,req.body.student);
-                userToUpdate.student = student;
-            }else if(req.body.professor){
-                const professor = await model.getById(Professor,req.body.professor);
-                userToUpdate.professor = professor;
+
+            if(req.body.person){
+                const person = model.getById(Person, req.body.person);
+                if(!person){
+                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
+                }
+                userToUpdate.person = person;
             }
 
-            if(!userToUpdate.student && req.body.student || !userToUpdate.professor && req.body.professor){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
-            }
 
             if(req.body.role){
                 const role = await model.getById(Role,req.body.id);
-
                 if(!role){
                     res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_RESQUEST});
                 }
-                
                 userToUpdate.role = role;
             }
             
