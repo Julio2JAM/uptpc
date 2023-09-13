@@ -1,6 +1,6 @@
 //Entity
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm";
-import { IsNotEmpty, IsNumber, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from "typeorm";
+import { IsNotEmpty, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
 //Models
 import { Program } from "./program.model";
 import { Model } from "../Base/model";
@@ -11,7 +11,7 @@ interface AssignmentI{
     name: string,
     description: string,
     porcentage: number,
-    quantity: number,
+    base: number,
     datetime_end: Date,
     status: number,
 }
@@ -22,7 +22,7 @@ export class Assignment{
     id!: number;
 
     @ManyToOne(() => Program, {nullable: false})
-    @JoinColumn({name: "id_classroom"})
+    @JoinColumn({name: "id_program"})
     @Index("assignment_FK_1")
     @IsNotEmpty({message:"Please enter a classroom, professor and subject"})
     program!: Program;
@@ -36,8 +36,6 @@ export class Assignment{
     description: string;
 
     @Column({type:'tinyint', width:3, nullable:false})
-    @IsNotEmpty({message:"The porcentage of the assignment is required"})
-    @IsNumber()
     @IsInt({message:"The porcentage is not numeric"})
     @Min(1,{message:"The porcentage must be greater than 0"})
     @Max(100,{message:"The porcentage must be less than 100"})
@@ -45,10 +43,9 @@ export class Assignment{
 
     @Column({type:'tinyint', width:3, nullable:true, default: 20})
     @IsOptional()
-    @IsNumber()
-    @IsPositive({message: 'The porcentage must be greater than 0'})
-    @IsInt({message:"The quantity is not numeric"})
-    quantity: number;
+    @IsPositive({message: 'The base of the evaluation must be greater than 0'})
+    @IsInt({message:"The base is not numeric"})
+    base: number;
 
     @Column({type:'date', nullable:true})
     @IsOptional()
@@ -57,6 +54,9 @@ export class Assignment{
     @CreateDateColumn()
     datetime!: Date;
 
+    @UpdateDateColumn()
+    datetime_updated!: Date;
+
     @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: number
 
@@ -64,8 +64,8 @@ export class Assignment{
         this.program = data?.program;
         this.name = data?.name;
         this.description = data?.description;
-        this.porcentage = data?.porcentage;
-        this.quantity = data?.quantity;
+        this.porcentage = Number(data?.porcentage);
+        this.base = Number(data?.base);
         this.datetime_end = data?.datetime_end;
     }
 }
@@ -78,13 +78,13 @@ export class AssignmentModel extends Model {
      * @param id_program program identifier
      * @returns porcentage
      */
-    async calculatePorcentage(id_program: number){
+    async calculatePorcentage(id_program: number):Promise< {porcentage:number} | null >{
         const query = await AppDataSource.createQueryBuilder(Assignment, "assignment")
         .leftJoinAndSelect("assignment.program", "program")
         .where("program.id = :id_program", {id_program: id_program})
         .groupBy("program.id")
-        .select("(SUM(assignment.porcentage) - 100) AS porcentage")
-        .getOne();
+        .select("(100 - SUM(assignment.porcentage))", "porcentage")
+        .getRawOne();
 
         return query;
     }

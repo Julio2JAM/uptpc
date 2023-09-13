@@ -11,8 +11,23 @@ export class AssignmentGradeController{
     async get(req: Request, res:Response):Promise<Response>{
         try {
             const relations = {
-                assignment  : true,
-                enrollment  : true,
+                assignment  : {
+                    program:{
+                        classroom   : true,
+                        subject     : true,
+                        professor   : {
+                            person: true
+                        },
+                    }
+                },
+                enrollment  : {
+                    classroom           : true,
+                    student: {
+                        person          : true,
+                        representative1 : true,
+                        representative2 : true,
+                    },
+                },
             }
             const where = {
                 id          : req.query?.id,
@@ -45,18 +60,52 @@ export class AssignmentGradeController{
         try {
 
             if (!req.body.assignment || !req.body?.enrollment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Invalid data', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_RESQUEST});
             }
             
             const model = new Model();
-            req.body.assignment = model.getById(Assignment, req.body.idAssignment);
-            req.body.enrollment = model.getById(Enrollment, req.body.idEnrollment);
+            const assignmentRelations = {
+                program:{
+                    classroom   : true,
+                    subject     : true,
+                    professor   : {
+                        person: true
+                    },
+                }
+            }
+            req.body.assignment = await model.getById(Assignment, req.body.assignment, assignmentRelations);
+            
+            const enrollmentRelations = {
+                classroom           : true,
+                student: {
+                    person          : true,
+                    representative1 : true,
+                    representative2 : true,
+                },
+            }
+            req.body.enrollment = await model.getById(Enrollment, req.body.enrollment, enrollmentRelations);
 
             const newEvaluation = new Evaluation(req.body);
+            const error = await validation(newEvaluation);
+            if(error){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({error: error, status: HTTP_STATUS.BAD_RESQUEST});
+            }
 
-            const error = validation(newEvaluation);
-            if(!error){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({error: error, status: HTTP_STATUS.BAD_RESQUEST});
+            const validateEvaluation = await model.get(Evaluation, {
+                assignment: req.body.assignment,
+                enrollment: req.body.enrollment,
+            });
+
+            if(validateEvaluation.length > 0){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({error: "Alrady exist", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            if(req.body.grade > req.body.assignment.base){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({
+                    error: "Invalid grade", 
+                    min_grade: req.body.assignment.base, 
+                    status: HTTP_STATUS.BAD_RESQUEST
+                });
             }
 
             const evaluationModel = new EvaluationModel();
@@ -64,7 +113,37 @@ export class AssignmentGradeController{
             return res.status(HTTP_STATUS.CREATED).json(evaluation);
         } catch (error) {
             console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
+
+    async put(req: Request, res: Response): Promise<Response> {
+        try {
+            
+            if(!req.body.id){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const evaluationModel = new EvaluationModel();
+            let evaluationToUpdate = await evaluationModel.getById(Evaluation, req.body.id, ["enrollment", "assignment"]);
+            delete req.body.id;
+
+            if(!evaluationToUpdate){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: 'Invalid evaluation', status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            evaluationToUpdate = Object.assign(evaluationToUpdate, req.body);
+            const error = await validation(evaluationToUpdate);
+            if(error){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({error: error, status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const evaluation = await evaluationModel.create(Evaluation,evaluationToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(evaluation);
+
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
         }
     }
 }
