@@ -6,5 +6,6 @@ const controller = new AssignmentGradeController();
 
 router.get('/', controller.get);
 router.post('/', controller.post);
+router.put('/', controller.put);
 
 export default router;

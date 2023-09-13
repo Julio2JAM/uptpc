@@ -12,10 +12,10 @@ export class ProgramController{
         try {
             const relations = {
                 classroom: true, 
+                subject: true,
                 professor: {
                     person: true
                 }, 
-                subject: true
             };
             const where = {
                 id              : req.query?.id,

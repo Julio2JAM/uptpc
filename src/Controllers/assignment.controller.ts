@@ -10,18 +10,33 @@ export class AssignmentController{
     async get(req:Request, res:Response):Promise<Response>{
         try {
             const relations = {
-                program:true
+                program:{
+                    classroom   : true,
+                    subject     : true,
+                    professor   : {
+                        person: true
+                    },
+                }
             }
             const where = {
                 program: {
-                    id:req.query.idProgram,
+                    id          : req.query.idProgram,
+                    classroom: {
+                        id      : req.query.idClassroom
+                    },
+                    professor: {
+                        id      : req.query.idProfessor
+                    },
+                    subject: {
+                        id      : req.query.idSubject
+                    },
                 },
-                name: req.query?.name && Like(`%${req.query.name}%`),
-                description: req.query?.description && Like(`%${req.query.description}%`),
-                porcentage: req.query?.porcentage && Number(req.query.porcentage),
-                quantity: req.query?.quantity && Number(req.query.quantity),
-                datetime_end: req.query?.datetime_end,
-                id_status: req.query?.id_status,
+                name            : req.query?.name && Like(`%${req.query.name}%`),
+                description     : req.query?.description && Like(`%${req.query.description}%`),
+                porcentage      : req.query?.porcentage && Number(req.query.porcentage),
+                quantity        : req.query?.quantity && Number(req.query.quantity),
+                datetime_end    : req.query?.datetime_end,
+                id_status       : req.query?.id_status,
             }
 
             const findData = {relations:relations, where: removeFalsyFromObject(where)}
@@ -48,7 +63,14 @@ export class AssignmentController{
             }
 
             const programModel = new ProgramModel();
-            req.body.program = await programModel.getById(Program, req.body.program);
+            const programRelations = {
+                professor:{
+                    person  : true
+                },
+                classroom   : true,
+                subject     : true
+            }
+            req.body.program = await programModel.getById(Program, req.body.program, programRelations);
 
             if(!req.body.program){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid program", "status": HTTP_STATUS.BAD_RESQUEST});
@@ -57,12 +79,11 @@ export class AssignmentController{
             const assignmentModel = new AssignmentModel();
 
             if(req.body.porcentage){
-                const porcentage = assignmentModel.calculatePorcentage(1/*req.body.program.id*/);
-                console.log(`Porcentage: ${porcentage}`);
+                const porcentage = await assignmentModel.calculatePorcentage(req.body.program.id);
 
-                //if(Number(req.body.porcentage) < porcentage){
-                //    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid porcentage", "status": HTTP_STATUS.BAD_RESQUEST});
-                //}
+                if(porcentage && Number(req.body.porcentage) > porcentage.porcentage){
+                   return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_RESQUEST});
+                }
             }
 
             const newAssignment = new Assignment(req.body);
@@ -71,8 +92,8 @@ export class AssignmentController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const acitvity = await assignmentModel.create(Assignment,newAssignment);
-            return res.status(HTTP_STATUS.CREATED).json(acitvity)
+            const assignment = await assignmentModel.create(Assignment,newAssignment);
+            return res.status(HTTP_STATUS.CREATED).json(assignment)
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR})
@@ -88,9 +109,18 @@ export class AssignmentController{
 
             const assignmentModel = new AssignmentModel();
             let assignmentToUpdate = await assignmentModel.getById(Assignment, req.body.id, ["program"]);
+            delete req.body.id;
 
             if(!assignmentToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No assignment fund", "status": HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            if(req.body.porcentage){
+                const porcentage = await assignmentModel.calculatePorcentage(assignmentToUpdate.program.id);
+
+                if(porcentage && Number(req.body.porcentage) > porcentage.porcentage && req.body.porcentage > assignmentToUpdate.porcentage){
+                   return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_RESQUEST});
+                }
             }
 
             assignmentToUpdate = Object.assign(assignmentToUpdate, req.body);

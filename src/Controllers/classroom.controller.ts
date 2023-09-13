@@ -67,20 +67,14 @@ export class ClassroomController{
             }
 
             const classroomModel = new ClassroomModel();
-            const classroomToUpdate = await classroomModel.getById(Classroom, req.body.id);
+            let classroomToUpdate = await classroomModel.getById(Classroom, req.body.id);
+            delete req.body.id;
 
             if(!classroomToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Classroom not found", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
-            for(const key in classroomToUpdate){
-                classroomToUpdate[key] = req.body[key] ?? classroomToUpdate[key];
-
-                if(classroomToUpdate[key] === ""){
-                    classroomToUpdate[key] = null;
-                }
-            }
-
+            classroomToUpdate = Object.assign(classroomToUpdate, req.body);
             const classroom = await classroomModel.create(Classroom, classroomToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(classroom);
         } catch (error) {

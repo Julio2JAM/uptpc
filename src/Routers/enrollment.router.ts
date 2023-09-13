@@ -5,6 +5,7 @@ const router = Router();
 const controller = new EnrollmentController();
 
 router.get('/', controller.get);
+router.get('/program/', controller.getProgram);
 router.get('/studentNoClassroom/', controller.studentNoClassroom);
 router.post('/', controller.post);
 

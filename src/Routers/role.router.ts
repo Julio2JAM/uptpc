@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { LevelController } from "../Controllers/level.controller";
+import { RoleController } from "../Controllers/role.controller";
 
 const router = Router();
-const controller = new LevelController();
+const controller = new RoleController();
 
 router.get('/', controller.get);
-router.get('/:id', controller.getById);
 router.post('/', controller.post);
 
 export default router;
