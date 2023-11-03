@@ -106,7 +106,9 @@ export class EnrollmentController{
                     name: req.query.subjectName
                 },
                 professor: {
-                    name: req.query.professorName,
+                    person: {
+                        name:req.query.professorName
+                    }
                 }
             }
 
