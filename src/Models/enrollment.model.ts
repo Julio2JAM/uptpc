@@ -87,7 +87,7 @@ export class EnrollmentModel extends Model{
         .leftJoinAndSelect("student.representative1", "representative1")
         .leftJoinAndSelect("student.representative2", "representative2")
         .leftJoinAndSelect("enrollment", "enrollment", "enrollment.id_student = student.id")
-        .where("enrollment.id IS NULL")
+        //.where("enrollment.id IS NULL")
         .getMany();
 
         return Students;

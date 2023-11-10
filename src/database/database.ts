@@ -1,6 +1,6 @@
 //import mariadb from 'mariadb';
 import { DataSource } from 'typeorm';
-import { DATABASE } from '../Base/globals';
+import { DATABASE, ENVIROMENT } from '../Base/globals';
 /*
 export const pool = mariadb.createPool({
     "host": DATABASE.HOST,
@@ -17,7 +17,7 @@ const AppDataSource = new DataSource({
     database: 'sstest2',//DATABASE.NAME,
     username: DATABASE.USER,
     password: DATABASE.PASS,
-    entities: ['**/*.model.ts'],
+    entities: [ENVIROMENT == 'production' ? "**/*.model.js" : "**/*.model.ts"],
     synchronize: false,
     logging: true
 });

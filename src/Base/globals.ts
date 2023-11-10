@@ -12,3 +12,5 @@ export const DATABASE = {
     PASS: process.env.BD_PASS,
     PORT: process.env.BD_PORT
 }
+
+export const ENVIROMENT = process.env.ENVIROMENT || "development";
