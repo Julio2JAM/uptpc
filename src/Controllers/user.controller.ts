@@ -107,12 +107,12 @@ export class UserController{
             }
 
             const model = new Model();
-            const userToUpdate = await model.getById(User,req.body.id,["role", "person"]);
+            var userToUpdate = await model.getById(User,req.body.id,["role", "person"]);
+            delete req.body.id;
             
             if(!userToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
-
 
             if(req.body.person){
                 const person = model.getById(Person, req.body.person);
@@ -120,21 +120,24 @@ export class UserController{
                     return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
                 }
                 userToUpdate.person = person;
+                delete req.body.person;
             }
 
-
-            if(req.body.role){
-                const role = await model.getById(Role,req.body.id);
+            if(req.body.id_role){
+                const role = await model.getById(Role,req.body.id_role);
                 if(!role){
                     res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_RESQUEST});
                 }
                 userToUpdate.role = role;
+                delete req.body.id_role;
             }
             
             if(req.body.password){
                 userToUpdate.password = await hashPassword(req.body.password);
+                delete req.body.password;
             }
 
+            userToUpdate = Object.assign(userToUpdate, req.body);
             const user = await model.create(User,userToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {
