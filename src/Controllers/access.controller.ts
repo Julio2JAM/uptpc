@@ -44,7 +44,7 @@ export class AccessController{
 
             const dataAccess = {
                 user: user,
-                token: generateToken({id: user.id})
+                token: generateToken({id_user: user.id})
             }
             
             const newAccess = new Access(dataAccess);
@@ -73,13 +73,12 @@ export class AccessController{
             }
 
             const validateToken = verifyToken(token);
-
-            if(!validateToken.token){
-                return res.status(HTTP_STATUS.UNAUTHORIZED).json(token);
+            if(!validateToken.id_user){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json(validateToken);
             }
             
             const userModel = new UserModel();
-            const user = userModel.getById(User, validateToken.user, ["role", "person"])
+            const user = await userModel.getById(User, validateToken.id_user, ["role", "person"])
 
             if(!user){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: "Corrupt user", status:HTTP_STATUS.BAD_RESQUEST});
