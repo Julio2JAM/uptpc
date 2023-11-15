@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Professor, ProfessorModel } from "../Models/professor.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Person, PersonModel } from "../Models/person.model";
-import { removeFalsyFromObject, validation } from "../Base/toolkit";
+import { removeFalsyFromObject } from "../Base/toolkit";
 import { Like } from "typeorm";
 
 export class ProfessorController{
@@ -79,14 +79,6 @@ export class ProfessorController{
 
             if(!req.body.person && !req.body.idPerson){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
-            }
-
-            const personModel = new PersonModel();
-            const newPerson = new Person(req.body.idPerson ? await personModel.getById(Person, Number(req.body.idPerson)) : req.body.person);
-
-            const errors = await validation(newPerson);
-            if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const professorModel = new ProfessorModel();

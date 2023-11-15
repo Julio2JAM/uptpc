@@ -13,7 +13,8 @@ export class UserController{
         try {
 
             const relations = {
-                role: true
+                role: true,
+                person: true
             }
             const where = {
                 id          : req.query?.id,
@@ -115,7 +116,7 @@ export class UserController{
             }
 
             if(req.body.person){
-                const person = model.getById(Person, req.body.person);
+                const person = await model.getById(Person, req.body.person);
                 if(!person){
                     return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
                 }

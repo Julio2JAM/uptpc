@@ -1,8 +1,8 @@
 import { Student, StudentModel } from "../Models/student.model";
 import { Response, Request } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { Model } from "../Base/model";
-import { Person } from "../Models/person.model";
+// import { Model } from "../Base/model";
+// import { Person } from "../Models/person.model";
 import { Like } from "typeorm";
 import { removeFalsyFromObject } from "../Base/toolkit";
 
@@ -109,20 +109,10 @@ export class StudentController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const model = new Model();
             for (const key in req.body) {
-
                 if(Object.entries(req.body[key]).length == 0){
-                    continue;
+                    delete req.body[key];
                 }
-
-                const newPerson = new Person(req.body[key]);
-                req.body[key] = await model.create(Person,newPerson);
-
-                if(!req.body[key]){
-                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
-                }
-
             }
 
             const studentModel = new StudentModel();
