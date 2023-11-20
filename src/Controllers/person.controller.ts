@@ -22,7 +22,7 @@ export class PersonController{
             const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
 
             const personModel = new PersonModel();
-            const persons = await personModel.get(Person, {where:whereOptions});
+            const persons = await personModel.get(Person, {where:whereOptions, relation:["student"]});
 
             if(persons.length == 0){
                 console.log("no data found");
