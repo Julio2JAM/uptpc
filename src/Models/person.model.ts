@@ -60,7 +60,7 @@ export class Person {
     student!: Student;
 
     @OneToOne(() => Professor, professor => professor.person)
-    professor!: Student;
+    professor!: Professor;
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
     @IsInt()
