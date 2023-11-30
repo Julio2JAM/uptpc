@@ -10,26 +10,13 @@ export class AssignmentController{
     async get(req:Request, res:Response):Promise<Response>{
         try {
             const relations = {
-                program:{
-                    classroom   : true,
-                    subject     : true,
-                    professor   : {
-                        person: true
-                    },
-                }
+                professor   : {
+                    person: true
+                },
             }
             const where = {
-                program: {
-                    id          : req.query.idProgram,
-                    classroom: {
-                        id      : req.query.idClassroom
-                    },
-                    professor: {
-                        id      : req.query.idProfessor
-                    },
-                    subject: {
-                        id      : req.query.idSubject
-                    },
+                professor       : {
+                    id: req.query?.idProfessor
                 },
                 name            : req.query?.name && Like(`%${req.query.name}%`),
                 description     : req.query?.description && Like(`%${req.query.description}%`),
