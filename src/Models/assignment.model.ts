@@ -14,6 +14,7 @@ interface AssignmentI{
     description: string,
     porcentage: number,
     base: number,
+    datetime_start: Date,
     datetime_end: Date,
     status: number,
 }
@@ -56,6 +57,10 @@ export class Assignment{
 
     @Column({type:'date', nullable:true})
     @IsOptional()
+    datetime_start: Date;
+
+    @Column({type:'date', nullable:true})
+    @IsOptional()
     datetime_end: Date;
 
     @CreateDateColumn()
@@ -74,6 +79,7 @@ export class Assignment{
         this.description = data?.description;
         this.porcentage = Number(data?.porcentage);
         this.base = Number(data?.base);
+        this.datetime_start = data?.datetime_start;
         this.datetime_end = data?.datetime_end;
     }
 }

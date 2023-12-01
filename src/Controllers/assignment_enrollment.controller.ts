@@ -2,29 +2,39 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Assignment_enrollment, Assignment_enrollmentModel } from "../Models/assignment_enrollment.model";
 import { removeFalsyFromObject } from "../Base/toolkit";
-import { Professor } from "../Models/professor.model";
 import { Model } from "../Base/model";
 import { Assignment } from "../Models/assignment.model";
+import { Subject } from "typeorm/persistence/Subject";
+import { Classroom } from "../Models/classroom.model";
 
 export class Assignment_enrollmentController{
     async get(req: Request, res: Response): Promise<Response>{
         try {
             
             const relations = {
-                professor: {
-                    person: true
+                assignment: {
+                    Professor: {
+                        person: true
+                    }
                 },
-                Subject: true,
+                classroom: true,
+                subject: true,
             };
 
             const where = {
-                professor: {
-                    id: req.query.idProfessor,
-                    person:{
-                        id: req.query.idPerson,
+                assignment: {
+                    id: req.query.idAssigment,
+                    professor: {
+                        id: req.query.idProfessorAssigment,
+                        person: {
+                            id: req.query.idPersonAssigment,
+                        }
                     }
                 },
-                Subject: {
+                classroom: {
+                    id: req.query.idClassroom,
+                },
+                subject: {
                     id: req.query.idSubject,
                 },
             }
@@ -48,15 +58,16 @@ export class Assignment_enrollmentController{
     async post(req: Request, res: Response): Promise<Response> {
         try {
             
-            if(!req.body.idProfessor || !req.body.idAssigment){
+            if(!req.body.idProgram || !req.body.idAssigment){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const model = new Model();
-            req.body.idProfessor = await model.getById(Professor, req.body.idProfessor);
             req.body.idAssigment = await model.getById(Assignment, req.body.idAssigment);
+            req.body.idClassroom = await model.getById(Classroom, req.body.idClassroom);
+            req.body.idSubject = await model.getById(Subject, req.body.idSubject);
 
-            if(!req.body.idProfessor || !req.body.idAssigment){
+            if(!req.body.idProfessor || !req.body.idAssigment || !req.body.idClassroom){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
