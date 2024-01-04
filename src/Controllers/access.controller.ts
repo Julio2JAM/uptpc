@@ -73,18 +73,23 @@ export class AccessController{
             }
 
             const validateToken = verifyToken(token);
+
+            if(typeof validateToken == 'string'){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: "Corrupt user", status:HTTP_STATUS.BAD_RESQUEST});
+            }
+
             if(!validateToken.id_user){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).json(validateToken);
             }
             
             const userModel = new UserModel();
-            const user = await userModel.getById(User, validateToken.id_user, ["role", "person"])
+            const user = await userModel.getById(User, Number(validateToken.id_user), ["role", "person"])
 
             if(!user){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: "Corrupt user", status:HTTP_STATUS.BAD_RESQUEST});
             }
 
-            validateToken.user = user;
+            validateToken.id_user = user;
             return res.status(HTTP_STATUS.OK).json(validateToken);
 
         } catch (error) {

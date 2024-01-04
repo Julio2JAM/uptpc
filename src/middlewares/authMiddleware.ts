@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { HTTP_STATUS } from '../Base/statusHttp';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const secret = "LaPromesa-JustinQuiles";
 
@@ -8,20 +8,12 @@ export function generateToken(payload: any): string {
   return jwt.sign(payload, secret, { expiresIn: '8h' });
 }
 
-export function verifyToken(token: string): any {
+export function verifyToken(token: string): JwtPayload | string {
   try {
-    const decoded = jwt.verify(token, secret) as { [key: string]: any };
+    const decoded = jwt.verify(token, secret);
     return decoded;
-  } catch (error) {
-    const response: { token: null, expiredAt: any } = {
-      token: null,
-      expiredAt: null
-    }
-
-    if (error && typeof error === "object" && "expiredAt" in error) {
-      response.expiredAt = error.expiredAt;
-    }
-    return response
+  } catch (error: any) {
+    return error?.message ?? "Error verifying token";
   }
 }
 
@@ -39,11 +31,12 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   const payload = verifyToken(token);
-  if (!payload) {
-    res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Invalid token' });
+
+  if (typeof payload == "string") {
+    res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: payload });
     return;
   }
 
-  req.user = payload;
+  req.user = payload.id_user;
   next();
 }
