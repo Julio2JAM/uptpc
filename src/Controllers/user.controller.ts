@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { UserModel, User } from "../Models/user.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { validation, hashPassword, removeFalsyFromObject } from "../Base/toolkit";
-import { Role, RoleModel } from "../Models/role.model";
+import { Role } from "../Models/role.model";
 import { Model } from "../Base/model";
 import { Like } from "typeorm";
 import { Person } from "../Models/person.model";
@@ -13,7 +13,8 @@ export class UserController{
         try {
 
             const relations = {
-                role: true
+                role: true,
+                person: true
             }
             const where = {
                 id          : req.query?.id,
@@ -70,15 +71,22 @@ export class UserController{
             }
             req.body.password = await hashPassword(req.body.password);
             
+            const model = new Model();
             if(req.body.role){
-                const roleModel = new RoleModel();
-                const role = roleModel.getById(Role,req.body.role);
-
+                const role = model.getById(Role,req.body.role);
                 if(!role){
                     return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid role id", "status": HTTP_STATUS.BAD_RESQUEST});
                 }
-
                 req.body.role = role;
+            }
+
+            if(req.body.idPerson){
+                const person = model.getById(Person,req.body.role);
+                if(!person){
+                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid person id", "status": HTTP_STATUS.BAD_RESQUEST});
+                }
+                req.body.person = person;
+                delete req.body.idPerson;
             }
 
             //Se obtienen los datos del req y se usa el constructor para asignarlos
@@ -107,34 +115,37 @@ export class UserController{
             }
 
             const model = new Model();
-            const userToUpdate = await model.getById(User,req.body.id,["role", "person"]);
+            var userToUpdate = await model.getById(User,req.body.id,["role", "person"]);
+            delete req.body.id;
             
             if(!userToUpdate){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
             }
 
-
-            if(req.body.person){
-                const person = model.getById(Person, req.body.person);
+            if(req.body.idPerson){
+                const person = await model.getById(Person, req.body.idPerson);
                 if(!person){
                     return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
                 }
                 userToUpdate.person = person;
+                delete req.body.idPerson;
             }
 
-
-            if(req.body.role){
-                const role = await model.getById(Role,req.body.id);
+            if(req.body.idRole){
+                const role = await model.getById(Role,req.body.idRole);
                 if(!role){
                     res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_RESQUEST});
                 }
                 userToUpdate.role = role;
+                delete req.body.idRole;
             }
             
             if(req.body.password){
                 userToUpdate.password = await hashPassword(req.body.password);
+                delete req.body.password;
             }
 
+            userToUpdate = Object.assign(userToUpdate, req.body);
             const user = await model.create(User,userToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(user);
         } catch (error) {

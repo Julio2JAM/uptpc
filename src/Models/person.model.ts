@@ -1,7 +1,9 @@
 //import AppDataSource from "../database/database"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne } from "typeorm"
 import { IsNotEmpty, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, Allow} from 'class-validator';
 import { Model } from "../Base/model";
+import { Student } from "./student.model";
+import { Professor } from "./professor.model";
 
 interface StudentI{
     id: number,
@@ -53,6 +55,12 @@ export class Person {
 
     @CreateDateColumn()
     datetime!: Date;
+
+    @OneToOne(() => Student, student => student.person)
+    student!: Student;
+
+    @OneToOne(() => Professor, professor => professor.person)
+    professor!: Professor;
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
     @IsInt()

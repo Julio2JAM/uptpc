@@ -9,6 +9,10 @@ export class PersonController{
     async get(req:Request, res:Response):Promise<Response>{
         try {
 
+            const relations = {
+                student:true,
+                professor:true,
+            };
             const data = {
                 id         : req.query?.id,
                 cedule     : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
@@ -22,7 +26,7 @@ export class PersonController{
             const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
 
             const personModel = new PersonModel();
-            const persons = await personModel.get(Person, {where:whereOptions});
+            const persons = await personModel.get(Person, {where:whereOptions, relations:relations});
 
             if(persons.length == 0){
                 console.log("no data found");

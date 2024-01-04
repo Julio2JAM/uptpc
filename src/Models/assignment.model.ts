@@ -2,16 +2,19 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from "typeorm";
 import { IsNotEmpty, IsOptional, IsInt, Min, Max, IsPositive } from "class-validator";
 //Models
-import { Program } from "./program.model";
+// import { Program } from "./program.model";
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
+import { Professor } from "./professor.model";
 
 interface AssignmentI{
-    program: Program,
+    // program: Program,
+    professor: Professor,
     name: string,
     description: string,
     porcentage: number,
     base: number,
+    datetime_start: Date,
     datetime_end: Date,
     status: number,
 }
@@ -21,11 +24,16 @@ export class Assignment{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => Program, {nullable: false})
-    @JoinColumn({name: "id_program"})
+    // @ManyToOne(() => Program, {nullable: false})
+    // @JoinColumn({name: "id_program"})
+    // @Index("assignment_FK_1")
+    // @IsNotEmpty({message:"Please enter a classroom, professor and subject"})
+    // program!: Program;
+
+    @ManyToOne(() => Professor, {nullable: false})
+    @JoinColumn({name: "id_professor"})
     @Index("assignment_FK_1")
-    @IsNotEmpty({message:"Please enter a classroom, professor and subject"})
-    program!: Program;
+    professor!: Professor;
 
     @Column({type:'varchar', length:60, nullable:false})
     @IsNotEmpty({message:"The name of the assignment is not specified"})
@@ -49,6 +57,10 @@ export class Assignment{
 
     @Column({type:'date', nullable:true})
     @IsOptional()
+    datetime_start: Date;
+
+    @Column({type:'date', nullable:true})
+    @IsOptional()
     datetime_end: Date;
 
     @CreateDateColumn()
@@ -61,11 +73,13 @@ export class Assignment{
     id_status!: number
 
     constructor(data:AssignmentI){
-        this.program = data?.program;
+        // this.program = data?.program;
+        this.professor = data?.professor;
         this.name = data?.name;
         this.description = data?.description;
         this.porcentage = Number(data?.porcentage);
         this.base = Number(data?.base);
+        this.datetime_start = data?.datetime_start;
         this.datetime_end = data?.datetime_end;
     }
 }

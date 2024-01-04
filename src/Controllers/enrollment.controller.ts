@@ -7,11 +7,28 @@ import { Model } from "../Base/model";
 import { Like } from "typeorm";
 import { Program } from "../Models/program.model";
 import { removeFalsyFromObject } from "../Base/toolkit";
+import { User, UserModel } from "../Models/user.model";
 
 export class EnrollmentController{
 
     async get(req: Request, res:Response):Promise<Response>{
         try {
+
+            const userModel = new UserModel();
+            const user = await userModel.getById(User, Number(req.user), {
+                person: true,
+            })
+
+            const query: any = {
+                idPerson: null,
+            };
+
+            if(!user){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
+            }else if(user.role !== 1){
+                query.idPerson = user.person.id;
+                req.query = query;
+            }
 
             const relations = {
                 classroom           : true,
@@ -27,7 +44,7 @@ export class EnrollmentController{
                 student: {
                     id              : req.query?.idStudent,
                     person:{
-                        id          : req.query?.personId && Number(req.query.personId),
+                        id          : req.query?.idPerson && Number(req.query.idPerson),
                         name        : req.query?.personName && Like(`%${req.query?.personName}%`),
                         lastName    : req.query?.personLastName && Like(`%${req.query?.personLastName}%`),
                         cedule      : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
