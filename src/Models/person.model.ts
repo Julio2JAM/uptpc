@@ -4,6 +4,7 @@ import { IsNotEmpty, IsDate, IsString, IsEmail, IsOptional, IsInt, IsPositive, A
 import { Model } from "../Base/model";
 import { Student } from "./student.model";
 import { Professor } from "./professor.model";
+import { User } from "./user.model";
 
 interface StudentI{
     id: number,
@@ -61,6 +62,9 @@ export class Person {
 
     @OneToOne(() => Professor, professor => professor.person)
     professor!: Professor;
+
+    @OneToOne(() => User, user => user.person)
+    user!: User;
 
     @Column({ type: 'tinyint', width: 2, default: 1, nullable: false})
     @IsInt()
