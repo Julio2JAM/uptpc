@@ -8,12 +8,17 @@ export function generateToken(payload: any): string {
   return jwt.sign(payload, secret, { expiresIn: '8h' });
 }
 
-export function verifyToken(token: string): JwtPayload | string {
+export function verifyToken(token: string): JwtPayload | { error: string } {
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded: string | JwtPayload = jwt.verify(token, secret);
+    if (typeof decoded === 'string') {
+      throw new Error(decoded);
+    }
     return decoded;
   } catch (error: any) {
-    return error?.message ?? "Error verifying token";
+    return {
+      error: error?.message ?? "Error verifying token"
+    };
   }
 }
 
@@ -32,11 +37,11 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
 
   const payload = verifyToken(token);
 
-  if (typeof payload == "string") {
+  if ("error" in payload) {
     res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: payload });
     return;
   }
 
-  req.user = payload.id_user;
+  req.user = payload.user?.id;
   next();
 }

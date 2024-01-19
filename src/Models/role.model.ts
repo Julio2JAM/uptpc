@@ -2,6 +2,10 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Model } from "../Base/model";
 import { IsNotEmpty } from "class-validator";
 
+interface RoleI{
+    name: string,
+}
+
 @Entity()
 export class Role{
     @PrimaryGeneratedColumn()
@@ -14,8 +18,8 @@ export class Role{
     @Column({type:"int", width:2, nullable:false, default:1})
     id_status!: number;
 
-    constructor(name:string){
-        this.name = name;
+    constructor(data:RoleI){
+        this.name = data?.name;
     }
 }
 

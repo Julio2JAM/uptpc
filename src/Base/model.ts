@@ -4,6 +4,12 @@ import AppDataSource from "../database/database"
 
 export class Model{
 
+    /**
+     * Search data in the database by params (conditions) and relations sends.
+     * @param {EntityTarget<ObjectLiteral>} entity - The entity from which to retrieve the data from the database.
+     * @param {Object} findData 
+     * @returns {Promise<ObjectLiteral>} Returns the data of the entity stored in the database.
+     */
     async get(entity:EntityTarget<ObjectLiteral>, findData:Object = {where:{},relations:{}}): Promise<any>{
         console.log("get");
         return await AppDataSource.manager.find(entity, findData);

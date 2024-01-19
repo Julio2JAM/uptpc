@@ -55,6 +55,7 @@ export class RoleController{
 
             const roleModel = new RoleModel();
             let roleToUpdate = roleModel.getById(Role, req.body.id);
+            delete req.body.id;
 
             if(!roleToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
