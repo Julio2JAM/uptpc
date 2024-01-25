@@ -67,11 +67,12 @@ export class StudentController{
             }
 
             const studentModel = new StudentModel();
-            const studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"]);
+            var studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"]);
 
             if(!studentToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Student no fund", status:HTTP_STATUS.BAD_RESQUEST});
             }
+            delete req.body.id;
 
             const updatable = [
                 "person",
@@ -79,20 +80,19 @@ export class StudentController{
                 "representative2",
             ];
 
-            for (const key in studentToUpdate) {
+            for (const value of updatable) {
 
-                if(!updatable.includes(key) || !req.body[key] && key == "person" || typeof req.body[key] !== "object") {
-                    continue;
-                }
-
-                if(Object.entries(req.body[key]).length == 0 && req.body[key] !== undefined){
-                    studentToUpdate[key] = null;
-                }else if(!req.body[key].id && Object.entries(studentToUpdate[key]).length > 0){
-                    studentToUpdate[key] = Object.assign(studentToUpdate[key], req.body[key]);
+                if(Object.entries(req.body[value]).length == 0){
+                    studentToUpdate[value] = null;
+                    delete req.body[value];
+                }else if(!req.body[value].id && Object.entries(studentToUpdate[value]).length > 0){
+                    studentToUpdate[value] = Object.assign(studentToUpdate[value], req.body[value]);
+                    delete req.body[value];
                 }
 
             }
 
+            studentToUpdate = Object.assign(studentToUpdate, req.body);
             const student = await studentModel.create(Student, studentToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(student);
 
