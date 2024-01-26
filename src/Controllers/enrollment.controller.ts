@@ -15,10 +15,7 @@ export class EnrollmentController{
         try {
 
             const userModel = new UserModel();
-            const user = await userModel.getById(User, Number(req.user), {
-                person: true,
-            })
-
+            const user = await userModel.getById(User, Number(req.user));
             const query: any = {
                 idPerson: null,
             };
@@ -26,7 +23,7 @@ export class EnrollmentController{
             if(!user){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
             }else if(user.role !== 1){
-                query.idPerson = user.person.id;
+                query.idPerson = user.person;
                 req.query = query;
             }
 
@@ -134,6 +131,7 @@ export class EnrollmentController{
                 where: removeFalsyFromObject(where)
             });
             return res.status(HTTP_STATUS.OK).json(program);
+            
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
@@ -161,8 +159,8 @@ export class EnrollmentController{
         try {
 
             const data = {
-                student: req.body?.student?.id,
-                classroom: req.body?.classroom?.id,
+                student: req.body?.student,
+                classroom: req.body?.classroom,
             }
 
             if(!data.classroom || !data.student){
@@ -178,8 +176,9 @@ export class EnrollmentController{
             }
 
             const newEnrollment = new Enrollment(data);
-            const enrollment = await model.create(Enrollment,newEnrollment);
+            const enrollment = await model.create(Enrollment, newEnrollment);
             return res.status(HTTP_STATUS.CREATED).json(enrollment);
+
         } catch (error) {
             console.log(error);
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});

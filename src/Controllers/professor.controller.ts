@@ -49,11 +49,12 @@ export class ProfessorController{
             }
 
             const professorModel = new ProfessorModel();
-            const professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"]);
+            var professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"]);
 
             if(!professorToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_RESQUEST});
             }
+            delete req.body.id;
 
             const personModel = new PersonModel();
 
@@ -61,10 +62,10 @@ export class ProfessorController{
                 professorToUpdate.person = await personModel.getById(Person, req.body.idPerson);
             }else if(professorToUpdate.person?.id){
                 professorToUpdate.person = Object.assign(professorToUpdate.person, req.body.person);
-            }else{
-                professorToUpdate.person = new Person(req.body.person);
+                delete req.body.person;
             }
         
+            professorToUpdate = Object.assign(professorToUpdate, req.body);
             const professor = await professorModel.create(Professor, professorToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(professor);
 

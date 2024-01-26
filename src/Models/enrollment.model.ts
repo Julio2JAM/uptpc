@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn, ObjectLiteral } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn, ObjectLiteral, Unique } from "typeorm";
 import { Classroom } from "./classroom.model";
 import { Student } from "./student.model";
 import { IsNotEmpty } from "class-validator";
@@ -13,6 +13,7 @@ interface EnrollmentI{
 }
 
 @Entity()
+@Unique(["classroom", "student"])
 export class Enrollment{
     @PrimaryGeneratedColumn()
     id!: number;
