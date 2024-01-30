@@ -6,6 +6,7 @@ import { Classroom } from "../Models/classroom.model";
 import { Subject } from "typeorm/persistence/Subject";
 import { Professor } from "../Models/professor.model";
 import { removeFalsyFromObject } from "../Base/toolkit";
+import { Like } from "typeorm";
 
 export class ProgramController{
     async get(req: Request, res: Response):Promise<Response>{
@@ -25,12 +26,14 @@ export class ProgramController{
                 },
                 subject: {
                     id          : req.query?.idSubject,
-                    name        : req.query?.subjectName,
+                    name        : req.query?.subjectName && Like(`%${req.query?.subjectName}`),
                 },
                 professor: {
                     id          : req.query?.idProfessor,
                     person: {
-                        name    : req.query?.professorName,
+                        name    : req.query?.personName && Like(`%${req.query?.personName}%`),
+                        lastName: req.query?.personLastName && Like(`%${req.query?.personLastName}%`),
+                        cedule  : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
                     }
                 },
             }

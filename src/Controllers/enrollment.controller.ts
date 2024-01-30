@@ -55,7 +55,8 @@ export class EnrollmentController{
                     datetime_end    : req.query?.datetime_end,
                 },
             };
-            const findData = {relations: relations, where: where}
+            
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
             const enrollmentModel = new EnrollmentModel();
             const enrollment = await enrollmentModel.get(Enrollment, findData);
 
