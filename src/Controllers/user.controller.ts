@@ -73,7 +73,7 @@ export class UserController{
             
             const model = new Model();
             if(req.body.role){
-                const role = model.getById(Role,req.body.role);
+                const role = model.getById(Role, req.body.role ?? req.body.idRole);
                 if(!role){
                     return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid role id", "status": HTTP_STATUS.BAD_RESQUEST});
                 }

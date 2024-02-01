@@ -81,4 +81,28 @@ export class ProgramController{
         }
     }
 
+    async put(req:Request, res:Response): Promise<Response> {
+        try {
+
+            if(!req.body.id){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Invalid request', status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            const programModel = new ProgramModel();
+            var programToUpdate = programModel.getById(Program, req.body.id);
+            delete req.body.id;
+
+            if(!programToUpdate){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Program no found', status: HTTP_STATUS.BAD_RESQUEST});
+            }
+
+            programToUpdate = Object.assign(programToUpdate, req.body);
+            const program = programModel.create(Program, programToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(program);
+            
+        } catch (error) {
+            console.log(error);
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+        }
+    }
 }

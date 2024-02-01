@@ -23,6 +23,7 @@ export function verifyToken(token: string): JwtPayload | { error: string } {
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Authorization header missing' });

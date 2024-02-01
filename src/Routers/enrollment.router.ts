@@ -9,5 +9,6 @@ router.get('/', authMiddleware, controller.get);
 router.get('/program/', authMiddleware, controller.getProgram);
 router.get('/studentNoClassroom/', controller.studentNoClassroom);
 router.post('/', controller.post);
+router.put('/', controller.put);
 
 export default router;

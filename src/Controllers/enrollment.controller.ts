@@ -22,7 +22,9 @@ export class EnrollmentController{
 
             if(!user){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
-            }else if(user.role !== 1){
+            }
+            
+            if(user.role !== 1){
                 query.idPerson = user.person;
                 req.query = query;
             }
@@ -146,9 +148,17 @@ export class EnrollmentController{
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
             }
 
-            const enrollmentModel = new EnrollmentModel();
-            const enrollmentToUpdate = await enrollmentModel.getById(Enrollment, req.body.id, ["student", "classroom"])
-            return res.status(HTTP_STATUS.CREATED).json(enrollmentToUpdate);
+            const model = new Model();
+            var enrollmentToUpdate = await model.getById(Enrollment, req.body.id, ["student", "classroom"])
+
+            if(!enrollmentToUpdate){
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Enrollment no found", status: HTTP_STATUS.BAD_RESQUEST});
+            }
+            delete req.body.id;
+
+            enrollmentToUpdate = Object.assign(enrollmentToUpdate, req.body);
+            const enrollment = model.create(Enrollment, enrollmentToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(enrollment);
 
         } catch (error) {
             console.log(error);

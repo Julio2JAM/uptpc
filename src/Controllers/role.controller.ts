@@ -11,6 +11,7 @@ export class RoleController{
 
             const where = {
                 name        : req.query?.name && Like(`%${req.query.name}%`),
+                code        : req.query?.code && Like(`%${req.query.code}%`),
                 id_status   : req.query?.id_status
             }
 
@@ -30,15 +31,15 @@ export class RoleController{
 
     async post(req: Request, res: Response): Promise<Response> {
         try {
-            const newLevel = new Role(req.body);
-            const errors = await validation(newLevel);
+            const newRole = new Role(req.body);
+            const errors = await validation(newRole);
             
             if(errors) {
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
             const roleModel = new RoleModel();
-            const role = await roleModel.create(Role,newLevel);
+            const role = await roleModel.create(Role, newRole);
             return res.status(HTTP_STATUS.CREATED).json(role);
         } catch (error) {
             console.error(error);
@@ -54,16 +55,19 @@ export class RoleController{
             }
 
             const roleModel = new RoleModel();
-            let roleToUpdate = roleModel.getById(Role, req.body.id);
-            delete req.body.id;
+            let roleToUpdate = await roleModel.getById(Role, req.body.id);
 
             if(!roleToUpdate){
                 return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
             }
 
+            req.body.name = req.body?.name ?? roleToUpdate.name;
+            req.body.code = req.body?.code ?? roleToUpdate.code;
+
             const newRole = new Role(req.body);
             roleToUpdate = Object.assign(roleToUpdate, newRole);
-            return res.status(HTTP_STATUS.CREATED).json(roleToUpdate);
+            const role = await roleModel.create(Role, roleToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(role);
 
         } catch (error) {
             console.error(error);

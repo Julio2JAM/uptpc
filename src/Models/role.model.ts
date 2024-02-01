@@ -4,12 +4,17 @@ import { IsNotEmpty } from "class-validator";
 
 interface RoleI{
     name: string,
+    code: string,
 }
 
 @Entity()
 export class Role{
     @PrimaryGeneratedColumn()
     id!: number;
+
+    @Column({type:"varchar", length:20, nullable:false, unique:true})
+    @IsNotEmpty({message: "Code not specified"})
+    code!: string;
 
     @Column({type:"varchar", length:20, nullable:false})
     @IsNotEmpty({message: "Name not specified"})
@@ -19,7 +24,8 @@ export class Role{
     id_status!: number;
 
     constructor(data:RoleI){
-        this.name = data?.name;
+        this.name = data?.name.toUpperCase();
+        this.code = data?.code.toUpperCase();
     }
 }
 
