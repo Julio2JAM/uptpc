@@ -89,7 +89,7 @@ export class ProgramController{
             }
 
             const programModel = new ProgramModel();
-            var programToUpdate = programModel.getById(Program, req.body.id);
+            var programToUpdate = await programModel.getById(Program, req.body.id);
             delete req.body.id;
 
             if(!programToUpdate){
@@ -97,7 +97,7 @@ export class ProgramController{
             }
 
             programToUpdate = Object.assign(programToUpdate, req.body);
-            const program = programModel.create(Program, programToUpdate);
+            const program = await programModel.create(Program, programToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(program);
             
         } catch (error) {
