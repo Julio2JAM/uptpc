@@ -9,9 +9,9 @@ import { Classroom } from "./classroom.model";
 
 interface ProgramI{
     id: number,
-    classroom: Classroom,
-    professor: Professor,
-    subject: Subject,
+    idClassroom: Classroom,
+    idProfessor: Professor,
+    idSubject: Subject,
     id_status: number
 }
 
@@ -47,9 +47,9 @@ export class Program{
     id_status!: number;
 
     constructor(data:ProgramI){
-        this.classroom = data?.classroom;
-        this.professor = data?.professor;
-        this.subject = data?.subject;
+        this.classroom = data?.idClassroom;
+        this.professor = data?.idProfessor;
+        this.subject = data?.idSubject;
     }
 }
 

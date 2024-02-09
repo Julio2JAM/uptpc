@@ -1,4 +1,6 @@
 import { validate } from "class-validator";
+import bcrypt from 'bcryptjs';
+import { User, UserModel } from "../Models/user.model";
 
 export async function validation(data: Object): Promise<null | object>{
     const errors = await validate(data);
@@ -36,8 +38,6 @@ export function removeFalsyFromObject(object: any){
     return object;
 }
 
-import bcrypt from 'bcryptjs';
-
 export async function  hashPassword (password: string){
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
@@ -47,4 +47,10 @@ export async function  hashPassword (password: string){
 export async function matchPassword (password: string, hashedPassword: string){
     const isMatch = await bcrypt.compare(password, hashedPassword);
     return isMatch;
+}
+
+export async function getUserData(idUser: string | number | undefined): Promise<User | null>{
+    const userModel = new UserModel();
+    const user = await userModel.getById(User, Number(idUser));
+    return user;
 }

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Model } from "../Base/model";
 import { Classroom } from "../Models/classroom.model";
-import { Subject } from "typeorm/persistence/Subject";
+import { Subject } from "../Models/subject.model";
 import { Professor } from "../Models/professor.model";
 import { removeFalsyFromObject } from "../Base/toolkit";
 import { Like } from "typeorm";
@@ -11,6 +11,7 @@ import { Like } from "typeorm";
 export class ProgramController{
     async get(req: Request, res: Response):Promise<Response>{
         try {
+            
             const relations = {
                 classroom: true, 
                 subject: true,
@@ -26,7 +27,7 @@ export class ProgramController{
                 },
                 subject: {
                     id          : req.query?.idSubject,
-                    name        : req.query?.subjectName && Like(`%${req.query?.subjectName}`),
+                    name        : req.query?.subjectName && Like(`%${req.query?.subjectName}%`),
                 },
                 professor: {
                     id          : req.query?.idProfessor,
@@ -36,8 +37,9 @@ export class ProgramController{
                         cedule  : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
                     }
                 },
+                id_status       : req.query?.idStatus,
             }
-            
+
             const findData = {relations:relations, where: removeFalsyFromObject(where)}
             const programModel = new ProgramModel();
             const program = await programModel.get(Program, findData);
@@ -55,24 +57,23 @@ export class ProgramController{
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
-
-            if(!req.params.classroom && !req.params.subject && !req.params.professor) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
+            if(!req.body.idClassroom && !req.body.idSubject && !req.body.idProfessor) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Must be send a classroom, a Subject and a Professor', status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const model = new Model();
 
-            req.params.classroom = await model.getById(Classroom, Number(req.params.classroom));
-            req.params.subject = await model.getById(Subject, Number(req.params.subject));
-            req.params.professor = await model.getById(Professor, Number(req.params.professor));
+            req.body.idClassroom = await model.getById(Classroom, Number(req.body.idClassroom));
+            req.body.idSubject = await model.getById(Subject, Number(req.body.idSubject));
+            req.body.idProfessor = await model.getById(Professor, Number(req.body.idProfessor));
 
-            if(!req.params.classroom && !req.params.subject && !req.params.professor) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'No data send', status: HTTP_STATUS.BAD_RESQUEST});
+            if(!req.body.idClassroom && !req.body.idSubject && !req.body.idProfessor) {
+                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Data no found', status: HTTP_STATUS.BAD_RESQUEST});
             }
 
             const newProgram = new Program(req.body);
             const programModel = new ProgramModel();
-            const program = await programModel.create(Program,newProgram);
+            const program = await programModel.create(Program, newProgram);
             return res.status(HTTP_STATUS.CREATED).json(program);
 
         } catch (error) {
