@@ -50,6 +50,9 @@ export async function matchPassword (password: string, hashedPassword: string){
 }
 
 export async function getUserData(idUser: string | number | undefined): Promise<User | null>{
+    if(typeof idUser === undefined){
+        return null;
+    }
     const userModel = new UserModel();
     const user = await userModel.getById(User, Number(idUser));
     return user;

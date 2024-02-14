@@ -13,11 +13,11 @@ export class EnrollmentController{
     async get(req: Request, res:Response):Promise<Response>{
         try {
 
-            const user = getUserData(req.user);
+            const user = await getUserData(req.user);
             if(!user){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
             }
-            // req.query.idPerson = user.role !== 1 ? user?.person.id : null;
+            req.query.idPerson = Number(user.role) !== 1 ? String(user?.person) : '';
 
             const relations = {
                 classroom           : true,
