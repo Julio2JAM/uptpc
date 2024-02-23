@@ -5,13 +5,19 @@ import { Model } from "../Base/model";
 import { Classroom } from "../Models/classroom.model";
 import { Subject } from "../Models/subject.model";
 import { Professor } from "../Models/professor.model";
-import { removeFalsyFromObject } from "../Base/toolkit";
+import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
 import { Like } from "typeorm";
 
 export class ProgramController{
     async get(req: Request, res: Response):Promise<Response>{
         try {
             
+            const user = await getUserData(req.user);
+            if(!user || !user.role){
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
+            }
+            req.query.idPerson = Number(user.role) !== 1 ? String(user?.person) : '';
+
             const relations = {
                 classroom: true, 
                 subject: true,
@@ -32,6 +38,7 @@ export class ProgramController{
                 professor: {
                     id          : req.query?.idProfessor,
                     person: {
+                        id      : req.query?.idPerson,
                         name    : req.query?.personName && Like(`%${req.query?.personName}%`),
                         lastName: req.query?.personLastName && Like(`%${req.query?.personLastName}%`),
                         cedule  : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
