@@ -17,7 +17,7 @@ export class EnrollmentController{
             if(!user || !user.role){
                 return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
             }
-            req.query.idPerson = Number(user.role) !== 3 ? String(user?.person) : '';
+            req.query.idPerson = Number(user.role) === 3 ? String(user?.person) : '';
 
             const relations = {
                 classroom           : true,
