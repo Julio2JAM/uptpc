@@ -1,7 +1,7 @@
 import { Assignment, AssignmentModel } from "../Models/assignment.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { removeFalsyFromObject, validation } from "../Base/toolkit";
+import { getUserData, removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Program, ProgramModel } from "../Models/program.model";
 import { Like } from "typeorm";
 
@@ -9,14 +9,25 @@ export class AssignmentController{
 
     async get(req:Request, res:Response):Promise<Response>{
         try {
+
+            const user = await getUserData(req.user);
+            if(!user || !user.role){
+                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status:HTTP_STATUS.UNAUTHORIZED});
+            }
+            req.query.idPerson = Number(user.role) !== 1 ? String(user?.person) : '';
+
             const relations = {
                 professor   : {
                     person: true
                 },
             }
             const where = {
+                id              : req.query?.id,
                 professor       : {
-                    id: req.query?.idProfessor
+                    id: req.query?.idProfessor,
+                    person: {
+                        // id: req.query?.idPerson //! TEMPORALMENTE COMENTADO
+                    },
                 },
                 name            : req.query?.name && Like(`%${req.query.name}%`),
                 description     : req.query?.description && Like(`%${req.query.description}%`),

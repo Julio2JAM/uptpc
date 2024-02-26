@@ -15,7 +15,7 @@ export class EnrollmentController{
 
             const user = await getUserData(req.user);
             if(!user || !user.role){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
+                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status: HTTP_STATUS.UNAUTHORIZED});
             }
             req.query.idPerson = Number(user.role) === 3 ? String(user?.person) : '';
 
