@@ -49,7 +49,7 @@ export class UserController{
         
             if(!req.query.username){
                 console.log("No username send");
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_RESQUEST});    
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_REQUEST});    
             }
             
             const userModel = new UserModel();
@@ -67,7 +67,7 @@ export class UserController{
         try {
             //Se valida que se haya enviado una password para procedeser a hashearse
             if(!req.body.password || req.body.password.length < 8 || req.body.password.length > 16){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid password", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid password", "status": HTTP_STATUS.BAD_REQUEST});
             }
             req.body.password = await hashPassword(req.body.password);
             
@@ -75,7 +75,7 @@ export class UserController{
             if(req.body.role){
                 const role = model.getById(Role, req.body.role ?? req.body.idRole);
                 if(!role){
-                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid role id", "status": HTTP_STATUS.BAD_RESQUEST});
+                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid role id", "status": HTTP_STATUS.BAD_REQUEST});
                 }
                 req.body.role = role;
             }
@@ -83,7 +83,7 @@ export class UserController{
             if(req.body.idPerson){
                 const person = model.getById(Person,req.body.role);
                 if(!person){
-                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid person id", "status": HTTP_STATUS.BAD_RESQUEST});
+                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid person id", "status": HTTP_STATUS.BAD_REQUEST});
                 }
                 req.body.person = person;
                 delete req.body.idPerson;
@@ -95,7 +95,7 @@ export class UserController{
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validation(newUser);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const userModel = new UserModel();
@@ -111,7 +111,7 @@ export class UserController{
         try {
             
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
@@ -125,7 +125,7 @@ export class UserController{
             if(req.body.idPerson){
                 const person = await model.getById(Person, req.body.idPerson);
                 if(!person){
-                    return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_RESQUEST});
+                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_REQUEST});
                 }
                 userToUpdate.person = person;
                 delete req.body.idPerson;
@@ -134,7 +134,7 @@ export class UserController{
             if(req.body.idRole){
                 const role = await model.getById(Role,req.body.idRole);
                 if(!role){
-                    res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_RESQUEST});
+                    res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_REQUEST});
                 }
                 userToUpdate.role = role;
                 delete req.body.idRole;

@@ -60,7 +60,7 @@ export class AssignmentGradeController{
         try {
 
             if (!req.body.assignment || !req.body?.enrollment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_REQUEST});
             }
             
             const model = new Model();
@@ -88,7 +88,7 @@ export class AssignmentGradeController{
             const newEvaluation = new Evaluation(req.body);
             const error = await validation(newEvaluation);
             if(error){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({error: error, status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({error: error, status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const validateEvaluation = await model.get(Evaluation, {
@@ -97,14 +97,14 @@ export class AssignmentGradeController{
             });
 
             if(validateEvaluation.length > 0){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({error: "Alrady exist", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({error: "Alrady exist", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             if(req.body.grade > req.body.assignment.base){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({
                     error: "Invalid grade", 
                     min_grade: req.body.assignment.base, 
-                    status: HTTP_STATUS.BAD_RESQUEST
+                    status: HTTP_STATUS.BAD_REQUEST
                 });
             }
 
@@ -121,7 +121,7 @@ export class AssignmentGradeController{
         try {
             
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const evaluationModel = new EvaluationModel();
@@ -129,13 +129,13 @@ export class AssignmentGradeController{
             delete req.body.id;
 
             if(!evaluationToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: 'Invalid evaluation', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: 'Invalid evaluation', status: HTTP_STATUS.BAD_REQUEST});
             }
 
             evaluationToUpdate = Object.assign(evaluationToUpdate, req.body);
             const error = await validation(evaluationToUpdate);
             if(error){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({error: error, status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({error: error, status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const evaluation = await evaluationModel.create(Evaluation,evaluationToUpdate);

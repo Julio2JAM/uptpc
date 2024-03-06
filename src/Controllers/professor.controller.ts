@@ -17,6 +17,7 @@ export class ProfessorController{
                 id              : req.query.id,
                 id_status       : req.query.id_status,
                 person : {
+                    id          : req.query?.idPerson,
                     cedule      : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
                     name        : req.query?.name && Like(`%${req.query?.name}%`),
                     lastName    : req.query?.lastName && Like(`%${req.query?.lastName}%`),
@@ -45,14 +46,14 @@ export class ProfessorController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data"});
             }
 
             const professorModel = new ProfessorModel();
             var professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"]);
 
             if(!professorToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_REQUEST});
             }
             delete req.body.id;
 
@@ -79,7 +80,7 @@ export class ProfessorController{
         try {
 
             if(!req.body.person && !req.body.idPerson){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data"});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data"});
             }
 
             const professorModel = new ProfessorModel();

@@ -38,12 +38,12 @@ export class ClassroomController{
             const newClassroom = new Classroom(req.body);
 
             if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const errors = await validation(newClassroom);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const classroomModel = new ClassroomModel();
@@ -59,11 +59,11 @@ export class ClassroomController{
         try {
             
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const classroomModel = new ClassroomModel();
@@ -71,7 +71,7 @@ export class ClassroomController{
             delete req.body.id;
 
             if(!classroomToUpdate){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Classroom not found", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Classroom not found", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             classroomToUpdate = Object.assign(classroomToUpdate, req.body);

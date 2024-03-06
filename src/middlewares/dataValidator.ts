@@ -16,7 +16,7 @@ export async function dataValidator(entity:any, req: Request, res: Response, nex
     if(errors.length > 0){
         console.log(errors);
         const message = Object.fromEntries(errors.map(value => [value.property, Object.values(value.constraints!)]));
-        res.status(HTTP_STATUS.BAD_RESQUEST).send({error: message, status: HTTP_STATUS.BAD_RESQUEST});
+        res.status(HTTP_STATUS.BAD_REQUEST).send({error: message, status: HTTP_STATUS.BAD_REQUEST});
     }else{
         next();
     }

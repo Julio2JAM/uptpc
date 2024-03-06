@@ -13,4 +13,10 @@ export const DATABASE = {
     PORT: process.env.BD_PORT
 }
 
+export const ROLES = {
+    "ADMIN": 1,
+    "PROFESSOR": 2,
+    "STUDENT": 3
+};
+
 export const ENVIROMENT = process.env.ENVIROMENT || "development";

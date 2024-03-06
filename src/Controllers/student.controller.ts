@@ -63,14 +63,14 @@ export class StudentController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             const studentModel = new StudentModel();
             var studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"]);
 
             if(!studentToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Student no fund", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Student no fund", status:HTTP_STATUS.BAD_REQUEST});
             }
             delete req.body.id;
 
@@ -106,7 +106,7 @@ export class StudentController{
         try {
 
             if(!req.body.person){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             for (const key in req.body) {

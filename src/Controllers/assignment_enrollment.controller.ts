@@ -59,7 +59,7 @@ export class Assignment_enrollmentController{
         try {
             
             if(!req.body.idProgram || !req.body.idAssigment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
@@ -68,7 +68,7 @@ export class Assignment_enrollmentController{
             req.body.idSubject = await model.getById(Subject, req.body.idSubject);
 
             if(!req.body.idProfessor || !req.body.idAssigment || !req.body.idClassroom){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const assignment_enrollment = new Assignment_enrollment(req.body);
@@ -85,7 +85,7 @@ export class Assignment_enrollmentController{
         try {
             
             if(req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             const assignment_enrollmentModel = new Assignment_enrollmentModel();
@@ -93,7 +93,7 @@ export class Assignment_enrollmentController{
             delete req.body.id;
 
             if(!assignment_enrollmentToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No data found.", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No data found.", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             assignment_enrollmentToUpdate = Object.assign(assignment_enrollmentToUpdate, req.body);

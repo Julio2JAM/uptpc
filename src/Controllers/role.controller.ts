@@ -35,7 +35,7 @@ export class RoleController{
             const errors = await validation(newRole);
             
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const roleModel = new RoleModel();
@@ -51,14 +51,14 @@ export class RoleController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const roleModel = new RoleModel();
             let roleToUpdate = await roleModel.getById(Role, req.body.id);
 
             if(!roleToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             req.body.name = req.body?.name ?? roleToUpdate.name;

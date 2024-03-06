@@ -81,7 +81,7 @@ export class EnrollmentController{
         try {
 
             if(!req.query.enrollment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Enrollment is required", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Enrollment is required", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
@@ -95,7 +95,7 @@ export class EnrollmentController{
             });
 
             if(!enrollment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid enrollment", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid enrollment", status: HTTP_STATUS.BAD_REQUEST});
             }
             
             const relations =  { 
@@ -135,14 +135,14 @@ export class EnrollmentController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
             var enrollmentToUpdate = await model.getById(Enrollment, req.body.id, ["student", "classroom"])
 
             if(!enrollmentToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Enrollment no found", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Enrollment no found", status: HTTP_STATUS.BAD_REQUEST});
             }
             delete req.body.id;
 
@@ -165,7 +165,7 @@ export class EnrollmentController{
             }
 
             if(!data.classroom || !data.student){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
@@ -173,7 +173,7 @@ export class EnrollmentController{
             data.classroom = await model.getById(Classroom, data.classroom);
 
             if(!data.student || !data.classroom) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const newEnrollment = new Enrollment(data);

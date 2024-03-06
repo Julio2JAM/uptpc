@@ -44,13 +44,13 @@ export class PersonController{
             const { name, lastname } = req.body;
 
             if(!name && !lastname){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Name or Lastname is required", status:HTTP_STATUS.BAD_RESQUEST})
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Name or Lastname is required", status:HTTP_STATUS.BAD_REQUEST})
             }
 
             const newPerson = new Person(req.body);
             const errors = await validation(newPerson);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const personModel = new PersonModel();
@@ -66,7 +66,7 @@ export class PersonController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "id is required", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "id is required", status: HTTP_STATUS.BAD_REQUEST});
             }
             
             const personModel = new PersonModel();

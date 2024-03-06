@@ -56,7 +56,7 @@ export class CalificationController{
     async post(req: Request, res: Response):Promise<Response>{
         try {
             if(!req.body.program && !req.body.enrollment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
@@ -64,7 +64,7 @@ export class CalificationController{
             req.body.enrollment = await model.getById(Enrollment, Number(req.body.enrollment), ["student"]);
             
             if(!req.body.program && !req.body.enrollment){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const calificationModel = new CalificationModel();
@@ -74,7 +74,7 @@ export class CalificationController{
             const newCalification = new Calification(req.body);
             const errors = await validation(newCalification);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const calification = await model.create(Calification, newCalification);
@@ -89,14 +89,14 @@ export class CalificationController{
         try {
             
             if(!req.body?.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const calificationModel = new CalificationModel();
             const calificationToUpdate = await calificationModel.getById(Calification, req.body.id, ["program", "enrollment"]);
 
             if(!calificationToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Calification no found", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Calification no found", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const grade = await calificationModel.calculateGrade(req.body.program.id,req.body.enrollment.student.id);

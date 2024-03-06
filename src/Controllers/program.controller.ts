@@ -65,7 +65,7 @@ export class ProgramController{
     async post(req:Request, res:Response):Promise<Response>{
         try {
             if(!req.body.idClassroom && !req.body.idSubject && !req.body.idProfessor) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Must be send a classroom, a Subject and a Professor', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Must be send a classroom, a Subject and a Professor', status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const model = new Model();
@@ -75,7 +75,7 @@ export class ProgramController{
             req.body.idProfessor = await model.getById(Professor, Number(req.body.idProfessor));
 
             if(!req.body.idClassroom && !req.body.idSubject && !req.body.idProfessor) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Data no found', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Data no found', status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const newProgram = new Program(req.body);
@@ -93,7 +93,7 @@ export class ProgramController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Invalid request', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Invalid request', status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const programModel = new ProgramModel();
@@ -101,7 +101,7 @@ export class ProgramController{
             delete req.body.id;
 
             if(!programToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: 'Program no found', status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Program no found', status: HTTP_STATUS.BAD_REQUEST});
             }
 
             programToUpdate = Object.assign(programToUpdate, req.body);

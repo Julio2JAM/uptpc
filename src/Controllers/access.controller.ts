@@ -27,7 +27,7 @@ export class AccessController{
         try {
 
             if(!req.body.username || !req.body.password){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message:"Password or username incorrect", status: HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message:"Password or username incorrect", status: HTTP_STATUS.BAD_REQUEST});
             }
 
             const userModel = new UserModel();
@@ -41,7 +41,7 @@ export class AccessController{
             const [user] = await userModel.get(User,findData);
 
             if(!user){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message:"Password or username incorrect E1", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message:"Password or username incorrect E1", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             if(!user.role){
@@ -50,7 +50,7 @@ export class AccessController{
 
             const validatePassword = await matchPassword(req.body.password, user.password);
             if(!validatePassword){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message:"Password or username incorrect E2", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message:"Password or username incorrect E2", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             const dataAccess = {
@@ -64,7 +64,7 @@ export class AccessController{
             const newAccess = new Access(dataAccess);
             const errors = await validation(newAccess);
             if(errors){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message:errors, status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message:errors, status:HTTP_STATUS.BAD_REQUEST});
             }
 
             const accessModel = new AccessModel();
@@ -82,7 +82,7 @@ export class AccessController{
             const { token } = req.params;
             
             if(!token){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message:"Token no send", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message:"Token no send", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             const validateToken = verifyToken(token);
@@ -90,18 +90,18 @@ export class AccessController{
             console.log(validateToken);
 
             if("error" in validateToken){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: validateToken.error, status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: validateToken.error, status:HTTP_STATUS.BAD_REQUEST});
             }
 
             if(!validateToken.user){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json(validateToken);
+                return res.status(HTTP_STATUS.BAD_REQUEST).json(validateToken);
             }
             
             const userModel = new UserModel();
             const user = await userModel.getById(User, Number(validateToken.user.id), ["role", "person"])
 
             if(!user){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).json({message: "Corrupt user", status:HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: "Corrupt user", status:HTTP_STATUS.BAD_REQUEST});
             }
 
             return res.status(HTTP_STATUS.OK).json(validateToken);

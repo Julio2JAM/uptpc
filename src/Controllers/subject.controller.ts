@@ -55,7 +55,7 @@ export class SubjectController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_REQUEST});
             }
             
             const subjectModel = new SubjectModel();

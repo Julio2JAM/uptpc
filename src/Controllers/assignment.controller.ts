@@ -2,7 +2,7 @@ import { Assignment, AssignmentModel } from "../Models/assignment.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { getUserData, removeFalsyFromObject, validation } from "../Base/toolkit";
-import { Program, ProgramModel } from "../Models/program.model";
+import { Professor, ProfessorModel } from "../Models/professor.model";
 import { Like } from "typeorm";
 
 export class AssignmentController{
@@ -26,7 +26,7 @@ export class AssignmentController{
                 professor       : {
                     id: req.query?.idProfessor,
                     person: {
-                        // id: req.query?.idPerson //! TEMPORALMENTE COMENTADO
+                        id: req.query?.idPerson
                     },
                 },
                 name            : req.query?.name && Like(`%${req.query.name}%`),
@@ -56,38 +56,52 @@ export class AssignmentController{
     async post(req: Request, res: Response):Promise<Response>{
         try {
             
-            if(!req.body?.program){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No program send", "status": HTTP_STATUS.BAD_RESQUEST});
+            const user = await getUserData(req.user);
+            if(!user || !user.role || Number(user.role) === 3){
+                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status:HTTP_STATUS.UNAUTHORIZED});
             }
 
-            const programModel = new ProgramModel();
-            const programRelations = {
-                professor:{
-                    person  : true
-                },
-                classroom   : true,
-                subject     : true
-            }
-            req.body.program = await programModel.getById(Program, req.body.program, programRelations);
+            // Inicializar el objeto professorData
+            const professorData:any = {};
 
-            if(!req.body.program){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid program", "status": HTTP_STATUS.BAD_RESQUEST});
+            // Verificar si el rol del usuario es 1 (admin)
+            if (Number(user.role) === 1) {
+                if (!req.body.professor) {
+                    return res.status(HTTP_STATUS.BAD_REQUEST).send({ message: "Professor not found", status: HTTP_STATUS.BAD_REQUEST });
+                }
+                professorData.id = req.body.professor;
+            } else {
+                professorData.person = { id: user.person };
+                professorData.relations = ["person"];
             }
-            
+
+            // Crear una nueva instancia de ProfessorModel
+            const professorModel = new ProfessorModel();
+
+            // Obtener el profesor utilizando professorData
+            const professor = await professorModel.get(Professor, professorData);
+
+            if(!professor){
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Professor not found", status:HTTP_STATUS.BAD_REQUEST});
+            }
+
             const assignmentModel = new AssignmentModel();
 
+            //! Esta funcion debe moverse al lugar donde se asigna la actividad
+            /*
             if(req.body.porcentage){
                 const porcentage = await assignmentModel.calculatePorcentage(req.body.program.id);
 
                 if(porcentage && Number(req.body.porcentage) > porcentage.porcentage){
-                   return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_RESQUEST});
+                   return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_REQUEST});
                 }
             }
+            */
 
             const newAssignment = new Assignment(req.body);
             const errors = await validation(newAssignment);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: errors, "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const assignment = await assignmentModel.create(Assignment,newAssignment);
@@ -102,7 +116,7 @@ export class AssignmentController{
         try {
 
             if(!req.body?.id){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             const assignmentModel = new AssignmentModel();
@@ -110,14 +124,14 @@ export class AssignmentController{
             delete req.body.id;
 
             if(!assignmentToUpdate){
-                return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: "No assignment fund", "status": HTTP_STATUS.BAD_RESQUEST});
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No assignment fund", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
             if(req.body.porcentage){
                 const porcentage = await assignmentModel.calculatePorcentage(assignmentToUpdate.program.id);
 
                 if(porcentage && Number(req.body.porcentage) > porcentage.porcentage && req.body.porcentage > assignmentToUpdate.porcentage){
-                   return res.status(HTTP_STATUS.BAD_RESQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_RESQUEST});
+                   return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_REQUEST});
                 }
             }
 
