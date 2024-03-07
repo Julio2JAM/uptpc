@@ -71,7 +71,7 @@ export class AssignmentController{
                 }
                 professorData.id = req.body.professor;
             } else {
-                professorData.person = { id: user.person };
+                professorData.where = { person: { id: user.person } };
                 professorData.relations = ["person"];
             }
 
@@ -84,7 +84,8 @@ export class AssignmentController{
             if(!professor){
                 return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Professor not found", status:HTTP_STATUS.BAD_REQUEST});
             }
-
+            
+            req.body.professor = professor[0];
             const assignmentModel = new AssignmentModel();
 
             //! Esta funcion debe moverse al lugar donde se asigna la actividad

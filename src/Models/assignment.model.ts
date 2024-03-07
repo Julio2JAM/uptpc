@@ -1,6 +1,6 @@
 //Entity
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from "typeorm";
-import { IsNotEmpty, IsOptional, IsInt, /* Min, Max, */ IsPositive } from "class-validator";
+import { IsNotEmpty, IsOptional, /*IsInt,  Min, Max, IsPositive*/ } from "class-validator";
 //Models
 // import { Program } from "./program.model";
 import { Model } from "../Base/model";
@@ -10,10 +10,10 @@ import { Professor } from "./professor.model";
 interface AssignmentI{
     // program: Program,
     professor: Professor,
-    name: string,
+    title: string,
     description: string,
     // porcentage: number,
-    base: number,
+    // base: number,
     datetime_start: Date,
     datetime_end: Date,
     status: number,
@@ -39,7 +39,7 @@ export class Assignment{
 
     @Column({type:'varchar', length:60, nullable:false})
     @IsNotEmpty({message:"The name of the assignment is not specified"})
-    name: string;
+    title: string;
 
     @Column({type:'varchar', length:255, nullable:true})
     @IsNotEmpty({message:"The description of the assignment is not specified"})
@@ -51,13 +51,13 @@ export class Assignment{
     @Min(1,{message:"The porcentage must be greater than 0"})
     @Max(100,{message:"The porcentage must be less than 100"})
     porcentage: number;
-    */
 
     @Column({type:'tinyint', width:3, nullable:true, default: 20})
     @IsOptional()
     @IsPositive({message: 'The base of the evaluation must be greater than 0'})
     @IsInt({message:"The base is not numeric"})
     base: number;
+    */
 
     @Column({type:'date', nullable:true})
     @IsOptional()
@@ -79,10 +79,10 @@ export class Assignment{
     constructor(data:AssignmentI){
         // this.program = data?.program;
         this.professor = data?.professor;
-        this.name = data?.name;
+        this.title = data?.title;
         this.description = data?.description;
         // this.porcentage = Number(data?.porcentage);
-        this.base = Number(data?.base);
+        // this.base = Number(data?.base);
         this.datetime_start = data?.datetime_start;
         this.datetime_end = data?.datetime_end;
     }
