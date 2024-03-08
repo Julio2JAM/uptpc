@@ -120,14 +120,19 @@ export class AssignmentController{
                 return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
+            if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
+                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_REQUEST});
+            }
+
             const assignmentModel = new AssignmentModel();
-            let assignmentToUpdate = await assignmentModel.getById(Assignment, req.body.id, ["program"]);
+            let assignmentToUpdate = await assignmentModel.getById(Assignment, req.body.id, ["professor"]);
             delete req.body.id;
 
             if(!assignmentToUpdate){
                 return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No assignment fund", "status": HTTP_STATUS.BAD_REQUEST});
             }
 
+            /*
             if(req.body.porcentage){
                 const porcentage = await assignmentModel.calculatePorcentage(assignmentToUpdate.program.id);
 
@@ -135,6 +140,7 @@ export class AssignmentController{
                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_REQUEST});
                 }
             }
+            */
 
             assignmentToUpdate = Object.assign(assignmentToUpdate, req.body);
             const assignment = await assignmentModel.create(Assignment, assignmentToUpdate);
