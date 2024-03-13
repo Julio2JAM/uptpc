@@ -19,7 +19,7 @@ export class User {
     id!: number
 
     @ManyToOne(() => Role, {nullable: true})
-    @JoinColumn({name: "id_level"})
+    @JoinColumn({name: "id_role"})
     @Index("user_fk_1")
     role: Role
 

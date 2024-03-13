@@ -16,7 +16,7 @@ export class ProgramController{
             if(!user || !user.role){
                 return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status:HTTP_STATUS.UNAUTHORIZED});
             }
-            req.query.idPerson = Number(user.role) !== 1 ? String(user?.person) : '';
+            req.query.idPerson = Number(user.role) == 2 ? String(user?.person) : '';
 
             const relations = {
                 classroom: true, 

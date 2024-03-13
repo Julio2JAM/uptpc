@@ -1,4 +1,4 @@
-import { validation } from "../Base/toolkit";
+import { removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { Person, PersonModel } from "../Models/person.model";
 import { HTTP_STATUS } from "../Base/statusHttp";
@@ -12,8 +12,9 @@ export class PersonController{
             const relations = {
                 student:true,
                 professor:true,
+                user:true,
             };
-            const data = {
+            const where = {
                 id         : req.query?.id,
                 cedule     : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
                 name       : req.query?.name && Like(`%${req.query?.name}%`),
@@ -23,10 +24,10 @@ export class PersonController{
                 birthday   : req.query?.birthday,
                 id_status  : req.query?.id_status
             };
-            const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
 
+            const findData = {where:removeFalsyFromObject(where), relations:relations};
             const personModel = new PersonModel();
-            const persons = await personModel.get(Person, {where:whereOptions, relations:relations});
+            const persons = await personModel.get(Person, findData);
 
             if(persons.length == 0){
                 console.log("no data found");
