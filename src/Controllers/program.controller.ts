@@ -7,6 +7,7 @@ import { Subject } from "../Models/subject.model";
 import { Professor } from "../Models/professor.model";
 import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
 import { Like } from "typeorm";
+import Errors, { handleError } from "../Base/errors";
 
 export class ProgramController{
     async get(req: Request, res: Response):Promise<Response>{
@@ -14,7 +15,7 @@ export class ProgramController{
             
             const user = await getUserData(req.user);
             if(!user || !user.role){
-                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status:HTTP_STATUS.UNAUTHORIZED});
+                throw new Errors.Unauthorized(`Permission failed`);
             }
             req.query.idPerson = Number(user.role) == 2 ? String(user?.person) : '';
 
@@ -52,20 +53,19 @@ export class ProgramController{
             const program = await programModel.get(Program, findData);
 
             if(program.length == 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No program found", status: HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Program not found`);
             }
-
             return res.status(HTTP_STATUS.OK).json(program);
+
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
     async post(req:Request, res:Response):Promise<Response>{
         try {
             if(!req.body.idClassroom && !req.body.idSubject && !req.body.idProfessor) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Must be send a classroom, a Subject and a Professor', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Must be send a classroom, a Subject and a Professor`);
             }
 
             const model = new Model();
@@ -75,7 +75,7 @@ export class ProgramController{
             req.body.idProfessor = await model.getById(Professor, Number(req.body.idProfessor));
 
             if(!req.body.idClassroom && !req.body.idSubject && !req.body.idProfessor) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Data no found', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Data not found`);
             }
 
             const newProgram = new Program(req.body);
@@ -84,8 +84,7 @@ export class ProgramController{
             return res.status(HTTP_STATUS.CREATED).json(program);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -93,7 +92,7 @@ export class ProgramController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Invalid request', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const programModel = new ProgramModel();
@@ -101,7 +100,7 @@ export class ProgramController{
             delete req.body.id;
 
             if(!programToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: 'Program no found', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Program not found`);
             }
 
             programToUpdate = Object.assign(programToUpdate, req.body);
@@ -109,8 +108,7 @@ export class ProgramController{
             return res.status(HTTP_STATUS.CREATED).json(program);
             
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 }

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { validation } from "../Base/toolkit";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Like } from "typeorm";
+import Errors, { handleError } from "../Base/errors";
 
 export class ClassroomController{
     async get(req: Request, res: Response):Promise<Response>{
@@ -21,14 +22,12 @@ export class ClassroomController{
             const classroom = await classroomModel.get(Classroom, {where: whereOptions});
 
             if(classroom.length == 0){
-                console.log("No classroom found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No classroom founds", status: HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Classroom not found`);
             }
 
             return res.status(HTTP_STATUS.OK).json(classroom);   
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
     
@@ -38,20 +37,19 @@ export class ClassroomController{
             const newClassroom = new Classroom(req.body);
 
             if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Datetime start must be less than datetime end`);
             }
 
             const errors = await validation(newClassroom);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.create(Classroom, newClassroom);
             return res.status(HTTP_STATUS.CREATED).json(classroom);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -59,11 +57,11 @@ export class ClassroomController{
         try {
             
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"ID is requiered", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Datetime start must be less than datetime end`);
             }
 
             const classroomModel = new ClassroomModel();
@@ -71,15 +69,14 @@ export class ClassroomController{
             delete req.body.id;
 
             if(!classroomToUpdate){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Classroom not found", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Classroom not found`);
             }
 
             classroomToUpdate = Object.assign(classroomToUpdate, req.body);
             const classroom = await classroomModel.create(Classroom, classroomToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(classroom);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 }

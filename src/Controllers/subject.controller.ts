@@ -2,6 +2,7 @@ import { Subject, SubjectModel } from "../Models/subject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Like } from "typeorm";
+import Errors, { handleError } from "../Base/errors";
 
 export class SubjectController{
     
@@ -26,14 +27,12 @@ export class SubjectController{
             const subject = await subjectModel.get(Subject, {where:whereOptions});
 
             if(subject.length == 0){
-                console.log("no data found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not subject found',"status":HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Subjects not found`);
             }
-
             return res.status(HTTP_STATUS.OK).json(subject);
-        }catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:'Something was wrong',status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+
+        } catch (error) {
+            return handleError(error, res);
         }
     }
 
@@ -46,8 +45,7 @@ export class SubjectController{
             return res.status(HTTP_STATUS.CREATED).json(subject);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -55,7 +53,7 @@ export class SubjectController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Id is requered","status":HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
             
             const subjectModel = new SubjectModel();
@@ -63,7 +61,7 @@ export class SubjectController{
             delete req.body.id;
             
             if(!subjectToUpdate){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Subject not found", status:HTTP_STATUS.NOT_FOUND});
+                throw new Errors.BadRequest(`Subject not found`);
             }
 
             subjectToUpdate = Object.assign(subjectToUpdate, req.body);
@@ -71,8 +69,7 @@ export class SubjectController{
             return res.status(HTTP_STATUS.CREATED).json(subject);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
     

@@ -7,6 +7,7 @@ import { Model } from "../Base/model";
 import { Like } from "typeorm";
 import { Program } from "../Models/program.model";
 import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
+import Errors, { handleError } from "../Base/errors";
 
 export class EnrollmentController{
 
@@ -15,7 +16,7 @@ export class EnrollmentController{
 
             const user = await getUserData(req.user);
             if(!user || !user.role){
-                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status: HTTP_STATUS.UNAUTHORIZED});
+                throw new Errors.Unauthorized(`Permission failed`);
             }
             req.query.idPerson = Number(user.role) === 3 ? String(user?.person) : '';
 
@@ -53,14 +54,12 @@ export class EnrollmentController{
             const enrollment = await enrollmentModel.get(Enrollment, findData);
 
             if(enrollment.length == 0){
-                console.log("No Enrollment found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No Enrollment found", status:HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Enrollments not found`);
             }
 
             return res.status(HTTP_STATUS.OK).json(enrollment);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -72,8 +71,7 @@ export class EnrollmentController{
             return res.status(HTTP_STATUS.OK).json(enrollment);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -81,7 +79,7 @@ export class EnrollmentController{
         try {
 
             if(!req.query.enrollment){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Enrollment is required", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Enrollment is required`);
             }
 
             const model = new Model();
@@ -95,7 +93,7 @@ export class EnrollmentController{
             });
 
             if(!enrollment){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid enrollment", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Enrollment not found`);
             }
             
             const relations =  { 
@@ -126,8 +124,7 @@ export class EnrollmentController{
             return res.status(HTTP_STATUS.OK).json(program);
             
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
     
@@ -135,14 +132,14 @@ export class EnrollmentController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const model = new Model();
             var enrollmentToUpdate = await model.getById(Enrollment, req.body.id, ["student", "classroom"])
 
             if(!enrollmentToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Enrollment no found", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Enrollment no found`);
             }
             delete req.body.id;
 
@@ -151,8 +148,7 @@ export class EnrollmentController{
             return res.status(HTTP_STATUS.CREATED).json(enrollment);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -165,7 +161,7 @@ export class EnrollmentController{
             }
 
             if(!data.classroom || !data.student){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid data`);
             }
 
             const model = new Model();
@@ -173,7 +169,7 @@ export class EnrollmentController{
             data.classroom = await model.getById(Classroom, data.classroom);
 
             if(!data.student || !data.classroom) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid data`);
             }
 
             const newEnrollment = new Enrollment(data);
@@ -181,8 +177,7 @@ export class EnrollmentController{
             return res.status(HTTP_STATUS.CREATED).json(enrollment);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 }

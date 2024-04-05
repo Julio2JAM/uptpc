@@ -2,11 +2,20 @@ import { validate } from "class-validator";
 import bcrypt from 'bcryptjs';
 import { User, UserModel } from "../Models/user.model";
 
+export function isJsonString(value: string): boolean {
+    try {
+        JSON.parse(value);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
 export async function validation(data: Object): Promise<null | object>{
     const errors = await validate(data);
 
     if(errors.length > 0){
-        console.log(errors);
+        // console.log(errors);
         return  Object.fromEntries(errors.map(value => [value.property, Object.values(value.constraints!)]));
     }
 

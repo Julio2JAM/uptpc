@@ -5,6 +5,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 import { Assignment } from "../Models/assignment.model";
 import { Enrollment } from "../Models/enrollment.model";
 import { Model } from "../Base/model";
+import Errors, { handleError } from "../Base/errors";
 
 export class AssignmentGradeController{
 
@@ -46,13 +47,12 @@ export class AssignmentGradeController{
             const evaluation = await evaluationModel.get(Evaluation, findData);
 
             if(evaluation.length == 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"No evaluation found."});
+                throw new Errors.NotFound(`Evaluations not found`);
             }
 
             return res.status(HTTP_STATUS.OK).json(evaluation);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -60,7 +60,7 @@ export class AssignmentGradeController{
         try {
 
             if (!req.body.assignment || !req.body?.enrollment){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid data`);
             }
             
             const model = new Model();
@@ -86,9 +86,9 @@ export class AssignmentGradeController{
             req.body.enrollment = await model.getById(Enrollment, req.body.enrollment, enrollmentRelations);
 
             const newEvaluation = new Evaluation(req.body);
-            const error = await validation(newEvaluation);
-            if(error){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({error: error, status: HTTP_STATUS.BAD_REQUEST});
+            const errors = await validation(newEvaluation);
+            if(errors){
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
             const validateEvaluation = await model.get(Evaluation, {
@@ -97,23 +97,22 @@ export class AssignmentGradeController{
             });
 
             if(validateEvaluation.length > 0){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({error: "Alrady exist", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest("Alrady exist");
             }
 
             if(req.body.grade > req.body.assignment.base){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                throw new Errors.BadRequest(JSON.stringify({
                     error: "Invalid grade", 
                     min_grade: req.body.assignment.base, 
                     status: HTTP_STATUS.BAD_REQUEST
-                });
+                }));
             }
 
             const evaluationModel = new EvaluationModel();
             const evaluation = await evaluationModel.create(Evaluation,newEvaluation);
             return res.status(HTTP_STATUS.CREATED).json(evaluation);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -121,7 +120,7 @@ export class AssignmentGradeController{
         try {
             
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: 'Invalid data', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid data`);
             }
 
             const evaluationModel = new EvaluationModel();
@@ -129,21 +128,20 @@ export class AssignmentGradeController{
             delete req.body.id;
 
             if(!evaluationToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({message: 'Invalid evaluation', status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid not found`);
             }
 
             evaluationToUpdate = Object.assign(evaluationToUpdate, req.body);
-            const error = await validation(evaluationToUpdate);
-            if(error){
-                return res.status(HTTP_STATUS.BAD_REQUEST).json({error: error, status: HTTP_STATUS.BAD_REQUEST});
+            const errors = await validation(evaluationToUpdate);
+            if(errors){
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
             const evaluation = await evaluationModel.create(Evaluation,evaluationToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(evaluation);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Something went wrong",status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 }

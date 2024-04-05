@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { Model } from "../Base/model";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, MinLength } from "class-validator";
 
 interface RoleI{
     name: string,
@@ -12,11 +12,13 @@ export class Role{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type:"varchar", length:20, nullable:false, unique:true})
+    @Column({type:"varchar", length:20, nullable:false, unique:true })
+    @MinLength(3, {message: "Invalid len code"})
     @IsNotEmpty({message: "Code not specified"})
     code!: string;
 
     @Column({type:"varchar", length:20, nullable:false})
+    @MinLength(3, {message: "Invalid len name"})
     @IsNotEmpty({message: "Name not specified"})
     name: string;
 
@@ -24,8 +26,8 @@ export class Role{
     id_status!: number;
 
     constructor(data:RoleI){
-        this.name = data?.name.toUpperCase();
-        this.code = data?.code.toUpperCase();
+        this.name = data?.name ? data?.name.toUpperCase() : "";
+        this.code = data?.code ? data?.code.toUpperCase() : "";
     }
 }
 
