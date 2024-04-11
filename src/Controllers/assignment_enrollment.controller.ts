@@ -6,6 +6,7 @@ import { Model } from "../Base/model";
 import { Assignment } from "../Models/assignment.model";
 import { Subject } from "typeorm/persistence/Subject";
 import { Classroom } from "../Models/classroom.model";
+import Errors, { handleError } from "../Base/errors";
 
 export class Assignment_enrollmentController{
     async get(req: Request, res: Response): Promise<Response>{
@@ -44,14 +45,13 @@ export class Assignment_enrollmentController{
             const assignment_enrollment = await assignment_enrollmentModel.get(Assignment_enrollment, findData);
 
             if(assignment_enrollment.length == 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).json({message: "No data found."});
+                throw new Errors.NotFound("No data found.");
             }
 
             return res.status(HTTP_STATUS.OK).json(assignment_enrollment);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -59,7 +59,7 @@ export class Assignment_enrollmentController{
         try {
             
             if(!req.body.idProgram || !req.body.idAssigment){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest("Invalid data.");
             }
 
             const model = new Model();
@@ -68,7 +68,7 @@ export class Assignment_enrollmentController{
             req.body.idSubject = await model.getById(Subject, req.body.idSubject);
 
             if(!req.body.idProfessor || !req.body.idAssigment || !req.body.idClassroom){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data.", status: HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest("Invalid data.");
             }
 
             const assignment_enrollment = new Assignment_enrollment(req.body);
@@ -76,8 +76,7 @@ export class Assignment_enrollmentController{
             return res.status(HTTP_STATUS.CREATED).json(assignment_enrollmentNew);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -85,7 +84,7 @@ export class Assignment_enrollmentController{
         try {
             
             if(req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const assignment_enrollmentModel = new Assignment_enrollmentModel();
@@ -93,7 +92,7 @@ export class Assignment_enrollmentController{
             delete req.body.id;
 
             if(!assignment_enrollmentToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No data found.", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest("No data found.");
             }
 
             assignment_enrollmentToUpdate = Object.assign(assignment_enrollmentToUpdate, req.body);
@@ -101,8 +100,7 @@ export class Assignment_enrollmentController{
             return res.status(HTTP_STATUS.CREATED).json(assignment_enrollment);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 }

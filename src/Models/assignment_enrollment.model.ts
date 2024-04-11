@@ -1,6 +1,6 @@
 //Entity
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, JoinColumn, Index, UpdateDateColumn, ManyToOne } from "typeorm";
-import { IsNotEmpty } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsPositive, Max, Min } from "class-validator";
 //Models
 import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
@@ -12,6 +12,8 @@ interface Assignment_enrollmentI{
     subject: Subject,
     classroom: Classroom,
     status: number,
+    porcentage: number,
+    base: number,
 }
 
 @Entity()
@@ -37,6 +39,17 @@ export class Assignment_enrollment{
     @IsNotEmpty({message: "Please enter a classroom"})
     classroom!: Classroom;
 
+    @Column({type:'tinyint', width:3, nullable:false})
+    @IsInt({message:"The porcentage is not numeric"})
+    @Min(1,{message:"The porcentage must be greater than 0"})
+    @Max(100,{message:"The porcentage must be less than 100"})
+    porcentage!: number;
+
+    @Column({type:'tinyint', width:3, nullable:true, default: 20})
+    @IsOptional()
+    @IsPositive({message: 'The base of the evaluation must be greater than 0'})
+    @IsInt({message:"The base is not numeric"})
+    base!: number;
 
     @CreateDateColumn()
     datetime!: Date;
@@ -52,6 +65,8 @@ export class Assignment_enrollment{
         this.subject = data?.subject;
         this.classroom = data?.classroom;
         this.id_status = data?.status;
+        this.porcentage = data?.porcentage;
+        this.base = data?.base;
     }
 }
 

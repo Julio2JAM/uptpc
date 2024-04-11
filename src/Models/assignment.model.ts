@@ -45,20 +45,6 @@ export class Assignment{
     @IsNotEmpty({message:"The description of the assignment is not specified"})
     description: string;
 
-    /* 
-    @Column({type:'tinyint', width:3, nullable:false})
-    @IsInt({message:"The porcentage is not numeric"})
-    @Min(1,{message:"The porcentage must be greater than 0"})
-    @Max(100,{message:"The porcentage must be less than 100"})
-    porcentage: number;
-
-    @Column({type:'tinyint', width:3, nullable:true, default: 20})
-    @IsOptional()
-    @IsPositive({message: 'The base of the evaluation must be greater than 0'})
-    @IsInt({message:"The base is not numeric"})
-    base: number;
-    */
-
     @Column({type:'date', nullable:true})
     @IsOptional()
     datetime_start: Date;
