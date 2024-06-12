@@ -14,7 +14,7 @@ export class Assignment_enrollmentController{
             
             const relations = {
                 assignment: {
-                    Professor: {
+                    professor: {
                         person: true
                     }
                 },
