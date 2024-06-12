@@ -4,12 +4,12 @@ import { IsInt, IsNotEmpty, IsOptional, IsPositive, Max, Min } from "class-valid
 //Models
 import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
-import { Subject } from "./subject.model";
+// import { Subject } from "./subject.model";
 import { Classroom } from "./classroom.model";
 
 interface Assignment_enrollmentI{
     assignment: Assignment,
-    subject: Subject,
+    // subject: Subject,
     classroom: Classroom,
     status: number,
     porcentage: number,
@@ -27,11 +27,13 @@ export class Assignment_enrollment{
     @IsNotEmpty({message: "Please enter an assignment"})
     assignment!: Assignment;
 
+    /*
     @ManyToOne(() => Subject, {nullable: false})
     @JoinColumn({name: "id_subject"})
     @Index("ae_FK_2")
     @IsNotEmpty({message: "Please enter a subject"})
     subject!: Subject;
+    */
 
     @ManyToOne(() => Classroom, {nullable: false})
     @JoinColumn({name: "id_classroom"})
@@ -62,7 +64,7 @@ export class Assignment_enrollment{
 
     constructor(data:Assignment_enrollmentI){
         this.assignment = data?.assignment;
-        this.subject = data?.subject;
+        // this.subject = data?.subject;
         this.classroom = data?.classroom;
         this.id_status = data?.status;
         this.porcentage = data?.porcentage;

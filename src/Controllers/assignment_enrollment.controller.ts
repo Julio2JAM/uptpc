@@ -4,7 +4,6 @@ import { Assignment_enrollment, Assignment_enrollmentModel } from "../Models/ass
 import { removeFalsyFromObject } from "../Base/toolkit";
 import { Model } from "../Base/model";
 import { Assignment } from "../Models/assignment.model";
-import { Subject } from "typeorm/persistence/Subject";
 import { Classroom } from "../Models/classroom.model";
 import Errors, { handleError } from "../Base/errors";
 
@@ -58,14 +57,13 @@ export class Assignment_enrollmentController{
     async post(req: Request, res: Response): Promise<Response> {
         try {
             
-            if(!req.body.idProgram || !req.body.idAssigment){
+            if(!req.body.idAssigment || !req.body.id_classroom){
                 throw new Errors.BadRequest("Invalid data.");
             }
 
             const model = new Model();
             req.body.idAssigment = await model.getById(Assignment, req.body.idAssigment);
             req.body.idClassroom = await model.getById(Classroom, req.body.idClassroom);
-            req.body.idSubject = await model.getById(Subject, req.body.idSubject);
 
             if(!req.body.idProfessor || !req.body.idAssigment || !req.body.idClassroom){
                 throw new Errors.BadRequest("Invalid data.");

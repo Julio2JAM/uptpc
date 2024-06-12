@@ -5,6 +5,7 @@ import { getUserData, removeFalsyFromObject, validation } from "../Base/toolkit"
 import { Professor, ProfessorModel } from "../Models/professor.model";
 import { Like } from "typeorm";
 import Errors, { handleError } from "../Base/errors";
+import { Subject, SubjectModel } from "../Models/subject.model";
 
 export class AssignmentController{
 
@@ -21,6 +22,7 @@ export class AssignmentController{
                 professor   : {
                     person: true
                 },
+                subject: true
             }
             const where = {
                 id              : req.query?.id,
@@ -29,6 +31,9 @@ export class AssignmentController{
                     person: {
                         id: req.query?.idPerson
                     },
+                },
+                subject       : {
+                    id: req.query?.idSubject,
                 },
                 name            : req.query?.name && Like(`%${req.query.name}%`),
                 description     : req.query?.description && Like(`%${req.query.description}%`),
@@ -63,6 +68,20 @@ export class AssignmentController{
             // Inicializar el objeto professorData
             const professorData:any = {};
 
+            if(!req.body.idSubject){
+                throw new Errors.BadRequest(`Subject required`);
+            }
+
+            const subjectModel = new SubjectModel();
+            const subject = await subjectModel.getById(Subject, req.body.idSubject);
+
+            if(!subject){
+                throw new Errors.BadRequest(`Subject required`);
+            }
+
+            delete req.body.idSubject;
+            req.body.subject = subject;
+
             // Verificar si el rol del usuario es 1 (admin)
             if (Number(user.role) === 1) {
                 if (!req.body.professor) {
@@ -85,7 +104,6 @@ export class AssignmentController{
             }
             
             req.body.professor = professor[0];
-            const assignmentModel = new AssignmentModel();
 
             //! Esta funcion debe moverse al lugar donde se asigna la actividad
             /*
@@ -104,6 +122,7 @@ export class AssignmentController{
                 throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
+            const assignmentModel = new AssignmentModel();
             const assignment = await assignmentModel.create(Assignment,newAssignment);
             return res.status(HTTP_STATUS.CREATED).json(assignment)
         } catch (error) {

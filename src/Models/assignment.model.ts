@@ -6,10 +6,11 @@ import { IsNotEmpty, IsOptional, /*IsInt,  Min, Max, IsPositive*/ } from "class-
 import { Model } from "../Base/model";
 import AppDataSource from "../database/database";
 import { Professor } from "./professor.model";
+import { Subject } from "./subject.model";
 
 interface AssignmentI{
-    // program: Program,
     professor: Professor,
+    subject: Subject,
     title: string,
     description: string,
     // porcentage: number,
@@ -24,18 +25,16 @@ export class Assignment{
     @PrimaryGeneratedColumn()
     id!: number;
 
-    /* 
-    @ManyToOne(() => Program, {nullable: false})
-    @JoinColumn({name: "id_program"})
-    @Index("assignment_FK_1")
-    @IsNotEmpty({message:"Please enter a classroom, professor and subject"})
-    program!: Program;
-    */
-
     @ManyToOne(() => Professor, {nullable: false})
     @JoinColumn({name: "id_professor"})
     @Index("assignment_FK_1")
     professor!: Professor;
+
+    @ManyToOne(() => Subject, {nullable: false})
+    @JoinColumn({name: "id_subject"})
+    @Index("assignment_FK_2")
+    @IsNotEmpty({message: "Please enter a subject"})
+    subject!: Subject;
 
     @Column({type:'varchar', length:60, nullable:false})
     @IsNotEmpty({message:"The name of the assignment is not specified"})
@@ -63,8 +62,8 @@ export class Assignment{
     id_status!: number
 
     constructor(data:AssignmentI){
-        // this.program = data?.program;
         this.professor = data?.professor;
+        this.subject = data?.subject;
         this.title = data?.title;
         this.description = data?.description;
         // this.porcentage = Number(data?.porcentage);
