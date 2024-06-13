@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Assignment_enrollment, Assignment_enrollmentModel } from "../Models/assignment_enrollment.model";
-import { removeFalsyFromObject } from "../Base/toolkit";
+import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
 import { Model } from "../Base/model";
 import { Assignment } from "../Models/assignment.model";
 import { Classroom } from "../Models/classroom.model";
 import Errors, { handleError } from "../Base/errors";
+import { Professor } from "../Models/professor.model";
 
 export class Assignment_enrollmentController{
     async get(req: Request, res: Response): Promise<Response>{
@@ -15,10 +16,10 @@ export class Assignment_enrollmentController{
                 assignment: {
                     professor: {
                         person: true
-                    }
+                    },
+                    subject: true
                 },
                 classroom: true,
-                subject: true,
             };
 
             const where = {
@@ -29,13 +30,13 @@ export class Assignment_enrollmentController{
                         person: {
                             id: req.query.idPersonAssigment,
                         }
+                    },
+                    subject: {
+                        id: req.query.idSubject,
                     }
                 },
                 classroom: {
                     id: req.query.idClassroom,
-                },
-                subject: {
-                    id: req.query.idSubject,
                 },
             }
 
@@ -56,18 +57,41 @@ export class Assignment_enrollmentController{
 
     async post(req: Request, res: Response): Promise<Response> {
         try {
-            
-            if(!req.body.idAssigment || !req.body.id_classroom){
+
+            const user = await getUserData(req.user);
+
+            if(!user || !user.role){
+                throw new Errors.Unauthorized(`Permission failed.`);
+            }
+
+            if(Number(user.role) == 3){
+                throw new Errors.BadRequest("Permission failed.");
+            }
+
+            if(!req.body.idAssigment || !req.body.idClassroom){
                 throw new Errors.BadRequest("Invalid data.");
             }
 
             const model = new Model();
-            req.body.idAssigment = await model.getById(Assignment, req.body.idAssigment);
-            req.body.idClassroom = await model.getById(Classroom, req.body.idClassroom);
 
-            if(!req.body.idProfessor || !req.body.idAssigment || !req.body.idClassroom){
-                throw new Errors.BadRequest("Invalid data.");
+            req.body.assigment = await model.getById(Assignment, req.body.idAssigment);
+            if(!req.body.assigment){
+                throw new Errors.BadRequest("Invalid assigment.");
             }
+            delete req.body.idAssigment;
+
+            if(Number(user.role) == 2){
+                const professor = await model.get(Professor, { relations:["person"], where:{person:{id:user?.person}}});
+                if(!professor || req.body.assigment.professor != professor[0].id){
+                    throw new Errors.BadRequest("Only your activities.");
+                }
+            }
+
+            req.body.classroom = await model.getById(Classroom, req.body.idClassroom);
+            if(!req.body.classroom){
+                throw new Errors.BadRequest("Invalid classroom.");
+            }
+            delete req.body.idClassroom;
 
             const assignment_enrollment = new Assignment_enrollment(req.body);
             const assignment_enrollmentNew = model.create(Assignment_enrollment, assignment_enrollment); 
