@@ -6,13 +6,14 @@ import { Model } from "../Base/model";
 import { Assignment } from "./assignment.model";
 // import { Subject } from "./subject.model";
 import { Classroom } from "./classroom.model";
+import AppDataSource from "../database/database";
 
 interface Assignment_enrollmentI{
     assignment: Assignment,
     // subject: Subject,
     classroom: Classroom,
     status: number,
-    porcentage: number,
+    percentage: number,
     base: number,
 }
 
@@ -42,10 +43,10 @@ export class Assignment_enrollment{
     classroom!: Classroom;
 
     @Column({type:'tinyint', width:3, nullable:false})
-    @IsInt({message:"The porcentage is not numeric"})
-    @Min(1,{message:"The porcentage must be greater than 0"})
-    @Max(100,{message:"The porcentage must be less than 100"})
-    porcentage!: number;
+    @IsInt({message:"The percentage is not numeric"})
+    @Min(1,{message:"The percentage must be greater than 0"})
+    @Max(100,{message:"The percentage must be less than 100"})
+    percentage!: number;
 
     @Column({type:'tinyint', width:3, nullable:true, default: 20})
     @IsOptional()
@@ -67,11 +68,33 @@ export class Assignment_enrollment{
         // this.subject = data?.subject;
         this.classroom = data?.classroom;
         this.id_status = data?.status;
-        this.porcentage = data?.porcentage;
+        this.percentage = data?.percentage;
         this.base = data?.base;
     }
 }
 
 export class Assignment_enrollmentModel extends Model {
+
+    /**
+     * Al colocarle el porcentaje a una actividad, entre todas las que se han creado, solo debe dar como maximo
+     * 100%, esta funcion retorna el porcentaje que aun se le puede asignar a una nueva actividad
+     * @param idClassroom classroom identifier
+     * @param idSubject subject identifier
+     * @returns percentage
+     */
+    async calculatePercentage(idClassroom: number, idSubject: number):Promise< {percentage:number} | null >{
+
+        const query = await AppDataSource.createQueryBuilder(Assignment_enrollment, "assignment_enrollment")
+        .leftJoinAndSelect("assignment_enrollment.classroom", "classroom")
+        .leftJoinAndSelect("assignment_enrollment.assignment", "assignment")
+        .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
+        .where("assignment.id_subject = :idSubject", {idSubject: idSubject})
+        .groupBy("classroom.id")
+        .select("(100 - SUM(assignment_enrollment.percentage))", "percentage")
+        .getRawOne();
+
+        return query;
+
+    }
 
 }

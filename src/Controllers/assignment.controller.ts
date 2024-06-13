@@ -105,17 +105,6 @@ export class AssignmentController{
             
             req.body.professor = professor[0];
 
-            //! Esta funcion debe moverse al lugar donde se asigna la actividad
-            /*
-            if(req.body.porcentage){
-                const porcentage = await assignmentModel.calculatePorcentage(req.body.program.id);
-
-                if(porcentage && Number(req.body.porcentage) > porcentage.porcentage){
-                   return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_REQUEST});
-                }
-            }
-            */
-
             const newAssignment = new Assignment(req.body);
             const errors = await validation(newAssignment);
             if(errors) {

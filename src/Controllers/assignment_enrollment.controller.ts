@@ -68,21 +68,21 @@ export class Assignment_enrollmentController{
                 throw new Errors.BadRequest("Permission failed.");
             }
 
-            if(!req.body.idAssigment || !req.body.idClassroom){
+            if(!req.body.idAssignment || !req.body.idClassroom){
                 throw new Errors.BadRequest("Invalid data.");
             }
 
             const model = new Model();
 
-            req.body.assigment = await model.getById(Assignment, req.body.idAssigment);
-            if(!req.body.assigment){
-                throw new Errors.BadRequest("Invalid assigment.");
+            req.body.assignment = await model.getById(Assignment, req.body.idAssignment);
+            if(!req.body.assignment){
+                throw new Errors.BadRequest("Invalid assignment.");
             }
-            delete req.body.idAssigment;
+            delete req.body.idAssignment;
 
             if(Number(user.role) == 2){
                 const professor = await model.get(Professor, { relations:["person"], where:{person:{id:user?.person}}});
-                if(!professor || req.body.assigment.professor != professor[0].id){
+                if(!professor || req.body.assignment.professor != professor[0].id){
                     throw new Errors.BadRequest("Only your activities.");
                 }
             }
@@ -93,9 +93,17 @@ export class Assignment_enrollmentController{
             }
             delete req.body.idClassroom;
 
+            const assignment_enrollmentModel = new Assignment_enrollmentModel();
+            const percentage = await assignment_enrollmentModel.calculatePercentage(req.body.classroom.id, req.body.assignment.subject);
+            console.log(percentage);
+            if(percentage && Number(req.body.percentage) > percentage.percentage){
+               return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${percentage.percentage}`, "status": HTTP_STATUS.BAD_REQUEST});
+            }
+
             const assignment_enrollment = new Assignment_enrollment(req.body);
-            const assignment_enrollmentNew = model.create(Assignment_enrollment, assignment_enrollment); 
-            return res.status(HTTP_STATUS.CREATED).json(assignment_enrollmentNew);
+            const newAssignment_enrollment = model.create(Assignment_enrollment, assignment_enrollment); 
+            return res.status(HTTP_STATUS.CREATED).json(newAssignment_enrollment);
+            // return res.status(HTTP_STATUS.CREATED).json({});
 
         } catch (error) {
             return handleError(error, res);

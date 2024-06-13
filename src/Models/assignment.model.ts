@@ -1,10 +1,8 @@
 //Entity
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, UpdateDateColumn } from "typeorm";
-import { IsNotEmpty, IsOptional, /*IsInt,  Min, Max, IsPositive*/ } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 //Models
-// import { Program } from "./program.model";
 import { Model } from "../Base/model";
-import AppDataSource from "../database/database";
 import { Professor } from "./professor.model";
 import { Subject } from "./subject.model";
 
@@ -75,20 +73,4 @@ export class Assignment{
 
 export class AssignmentModel extends Model {
 
-    /**
-     * Al colocarle el porcentaje a una actividad, entre todas las que se han creado, solo debe dar como maximo
-     * 100%, esta funcion retorna el porcentaje que aun se le puede asignar a una nueva actividad
-     * @param id_program program identifier
-     * @returns porcentage
-     */
-    async calculatePorcentage(id_program: number):Promise< {porcentage:number} | null >{
-        const query = await AppDataSource.createQueryBuilder(Assignment, "assignment")
-        .leftJoinAndSelect("assignment.program", "program")
-        .where("program.id = :id_program", {id_program: id_program})
-        .groupBy("program.id")
-        .select("(100 - SUM(assignment.porcentage))", "porcentage")
-        .getRawOne();
-
-        return query;
-    }
 }
