@@ -36,7 +36,7 @@ export class Classroom{
     id_status!:number;
 
     constructor(data:ClassroomI){
-        this.name = data?.name;
+        this.name = data?.name.toUpperCase();
         this.datetime_start = !data?.datetime_start ? null : data?.datetime_start;
         this.datetime_end = !data?.datetime_end ? null : data?.datetime_end;
         this.id_status = data?.id_status;

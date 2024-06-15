@@ -50,7 +50,7 @@ export class ProfessorController{
             }
 
             const professorModel = new ProfessorModel();
-            var professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"]);
+            var professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"], false);
 
             if(!professorToUpdate){
                 throw new Errors.BadRequest(`Professor not found`);

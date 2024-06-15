@@ -67,7 +67,7 @@ export class StudentController{
             }
 
             const studentModel = new StudentModel();
-            var studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"]);
+            var studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"], false);
 
             if(!studentToUpdate){
                 throw new Errors.BadRequest(`Student not found`);

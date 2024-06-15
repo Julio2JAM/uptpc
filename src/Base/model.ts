@@ -22,9 +22,9 @@ export class Model{
      * @param {Object} [relationData]
      * @returns {Promise<any>} - Returns the data from the database with the specified id of an entity.
      */
-    async getById(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral = {}): Promise<any>{
+    async getById(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral = {}, loadRelationIds:boolean = true): Promise<any>{
         console.log("get by id");
-        return await AppDataSource.manager.findOne(entity, { where: { id: Number(id)}, relations: relationData, loadRelationIds: true });
+        return await AppDataSource.manager.findOne(entity, { where: { id: Number(id)}, relations: relationData, loadRelationIds: loadRelationIds });
     }
 
     /**

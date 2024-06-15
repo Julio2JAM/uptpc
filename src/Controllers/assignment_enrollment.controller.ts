@@ -38,6 +38,7 @@ export class Assignment_enrollmentController{
                 classroom: {
                     id: req.query.idClassroom,
                 },
+                id_status: req.query.idStatus,
             }
 
             const assignment_enrollmentModel = new Assignment_enrollmentModel();
@@ -113,7 +114,7 @@ export class Assignment_enrollmentController{
     async put(req: Request, res: Response): Promise<Response> {
         try {
             
-            if(req.body.id){
+            if(!req.body.id){
                 throw new Errors.BadRequest(`Id is requered`);
             }
 
@@ -126,6 +127,7 @@ export class Assignment_enrollmentController{
             }
 
             assignment_enrollmentToUpdate = Object.assign(assignment_enrollmentToUpdate, req.body);
+            console.log("🚀 ~ Assignment_enrollmentController ~ put ~ assignment_enrollmentToUpdate:", assignment_enrollmentToUpdate)
             const assignment_enrollment = await assignment_enrollmentModel.create(Assignment_enrollment, assignment_enrollmentToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(assignment_enrollment);
 

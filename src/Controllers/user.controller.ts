@@ -68,16 +68,17 @@ export class UserController{
             req.body.password = await hashPassword(req.body.password);
             
             const model = new Model();
-            if(req.body.role){
-                const role = model.getById(Role, req.body.role ?? req.body.idRole);
+            if(req.body.role || req.body.idRole){
+                const role = await model.getById(Role, req.body.role ?? req.body.idRole);
                 if(!role){
                     throw new Errors.BadRequest("Invalid role id");
                 }
+                if(!req.body.idRole){delete req.body.idRole;}
                 req.body.role = role;
             }
 
             if(req.body.idPerson){
-                const person = model.getById(Person,req.body.role);
+                const person = await model.getById(Person,req.body.idPerson);
                 if(!person){
                     throw new Errors.BadRequest("Invalid person id");
                 }

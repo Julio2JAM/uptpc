@@ -44,7 +44,7 @@ export class User {
         this.username = data?.username;
         this.password = data?.password;
         this.person = data?.person;
-        this.id_status = 1;
+        this.id_status = data?.id_status;
     }
 }
 

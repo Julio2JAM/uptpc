@@ -7,7 +7,7 @@ export interface SubjectI{
     id: number,
     name: string,
     description: string,
-    status: number
+    id_status: number
 }
 
 @Entity()
@@ -40,7 +40,7 @@ export class Subject {
     constructor(data:SubjectI) {
         this.name = data?.name;
         this.description = data?.description;
-        this.id_status = data?.status;
+        this.id_status = data?.id_status;
     }
 }
 
