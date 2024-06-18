@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
-import { Assignment_enrollment, Assignment_enrollmentModel } from "../Models/assignment_enrollment.model";
+import { Assignment_entry, Assignment_entryModel } from "../Models/assignment_entry.model";
 import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
 import { Model } from "../Base/model";
 import { Assignment } from "../Models/assignment.model";
@@ -8,7 +8,7 @@ import { Classroom } from "../Models/classroom.model";
 import Errors, { handleError } from "../Base/errors";
 import { Professor } from "../Models/professor.model";
 
-export class Assignment_enrollmentController{
+export class Assignment_entryController{
     async get(req: Request, res: Response): Promise<Response>{
         try {
             
@@ -41,15 +41,27 @@ export class Assignment_enrollmentController{
                 id_status: req.query.idStatus,
             }
 
-            const assignment_enrollmentModel = new Assignment_enrollmentModel();
+            const assignment_entryModel = new Assignment_entryModel();
             const findData = {relations: relations, where: removeFalsyFromObject(where)}
-            const assignment_enrollment = await assignment_enrollmentModel.get(Assignment_enrollment, findData);
+            const assignment_entry = await assignment_entryModel.get(Assignment_entry, findData);
 
-            if(assignment_enrollment.length == 0){
+            if(assignment_entry.length == 0){
                 throw new Errors.NotFound("No data found.");
             }
 
-            return res.status(HTTP_STATUS.OK).json(assignment_enrollment);
+            return res.status(HTTP_STATUS.OK).json(assignment_entry);
+
+        } catch (error) {
+            return handleError(error, res);
+        }
+    }
+
+    async assignment_students(_req: Request, res: Response): Promise<Response>{
+        try {
+            
+            const assignment_entryModel = new Assignment_entryModel();
+            const assignment_entry = await assignment_entryModel.assignment_students(1, [2]);
+            return res.status(HTTP_STATUS.OK).json(assignment_entry);
 
         } catch (error) {
             return handleError(error, res);
@@ -94,16 +106,16 @@ export class Assignment_enrollmentController{
             }
             delete req.body.idClassroom;
 
-            const assignment_enrollmentModel = new Assignment_enrollmentModel();
-            const percentage = await assignment_enrollmentModel.calculatePercentage(req.body.classroom.id, req.body.assignment.subject);
+            const assignment_entryModel = new Assignment_entryModel();
+            const percentage = await assignment_entryModel.calculatePercentage(req.body.classroom.id, req.body.assignment.subject);
             console.log(percentage);
             if(percentage && Number(req.body.percentage) > percentage.percentage){
                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${percentage.percentage}`, "status": HTTP_STATUS.BAD_REQUEST});
             }
 
-            const assignment_enrollment = new Assignment_enrollment(req.body);
-            const newAssignment_enrollment = model.create(Assignment_enrollment, assignment_enrollment); 
-            return res.status(HTTP_STATUS.CREATED).json(newAssignment_enrollment);
+            const assignment_entry = new Assignment_entry(req.body);
+            const newAssignment_entry = model.create(Assignment_entry, assignment_entry); 
+            return res.status(HTTP_STATUS.CREATED).json(newAssignment_entry);
             // return res.status(HTTP_STATUS.CREATED).json({});
 
         } catch (error) {
@@ -118,18 +130,18 @@ export class Assignment_enrollmentController{
                 throw new Errors.BadRequest(`Id is requered`);
             }
 
-            const assignment_enrollmentModel = new Assignment_enrollmentModel();
-            let assignment_enrollmentToUpdate = await assignment_enrollmentModel.getById(Assignment_enrollment, req.body.id);
+            const assignment_entryModel = new Assignment_entryModel();
+            let assignment_entryToUpdate = await assignment_entryModel.getById(Assignment_entry, req.body.id);
             delete req.body.id;
 
-            if(!assignment_enrollmentToUpdate){
+            if(!assignment_entryToUpdate){
                 throw new Errors.BadRequest("No data found.");
             }
 
-            assignment_enrollmentToUpdate = Object.assign(assignment_enrollmentToUpdate, req.body);
-            console.log("🚀 ~ Assignment_enrollmentController ~ put ~ assignment_enrollmentToUpdate:", assignment_enrollmentToUpdate)
-            const assignment_enrollment = await assignment_enrollmentModel.create(Assignment_enrollment, assignment_enrollmentToUpdate);
-            return res.status(HTTP_STATUS.CREATED).json(assignment_enrollment);
+            assignment_entryToUpdate = Object.assign(assignment_entryToUpdate, req.body);
+            console.log("🚀 ~ Assignment_entryController ~ put ~ assignment_entryToUpdate:", assignment_entryToUpdate)
+            const assignment_entry = await assignment_entryModel.create(Assignment_entry, assignment_entryToUpdate);
+            return res.status(HTTP_STATUS.CREATED).json(assignment_entry);
 
         } catch (error) {
             return handleError(error, res);

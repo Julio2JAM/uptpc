@@ -7,7 +7,7 @@ import subjectRouter from '../Routers/subject.router';
 import calificationRouter from '../Routers/calification.router';
 //Assignment
 import assignmentRouter from '../Routers/assignment.router';
-import assignment_enrollmentRouter from '../Routers/assignment_enrollment.router'
+import assignment_entryRouter from '../Routers/assignment_entry.router'
 import evaluationRouter from '../Routers/evaluation.router';
 //Classroom
 import classroomRouter from '../Routers/classroom.router';
@@ -26,7 +26,7 @@ export const ROUTERS = {
     student                 : studentRouter,
     professor               : professorRouter,
     assignment              : assignmentRouter,
-    assignment_enrollment   : assignment_enrollmentRouter,
+    assignment_entry   : assignment_entryRouter,
     evaluation              : evaluationRouter,
     classroom               : classroomRouter,
     enrollment              : enrollmentRouter,

@@ -7,8 +7,9 @@ import { Assignment } from "./assignment.model";
 // import { Subject } from "./subject.model";
 import { Classroom } from "./classroom.model";
 import AppDataSource from "../database/database";
+import { Enrollment } from "./enrollment.model";
 
-interface Assignment_enrollmentI{
+interface Assignment_entryI{
     assignment: Assignment,
     // subject: Subject,
     classroom: Classroom,
@@ -18,7 +19,7 @@ interface Assignment_enrollmentI{
 }
 
 @Entity()
-export class Assignment_enrollment{
+export class Assignment_entry{
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -63,7 +64,7 @@ export class Assignment_enrollment{
     @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: number
 
-    constructor(data:Assignment_enrollmentI){
+    constructor(data:Assignment_entryI){
         this.assignment = data?.assignment;
         // this.subject = data?.subject;
         this.classroom = data?.classroom;
@@ -73,7 +74,7 @@ export class Assignment_enrollment{
     }
 }
 
-export class Assignment_enrollmentModel extends Model {
+export class Assignment_entryModel extends Model {
 
     /**
      * Al colocarle el porcentaje a una actividad, entre todas las que se han creado, solo debe dar como maximo
@@ -84,17 +85,52 @@ export class Assignment_enrollmentModel extends Model {
      */
     async calculatePercentage(idClassroom: number, idSubject: number):Promise< {percentage:number} | null >{
 
-        const query = await AppDataSource.createQueryBuilder(Assignment_enrollment, "assignment_enrollment")
-        .leftJoinAndSelect("assignment_enrollment.classroom", "classroom")
-        .leftJoinAndSelect("assignment_enrollment.assignment", "assignment")
+        const query = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
+        .leftJoinAndSelect("assignment_entry.classroom", "classroom")
+        .leftJoinAndSelect("assignment_entry.assignment", "assignment")
         .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
         .where("assignment.id_subject = :idSubject", {idSubject: idSubject})
         .groupBy("classroom.id")
-        .select("(100 - SUM(assignment_enrollment.percentage))", "percentage")
+        .select("(100 - SUM(assignment_entry.percentage))", "percentage")
         .getRawOne();
 
         return query;
 
     }
 
+    /**
+     * Al colocarle el porcentaje a una actividad, entre todas las que se han creado, solo debe dar como maximo
+     * 100%, esta funcion retorna el porcentaje que aun se le puede asignar a una nueva actividad
+     * @param idClassroom classroom identifier
+     * @param idSubject subject identifier
+     * @returns percentage
+     */
+    async assignment_students(idClassroom: number, idSubject: number[]){
+
+        const assignment_entry = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
+        .leftJoinAndSelect("assignment_entry.classroom", "classroom")
+        .leftJoinAndSelect("assignment_entry.assignment", "assignment")
+        .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
+        .where("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
+        .getMany();
+        console.log("🚀 ~ Assignment_entryModel ~ assignment_students ~ assignment_entry:", assignment_entry)
+
+        const students = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
+        .leftJoinAndSelect("enrollment.student", "student")
+        .leftJoinAndSelect("student.person", "person")
+        .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
+        .select([
+            "concat(person.name, ' ', person.lastName) as fullName", 
+            "person.cedule"
+        ])
+        .getRawMany();
+
+        const response = {
+            'assignment_entry':assignment_entry,
+            'student':students,
+        };
+
+        return response;
+
+    }
 }
