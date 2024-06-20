@@ -110,6 +110,7 @@ export class Assignment_entryModel extends Model {
             const assignment_entry = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
             .leftJoinAndSelect("assignment_entry.classroom", "classroom")
             .leftJoinAndSelect("assignment_entry.assignment", "assignment")
+            .leftJoinAndSelect("assignment.subject", "subject")
             .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
             .andWhere("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
             .getMany();
@@ -120,7 +121,7 @@ export class Assignment_entryModel extends Model {
             .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
             .select([
                 "concat(person.name, ' ', person.lastName) as fullName", 
-                "person.cedule"
+                "person.cedule as cedule"
             ])
             .getRawMany();
 
