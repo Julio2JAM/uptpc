@@ -6,6 +6,7 @@ import { Model } from "../Base/model";
 import { Subject } from "./subject.model";
 import { Professor } from "./professor.model";
 import { Classroom } from "./classroom.model";
+import AppDataSource from "../database/database";
 
 interface ProgramI{
     id: number,
@@ -54,5 +55,16 @@ export class Program{
 }
 
 export class ProgramModel extends Model{
+
+    async subjects(idProfessor: number){
+
+        const subjects = await AppDataSource.createQueryBuilder(Subject, "subject")
+        .leftJoinAndSelect(Program, "program", "program.id_subject = subject.id")
+        .where("program.id_professor = :idProfessor", {idProfessor: idProfessor})
+        .getMany();
+
+        return subjects;
+
+    }
 
 }

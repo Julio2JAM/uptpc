@@ -106,31 +106,32 @@ export class Assignment_entryModel extends Model {
      * @returns percentage
      */
     async assignment_students(idClassroom: number, idSubject: number[]){
+        try {
+            const assignment_entry = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
+            .leftJoinAndSelect("assignment_entry.classroom", "classroom")
+            .leftJoinAndSelect("assignment_entry.assignment", "assignment")
+            .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
+            .andWhere("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
+            .getMany();
 
-        const assignment_entry = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
-        .leftJoinAndSelect("assignment_entry.classroom", "classroom")
-        .leftJoinAndSelect("assignment_entry.assignment", "assignment")
-        .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
-        .where("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
-        .getMany();
-        console.log("🚀 ~ Assignment_entryModel ~ assignment_students ~ assignment_entry:", assignment_entry)
+            const students = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
+            .leftJoinAndSelect("enrollment.student", "student")
+            .leftJoinAndSelect("student.person", "person")
+            .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
+            .select([
+                "concat(person.name, ' ', person.lastName) as fullName", 
+                "person.cedule"
+            ])
+            .getRawMany();
 
-        const students = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
-        .leftJoinAndSelect("enrollment.student", "student")
-        .leftJoinAndSelect("student.person", "person")
-        .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
-        .select([
-            "concat(person.name, ' ', person.lastName) as fullName", 
-            "person.cedule"
-        ])
-        .getRawMany();
+            const response = {
+                'assignment_entry':assignment_entry,
+                'student':students,
+            };
 
-        const response = {
-            'assignment_entry':assignment_entry,
-            'student':students,
-        };
-
-        return response;
-
+            return response;      
+        } catch (error) {
+            return { 'assignment_entry':null, 'student':null }
+        }
     }
 }

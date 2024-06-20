@@ -7,6 +7,7 @@ import { Assignment } from "../Models/assignment.model";
 import { Classroom } from "../Models/classroom.model";
 import Errors, { handleError } from "../Base/errors";
 import { Professor } from "../Models/professor.model";
+import { ProgramModel } from "../Models/program.model";
 
 export class Assignment_entryController{
     async get(req: Request, res: Response): Promise<Response>{
@@ -56,11 +57,41 @@ export class Assignment_entryController{
         }
     }
 
-    async assignment_students(_req: Request, res: Response): Promise<Response>{
+    async assignment_students(req: Request, res: Response): Promise<Response>{
         try {
+
+            const user = await getUserData(req.user);
+            if(!user || !user.role || Number(user.role) == 3){
+                throw new Errors.Unauthorized(`Permission failed`);
+            }
             
+            if(!req.query.idClassroom){
+                throw new Errors.BadRequest("Invalid data.");
+            }
+
+            const model = new Model();
+            const classroom = await model.getById(Classroom, Number(req.query.idClassroom));
+
+            if(!classroom){
+                throw new Errors.BadRequest("Classroom not found.");
+            }
+
+            if(Number(user.role) != 1){
+
+                const findData = {where: {person:{id: user.person}}};
+                const professor = await model.get(Professor, findData);
+
+                if(!professor){
+                    throw new Errors.Unauthorized(`Permission failed`);
+                }
+
+                const programModel = new ProgramModel();
+                const subjects = await programModel.subjects(professor[0].id);
+                console.log("🚀 ~ Assignment_entryController ~ assignment_students ~ subjects:", subjects)
+            }
+
             const assignment_entryModel = new Assignment_entryModel();
-            const assignment_entry = await assignment_entryModel.assignment_students(1, [2]);
+            const assignment_entry = await assignment_entryModel.assignment_students(Number(req.query.idClassroom), [2]);
             return res.status(HTTP_STATUS.OK).json(assignment_entry);
 
         } catch (error) {

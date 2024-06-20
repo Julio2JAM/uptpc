@@ -6,7 +6,7 @@ const router = Router();
 const controller = new Assignment_entryController();
 
 router.get('/', controller.get)
-router.get('/assignment_students', controller.assignment_students)
+router.get('/assignment_students', authMiddleware, controller.assignment_students)
 router.post('/', authMiddleware, controller.post)
 router.put('/', controller.put);
 
