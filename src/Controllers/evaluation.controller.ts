@@ -7,26 +7,19 @@ import { Enrollment } from "../Models/enrollment.model";
 import { Model } from "../Base/model";
 import Errors, { handleError } from "../Base/errors";
 
-export class AssignmentGradeController{
+export class EvaluationController{
 
     async get(req: Request, res:Response):Promise<Response>{
         try {
             const relations = {
-                assignment  : {
-                    program:{
-                        classroom   : true,
-                        subject     : true,
-                        professor   : {
-                            person: true
-                        },
-                    }
+                assignment_entry: {
+                    assignment  : true,
+                    classroom   : true,
                 },
                 enrollment  : {
                     classroom           : true,
                     student: {
                         person          : true,
-                        representative1 : true,
-                        representative2 : true,
                     },
                 },
             }
@@ -34,7 +27,7 @@ export class AssignmentGradeController{
                 id          : req.query?.id,
                 grade       : req.query?.grade && Number(req.query?.grade),
                 id_status   : req.query?.id_status && Number(req.query?.grade),
-                assignment: {
+                assignment_entry: {
                     id      : req.query?.idAssignment
                 },
                 enrollment: {

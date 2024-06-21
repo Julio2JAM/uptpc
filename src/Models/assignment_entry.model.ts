@@ -115,12 +115,12 @@ export class Assignment_entryModel extends Model {
             .andWhere("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
             .getMany();
 
-            const students = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
+            const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
             .leftJoinAndSelect("enrollment.student", "student")
             .leftJoinAndSelect("student.person", "person")
             .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
             .select([
-                "student.id AS id",
+                "enrollment.id AS id",
                 "concat(person.name, ' ', person.lastName) as fullName", 
                 "person.cedule as cedule"
             ])
@@ -128,7 +128,7 @@ export class Assignment_entryModel extends Model {
 
             const response = {
                 'assignment_entry':assignment_entry,
-                'student':students,
+                'student':enrollment,
             };
 
             return response;      
