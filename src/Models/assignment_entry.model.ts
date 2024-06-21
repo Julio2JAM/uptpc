@@ -120,6 +120,7 @@ export class Assignment_entryModel extends Model {
             .leftJoinAndSelect("student.person", "person")
             .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
             .select([
+                "student.id AS id",
                 "concat(person.name, ' ', person.lastName) as fullName", 
                 "person.cedule as cedule"
             ])
