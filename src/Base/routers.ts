@@ -17,6 +17,7 @@ import programRouter from '../Routers/program.router';
 import personRouter from '../Routers/person.router';
 import studentRouter from '../Routers/student.router';
 import professorRouter from '../Routers/professor.router';
+import mainRouter from '../Base/controller'
 
 export const ROUTERS = {
     user                    : userRouter,
@@ -33,4 +34,5 @@ export const ROUTERS = {
     program                 : programRouter,
     calification            : calificationRouter,
     role                    : roleRouter,
+    pdf                     : mainRouter
 };

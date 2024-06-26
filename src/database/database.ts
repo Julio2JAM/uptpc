@@ -19,7 +19,7 @@ const AppDataSource = new DataSource({
     password: DATABASE.PASS,
     entities: [ENVIROMENT == 'production' ? "**/*.model.js" : "**/*.model.ts"],
     synchronize: false,
-    logging: true
+    logging: false
 });
 
 AppDataSource.initialize()

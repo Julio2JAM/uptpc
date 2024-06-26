@@ -1,8 +1,8 @@
-import { AssignmentGradeController } from "../Controllers/evaluation.controller";
+import { EvaluationController } from "../Controllers/evaluation.controller";
 import { Router } from "express";
 
 const router = Router();
-const controller = new AssignmentGradeController();
+const controller = new EvaluationController();
 
 router.get('/', controller.get);
 router.post('/', controller.post);
