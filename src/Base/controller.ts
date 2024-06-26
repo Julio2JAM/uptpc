@@ -10,22 +10,22 @@ export class Controller {
   async getPdf(_req: Request, res: Response): Promise<any> {
     try {
 
-        const pdf = await generatePDF();
-        if(typeof pdf != "string"){
-            throw new Error("");
-        }
-        
-        // Cargar el PDF en memoria
-        const pdfBuffer = fs.readFileSync(pdf);
+      const pdf = await generatePDF({});
+      if (typeof pdf != "string") {
+        throw new Error("");
+      }
 
-        // Eliminar el archivo PDF
-        fs.unlinkSync(pdf);
+      // Cargar el PDF en memoria
+      const pdfBuffer = fs.readFileSync(pdf);
 
-        return res.set({
-            "Content-Type": "application/pdf",
-            "Content-Disposition": "attachment; filename=document.pdf",
+      // Eliminar el archivo PDF
+      fs.unlinkSync(pdf);
+
+      return res.set({
+          "Content-Type": "application/pdf",
+          "Content-Disposition": "attachment; filename=document.pdf",
         }).send(pdfBuffer);
-      
+
     } catch (error) {
       return handleError(error, res);
     }
