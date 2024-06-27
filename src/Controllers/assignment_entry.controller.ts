@@ -170,7 +170,6 @@ export class Assignment_entryController{
             }
 
             assignment_entryToUpdate = Object.assign(assignment_entryToUpdate, req.body);
-            console.log("🚀 ~ Assignment_entryController ~ put ~ assignment_entryToUpdate:", assignment_entryToUpdate)
             const assignment_entry = await assignment_entryModel.create(Assignment_entry, assignment_entryToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(assignment_entry);
 

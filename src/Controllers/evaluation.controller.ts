@@ -109,6 +109,71 @@ export class EvaluationController{
         }
     }
 
+    async postAll(req: Request, res: Response): Promise<Response> {
+        try {
+
+            if(!req.body.data){
+                throw new Errors.BadRequest(`Invalid data`);
+            }
+
+            /*
+            if (!req.body.assignment || !req.body?.enrollment){
+                throw new Errors.BadRequest(`Invalid data`);
+            }
+            
+            const model = new Model();
+            const assignmentRelations = {
+                program:{
+                    classroom   : true,
+                    subject     : true,
+                    professor   : {
+                        person: true
+                    },
+                }
+            }
+            req.body.assignment = await model.getById(Assignment, req.body.assignment, assignmentRelations);
+            
+            const enrollmentRelations = {
+                classroom           : true,
+                student: {
+                    person          : true,
+                    representative1 : true,
+                    representative2 : true,
+                },
+            }
+            req.body.enrollment = await model.getById(Enrollment, req.body.enrollment, enrollmentRelations);
+
+            const newEvaluation = new Evaluation(req.body);
+            const errors = await validation(newEvaluation);
+            if(errors){
+                throw new Errors.BadRequest(JSON.stringify(errors));
+            }
+
+            const validateEvaluation = await model.get(Evaluation, {
+                assignment: req.body.assignment,
+                enrollment: req.body.enrollment,
+            });
+
+            if(validateEvaluation.length > 0){
+                throw new Errors.BadRequest("Alrady exist");
+            }
+
+            if(req.body.grade > req.body.assignment.base){
+                throw new Errors.BadRequest(JSON.stringify({
+                    error: "Invalid grade", 
+                    min_grade: req.body.assignment.base, 
+                    status: HTTP_STATUS.BAD_REQUEST
+                }));
+            }
+            const evaluationModel = new EvaluationModel();
+            const evaluation = await evaluationModel.create(Evaluation,newEvaluation);
+            */
+            return res.status(HTTP_STATUS.CREATED).json({});
+        } catch (error) {
+            return handleError(error, res);
+        }
+    }
+
     async put(req: Request, res: Response): Promise<Response> {
         try {
             
