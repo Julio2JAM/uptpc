@@ -23,12 +23,17 @@ export class SubjectController{
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.get(Subject, findData);
            
-           
-           const tableOptions = {
+            const tableOptions = {
                 title: 'Tabla de Materias',
                 subtitle:'Informacion de las Materias',
-                header: ['ID', 'Nombre', 'Estado'],
-                rows: subject
+                header: [
+                    {label:'ID', width: 50},
+                    {label:'Nombre', width: 184},
+                    {label:'Descripcion', width: 184},
+                    {label:'Estado', width: 50},
+                ],
+                rows: subject,
+                fields: ["id","name","description","id_status"]
             }
 
             const pdf = new PDF();

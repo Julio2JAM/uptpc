@@ -46,13 +46,12 @@ export class PDF{
         this.loadImg(doc);
         this.loadLetterhead(doc);
         this.loadDate(doc);
-        // doc.moveDown(2).text("Este documento es confidencial y está destinado exclusivamente para uso interno de la institución educativa. Queda prohibida su divulgación, copia o distribución sin autorización previa por parte de las autoridades escolares.", {align: "justify"})
+        doc.moveDown(2).text("Este documento es confidencial y está destinado exclusivamente para uso interno de la institución educativa. Queda prohibida su divulgación, copia o distribución sin autorización previa por parte de las autoridades escolares.", {align: "justify"})
         this.buildTable(doc, tableOptions);
 
         const response = new Promise((resolve, reject) => {
 
             const rute = this.fileRoute(fileName);
-            console.log(rute);
             const writeStream = fs.createWriteStream(rute);
             doc.pipe(writeStream);
             doc.end();
@@ -105,7 +104,7 @@ export class PDF{
             const documentN = this.getDocumentNumber();
 
             doc.fontSize(12).moveDown(0.5)
-                .text(`Documento Nº: ${documentN}`, { align: "right" })
+                .text(`Documento Nº ${documentN}`, { align: "right" })
                 .text(`Fecha: ${date}`, { align: "right" })
                 .text(`Hora: ${hours}`, { align: "right" });
 
@@ -118,12 +117,14 @@ export class PDF{
 
     private buildTable(doc:PDFDocumentWithTables, tableOptions:any){
 
-        const headers = tableOptions.header.map((item:string) => ({
-            label: item,
+        const headers:Header[] = tableOptions.header.map((item:any) => ({
+            label: item.label,
             headerOpacity: 0,
             columnColor: "#FFFFFF",
             headerColor: "#FFFFFF",
-            align: "center",
+            align: "left",
+            // headerAlign: "center",
+            width: item.width
         }));
     
         const table:Table = {
@@ -131,25 +132,27 @@ export class PDF{
             subtitle: tableOptions.subtitle,
             headers: headers,
             // datas: data,
-            rows: tableOptions.rows.map((item: any) => [
-                item.id,
-                item.name,
-                item.id_status,
-            ]),
+            rows: tableOptions.rows.map((item: any) => {
+                const row = [];
+                for (const field of tableOptions.fields) {
+                    row.push(item[field]);
+                }
+                return row;
+            }),
             
         };
-
+        // console.log(doc.page.width - (doc.page.margins.left + doc.page.margins.right)); //468
         const options:Options = {
             width: doc.page.width - (doc.page.margins.left + doc.page.margins.right),
-            // padding: [10,10],
-            // divider: {
-            //     horizontal: {
-            //         disabled: true,
-            //     },
-            //     header: {
-            //         disabled: true,
-            //     }
-            // }
+            padding: [5,5],
+            divider: {
+                // horizontal: {
+                //     disabled: true,
+                // },
+                header: {
+                    disabled: true,
+                }
+            }
         }
     
         doc.moveDown(2).table(table, options);
