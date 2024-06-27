@@ -6,6 +6,7 @@ const controller = new EvaluationController();
 
 router.get('/', controller.get);
 router.post('/', controller.post);
+router.post('/all', controller.postAll);
 router.put('/', controller.put);
 
 export default router;

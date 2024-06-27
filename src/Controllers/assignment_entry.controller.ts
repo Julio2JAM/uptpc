@@ -7,7 +7,7 @@ import { Assignment } from "../Models/assignment.model";
 import { Classroom } from "../Models/classroom.model";
 import Errors, { handleError } from "../Base/errors";
 import { Professor } from "../Models/professor.model";
-import { ProgramModel } from "../Models/program.model";
+import { Program, ProgramModel } from "../Models/program.model";
 
 export class Assignment_entryController{
     async get(req: Request, res: Response): Promise<Response>{
@@ -68,16 +68,10 @@ export class Assignment_entryController{
             if(!req.query.idClassroom){
                 throw new Errors.BadRequest("Invalid data.");
             }
-
-            const model = new Model();
-            const classroom = await model.getById(Classroom, Number(req.query.idClassroom));
-
-            if(!classroom){
-                throw new Errors.BadRequest("Classroom not found.");
-            }
-
+            
             if(Number(user.role) != 1){
-
+                
+                const model = new Model();
                 const findData = {where: {person:{id: user.person}}};
                 const professor = await model.get(Professor, findData);
 
@@ -85,13 +79,29 @@ export class Assignment_entryController{
                     throw new Errors.Unauthorized(`Permission failed`);
                 }
 
+                if(!req.query.idSubject){
+                    throw new Errors.BadRequest("Classroom not found.");
+                }
+                
                 const programModel = new ProgramModel();
-                const subjects = await programModel.subjects(professor[0].id);
-                console.log("🚀 ~ Assignment_entryController ~ assignment_students ~ subjects:", subjects)
+
+                const subjectFindData = {
+                    where:{
+                        classroom: {id: req.query.idClassroom},
+                        subject: {id: req.query.idSubject},
+                        professor: {id: professor[0].id}
+                    },
+                    relations: ["classroom","subject","professor",]
+                }
+                const program = programModel.get(Program, subjectFindData);
+
+                if(!program){
+                    throw new Errors.BadRequest("Invalid data.");
+                }
             }
 
             const assignment_entryModel = new Assignment_entryModel();
-            const assignment_entry = await assignment_entryModel.assignment_students(Number(req.query.idClassroom), [2]);
+            const assignment_entry = await assignment_entryModel.assignment_enrollment(Number(req.query.idClassroom), [Number(req.query.idSubject)]);
             return res.status(HTTP_STATUS.OK).json(assignment_entry);
 
         } catch (error) {

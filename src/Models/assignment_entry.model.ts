@@ -105,14 +105,15 @@ export class Assignment_entryModel extends Model {
      * @param idSubject subject identifier
      * @returns percentage
      */
-    async assignment_students(idClassroom: number, idSubject: number[]){
+    async assignment_enrollment(idClassroom: number, idSubject: number[]){
         try {
             const assignment_entry = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
             .leftJoinAndSelect("assignment_entry.classroom", "classroom")
             .leftJoinAndSelect("assignment_entry.assignment", "assignment")
             .leftJoinAndSelect("assignment.subject", "subject")
             .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
-            .andWhere("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
+            // .andWhere("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
+            .andWhere("assignment.id_subject = :idSubject", {idSubject: idSubject})
             .getMany();
 
             const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")

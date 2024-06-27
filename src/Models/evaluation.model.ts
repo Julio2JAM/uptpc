@@ -5,11 +5,10 @@ import { IsInt, IsNotEmpty, IsPositive } from "class-validator";
 import { Assignment_entry } from "./assignment_entry.model";
 
 interface EvaluationI {
-    id: number,
     assignment_entry: Assignment_entry,
     enrollment: Enrollment,
     grade: number,
-    id_status: number
+    id_status?: number
 }
 
 @Entity()
@@ -48,7 +47,7 @@ export class Evaluation {
         this.assignment_entry = data?.assignment_entry;
         this.enrollment = data?.enrollment;
         this.grade = Number(data?.grade);
-        this.id_status = data?.id_status;
+        this.id_status = data?.id_status ?? 1;
     }
 }
 

@@ -1,11 +1,12 @@
 import { Evaluation, EvaluationModel } from "../Models/evaluation.model";
-import { removeFalsyFromObject, validation } from "../Base/toolkit";
+import { isJsonString, removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Assignment } from "../Models/assignment.model";
 import { Enrollment } from "../Models/enrollment.model";
 import { Model } from "../Base/model";
 import Errors, { handleError } from "../Base/errors";
+import { Assignment_entry } from "../Models/assignment_entry.model";
 
 export class EvaluationController{
 
@@ -113,62 +114,74 @@ export class EvaluationController{
         try {
 
             if(!req.body.data){
-                throw new Errors.BadRequest(`Invalid data`);
+                throw new Errors.BadRequest(`Invalid data E1`);
             }
 
-            /*
-            if (!req.body.assignment || !req.body?.enrollment){
-                throw new Errors.BadRequest(`Invalid data`);
+            if(!isJsonString(req.body.data)){
+                throw new Errors.BadRequest(`Invalid data E2`);
+            }
+
+            const response = {
+                success: 0,
+                failed: 0,
             }
             
-            const model = new Model();
-            const assignmentRelations = {
-                program:{
-                    classroom   : true,
-                    subject     : true,
-                    professor   : {
-                        person: true
-                    },
+            const data = JSON.parse(req.body.data)
+            for (const element of data) {
+
+                if (!element.idEnrollment || !element.idAssignmentEntry){
+                    response.failed++;
+                    continue;
                 }
-            }
-            req.body.assignment = await model.getById(Assignment, req.body.assignment, assignmentRelations);
-            
-            const enrollmentRelations = {
-                classroom           : true,
-                student: {
-                    person          : true,
-                    representative1 : true,
-                    representative2 : true,
-                },
-            }
-            req.body.enrollment = await model.getById(Enrollment, req.body.enrollment, enrollmentRelations);
+                
+                const model = new Model();
+                const assignmentEntry = await model.getById(Assignment_entry, Number(element.idAssignmentEntry));
+                const enrollment = await model.getById(Enrollment, Number(element.idEnrollment));
 
-            const newEvaluation = new Evaluation(req.body);
-            const errors = await validation(newEvaluation);
-            if(errors){
-                throw new Errors.BadRequest(JSON.stringify(errors));
+                const validateEvaluation = await model.get(Evaluation, {
+                    assignment_entry: assignmentEntry,
+                    enrollment: enrollment,
+                });
+
+                if(validateEvaluation.length > 0){
+                    response.failed++;
+                    continue;
+                }
+
+                const dataPost = {
+                    assignment_entry: assignmentEntry,
+                    enrollment: enrollment,
+                    grade: element.grade
+                }
+
+                const newEvaluation = new Evaluation(dataPost);
+                const errors = await validation(newEvaluation);
+
+                if(errors){
+                    console.log(errors);
+                    response.failed++;
+                    continue;
+                }
+
+                if(element.grade > assignmentEntry.base){
+                    response.failed++;
+                    continue;
+                }
+
+                const evaluationModel = new EvaluationModel();
+                const evaluation = await evaluationModel.create(Evaluation,newEvaluation);
+
+                if(!evaluation){
+                    response.failed++;
+                    continue;
+                }
+
+                response.success++;
+
             }
 
-            const validateEvaluation = await model.get(Evaluation, {
-                assignment: req.body.assignment,
-                enrollment: req.body.enrollment,
-            });
+            return res.status(HTTP_STATUS.CREATED).json(response);
 
-            if(validateEvaluation.length > 0){
-                throw new Errors.BadRequest("Alrady exist");
-            }
-
-            if(req.body.grade > req.body.assignment.base){
-                throw new Errors.BadRequest(JSON.stringify({
-                    error: "Invalid grade", 
-                    min_grade: req.body.assignment.base, 
-                    status: HTTP_STATUS.BAD_REQUEST
-                }));
-            }
-            const evaluationModel = new EvaluationModel();
-            const evaluation = await evaluationModel.create(Evaluation,newEvaluation);
-            */
-            return res.status(HTTP_STATUS.CREATED).json({});
         } catch (error) {
             return handleError(error, res);
         }
