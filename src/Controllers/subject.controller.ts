@@ -3,9 +3,9 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Like } from "typeorm";
 import Errors, { handleError } from "../Base/errors";
-import { generatePDF } from "../libs/pdfCreator";
 import fs from 'fs';
 import { removeFalsyFromObject } from "../Base/toolkit";
+import { PDF } from "../libs/pdf"
 
 export class SubjectController{
     
@@ -22,17 +22,23 @@ export class SubjectController{
 
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.get(Subject, findData);
-
-            const headers = ['id', 'nombre', 'estado'];
-            const title = 'Tabla de Materias';
-            const subtitle = 'informacion de las Materias';
-            const pdf = await generatePDF(headers, title, subtitle, subject);
-
-            if (typeof pdf != "string") {
-              throw new Error("");
+           
+           
+           const tableOptions = {
+                title: 'Tabla de Materias',
+                subtitle:'Informacion de las Materias',
+                header: ['ID', 'Nombre', 'Estado'],
+                rows: subject
             }
 
-            const pdfBuffer = fs.readFileSync(pdf);
+            const pdf = new PDF();
+            const newPdf = await pdf.newPDF('materias', tableOptions);
+
+            if (typeof newPdf != "string") {
+                throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
+            }
+
+            const pdfBuffer = fs.readFileSync(newPdf);
             return res.set({
                 "Content-Type": "application/pdf",
                 "Content-Disposition": "attachment; filename=document.pdf",
@@ -53,16 +59,16 @@ export class SubjectController{
     async get(req:Request, res:Response):Promise<Response>{
         try {
 
-            const data = {
+            const where = {
                 id          : req.query?.id,
                 name        : req.query?.name && Like(`%${req.query?.name}%`),
                 description : req.query?.description && Like(`%${req.query?.description}%`),
                 id_status   : req.query?.id_status,
             };
-            const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
+            const findData = {where: removeFalsyFromObject(where)};
 
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.get(Subject, {where:whereOptions});
+            const subject = await subjectModel.get(Subject, findData);
 
             if(subject.length == 0){
                 throw new Errors.NotFound(`Subjects not found`);
