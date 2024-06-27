@@ -5,24 +5,28 @@ import { Like } from "typeorm";
 import Errors, { handleError } from "../Base/errors";
 import { generatePDF } from "../libs/pdfCreator";
 import fs from 'fs';
+import { removeFalsyFromObject } from "../Base/toolkit";
 
 export class SubjectController{
     
     pdf = async (req: Request, res: Response) => {
         try {
 
-            const data = {
+            const where = {
                 id          : req.query?.id,
                 name        : req.query?.name && Like(`%${req.query?.name}%`),
                 description : req.query?.description && Like(`%${req.query?.description}%`),
                 id_status   : req.query?.id_status,
             };
-            const whereOptions = Object.fromEntries(Object.entries(data).filter(value => value[1]));
+            const findData = {where: removeFalsyFromObject(where)};
 
             const subjectModel = new SubjectModel();
-            const subject = await subjectModel.get(Subject, {where:whereOptions});
+            const subject = await subjectModel.get(Subject, findData);
 
-            const pdf = await generatePDF(subject);
+            const headers = ['id', 'nombre', 'estado'];
+            const title = 'Tabla de Materias';
+            const subtitle = 'informacion de las Materias';
+            const pdf = await generatePDF(headers, title, subtitle, subject);
 
             if (typeof pdf != "string") {
               throw new Error("");
@@ -32,7 +36,7 @@ export class SubjectController{
             return res.set({
                 "Content-Type": "application/pdf",
                 "Content-Disposition": "attachment; filename=document.pdf",
-                }).send(pdfBuffer);
+            }).send(pdfBuffer);
 
         } catch (error) {
             console.log(error);

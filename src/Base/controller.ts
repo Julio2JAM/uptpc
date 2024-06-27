@@ -10,7 +10,7 @@ export class Controller {
   async getPdf(_req: Request, res: Response): Promise<any> {
     try {
 
-      const pdf = await generatePDF({});
+      const pdf = await generatePDF([],"","",{});
       if (typeof pdf != "string") {
         throw new Error("");
       }
