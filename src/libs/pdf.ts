@@ -40,7 +40,7 @@ export class PDF{
         };
     }
 
-    public async newPDF(tableOptions?:Object, fileName: string):Promise<any>{
+    public async newPDF(fileName: string, tableOptions?:Object):Promise<any>{
 
         const doc = new PDFDocument();
         this.loadImg(doc);
