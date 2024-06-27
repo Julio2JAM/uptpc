@@ -46,6 +46,7 @@ export class PDF{
         this.loadImg(doc);
         this.loadLetterhead(doc);
         this.loadDate(doc);
+        // doc.moveDown(2).text("Este documento es confidencial y está destinado exclusivamente para uso interno de la institución educativa. Queda prohibida su divulgación, copia o distribución sin autorización previa por parte de las autoridades escolares.", {align: "justify"})
         this.buildTable(doc, tableOptions);
 
         const response = new Promise((resolve, reject) => {
@@ -88,7 +89,7 @@ export class PDF{
         try {
 
             const imgRute = this.routeImg;
-            doc.image(imgRute, 25, 25, { width: 100 })
+            doc.image(imgRute, 60, 25, { width: 100 })
               .fillColor("#000")
             return doc;
 
@@ -151,7 +152,7 @@ export class PDF{
             // }
         }
     
-        doc.moveDown(3).table(table, options);
+        doc.moveDown(2).table(table, options);
 
     }
 
