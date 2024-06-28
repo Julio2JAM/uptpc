@@ -66,3 +66,21 @@ export async function getUserData(idUser: string | number | undefined): Promise<
     const user = await userModel.getById(User, Number(idUser));
     return user;
 }
+
+export function getPropertyValue(obj: any, propertyPath: string): any {
+
+    const parts = propertyPath.split('.');
+    let value = obj;
+
+    for (const part of parts) {
+      if (value && typeof value === "object" && part in value) {
+        value = value[part];
+      } else {
+        value = undefined;
+        break;
+      }
+    }
+    return value;
+
+}
+  

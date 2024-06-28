@@ -2,6 +2,7 @@ import PDFDocumentWithTables from "pdfkit-table";
 import PDFDocument from "pdfkit-table";
 import fs from "fs";
 import path from "path";
+import { getPropertyValue } from "../Base/toolkit";
 
 export class PDF{
 
@@ -135,7 +136,7 @@ export class PDF{
             rows: tableOptions.rows.map((item: any) => {
                 const row = [];
                 for (const field of tableOptions.fields) {
-                    row.push(item[field]);
+                    row.push(getPropertyValue(item,field));
                 }
                 return row;
             }),

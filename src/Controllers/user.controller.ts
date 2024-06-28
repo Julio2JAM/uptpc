@@ -7,8 +7,65 @@ import { Model } from "../Base/model";
 import { Like } from "typeorm";
 import { Person } from "../Models/person.model";
 import Errors, { handleError } from "../Base/errors";
+import { PDF } from "../libs/pdf";
+import fs from 'fs';
 
 export class UserController{
+
+    async pdf (req: Request, res: Response) {
+        try {
+
+            const relations = {
+                role: true,
+                person: true
+            }
+            const where = {
+                id          : req.query?.id,
+                username    : req.query?.username && Like(`%${req.query?.username}%`),
+                id_status   : req.query?.id_status,
+                role: {
+                    id      : req.query?.idRole
+                },
+                person: {
+                    id      : req.query?.person,
+                }
+            }
+
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
+            const userModel = new UserModel();
+            const user = await userModel.get(User,findData);
+           
+            const tableOptions = {
+                title: 'Tabla de Usuarios',
+                subtitle:'Informacion de los Usuarios',
+                header: [
+                    {label:'ID', width: 50},
+                    {label:'Usuario', width: 184},
+                    {label:'Propietario', width: 184},
+                    {label:'Estado', width: 50},
+                ],
+                rows: user,
+                fields: ["id","username","person.name","id_status"]
+            }
+
+            const pdf = new PDF();
+            const newPdf = await pdf.newPDF('usuarios', tableOptions);
+
+            if (typeof newPdf != "string") {
+                throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
+            }
+
+            const pdfBuffer = fs.readFileSync(newPdf);
+            return res.set({
+                "Content-Type": "application/pdf",
+                "Content-Disposition": "attachment; filename=document.pdf",
+            }).send(pdfBuffer);
+
+        } catch (error) {
+            console.log(error);
+            return handleError(error, res);
+        }
+    }
 
     async get(req:Request, res:Response):Promise<Response>{
         try {

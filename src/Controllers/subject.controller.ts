@@ -61,7 +61,7 @@ export class SubjectController{
      * @param {Response} res res object
      * @returns {Promise<Response>}
      */
-    async get(req:Request, res:Response):Promise<Response>{
+    async get(req:Request, res:Response):Promise<any>{
         try {
 
             const where = {
@@ -78,6 +78,8 @@ export class SubjectController{
             if(subject.length == 0){
                 throw new Errors.NotFound(`Subjects not found`);
             }
+            
+            // return {status: HTTP_STATUS.OK, response: subject};
             return res.status(HTTP_STATUS.OK).json(subject);
 
         } catch (error) {
