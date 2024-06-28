@@ -80,7 +80,7 @@ export class Assignment_entryController{
                 }
 
                 if(!req.query.idSubject){
-                    throw new Errors.BadRequest("Classroom not found.");
+                    throw new Errors.BadRequest("Subject not found.");
                 }
                 
                 const programModel = new ProgramModel();

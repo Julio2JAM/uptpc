@@ -108,24 +108,30 @@ export class Assignment_entryModel extends Model {
     async assignment_enrollment(idClassroom: number, idSubject: number[]){
         try {
             const assignment_entry = await AppDataSource.createQueryBuilder(Assignment_entry, "assignment_entry")
-            .leftJoinAndSelect("assignment_entry.classroom", "classroom")
-            .leftJoinAndSelect("assignment_entry.assignment", "assignment")
-            .leftJoinAndSelect("assignment.subject", "subject")
-            .where("classroom.id = :idClassroom", {idClassroom: idClassroom})
-            // .andWhere("assignment.id_subject IN (:...idSubject)", {idSubject: idSubject})
-            .andWhere("assignment.id_subject = :idSubject", {idSubject: idSubject})
-            .getMany();
+                .leftJoinAndSelect("assignment_entry.assignment", "assignment")
+                .where("assignment_entry.id_classroom = :idClassroom", {idClassroom: idClassroom})
+                .andWhere("assignment.id_subject = :idSubject", {idSubject: idSubject})
+                .select([
+                    "assignment.title AS title",
+                    "assignment.description AS description",
+                    "assignment.datetime_start AS datetime_start",
+                    "assignment.datetime_end AS datetime_end",
+                    "assignment.id_subject AS id_subject",
+                    "assignment_entry.base AS base",
+                    "assignment_entry.id AS id",
+                ])
+                .getRawMany();
 
             const enrollment = await AppDataSource.createQueryBuilder(Enrollment, "enrollment")
-            .leftJoinAndSelect("enrollment.student", "student")
-            .leftJoinAndSelect("student.person", "person")
-            .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
-            .select([
-                "enrollment.id AS id",
-                "concat(person.name, ' ', person.lastName) as fullName", 
-                "person.cedule as cedule"
-            ])
-            .getRawMany();
+                .leftJoinAndSelect("enrollment.student", "student")
+                .leftJoinAndSelect("student.person", "person")
+                .where("enrollment.id_classroom = :idClassroom", {idClassroom: idClassroom})
+                .select([
+                    "enrollment.id AS id",
+                    "concat(person.name, ' ', person.lastName) as fullName", 
+                    "person.cedule as cedule"
+                ])
+                .getRawMany();
 
             const response = {
                 'assignment_entry':assignment_entry,

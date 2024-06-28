@@ -7,6 +7,7 @@ import { Enrollment } from "../Models/enrollment.model";
 import { Model } from "../Base/model";
 import Errors, { handleError } from "../Base/errors";
 import { Assignment_entry } from "../Models/assignment_entry.model";
+import { In } from "typeorm"
 
 export class EvaluationController{
 
@@ -45,6 +46,27 @@ export class EvaluationController{
             }
 
             return res.status(HTTP_STATUS.OK).json(evaluation);
+        } catch (error) {
+            return handleError(error, res);
+        }
+    }
+
+    async getByAssignmentEntries(req: Request, res:Response):Promise<Response>{
+        try {
+
+            const where = {
+                assignment_entry: {id: In([req.query?.assignmentEntries])},
+            }
+
+            const findData = {relations: [], where: removeFalsyFromObject(where)}
+            const evaluationModel = new EvaluationModel();
+            const evaluation = await evaluationModel.get(Evaluation, findData);
+
+            if(evaluation.length == 0){
+                throw new Errors.NotFound(`Evaluations not found`);
+            }
+            return res.status(HTTP_STATUS.OK).json(evaluation);
+
         } catch (error) {
             return handleError(error, res);
         }
