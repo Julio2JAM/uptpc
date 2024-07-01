@@ -55,10 +55,11 @@ export class EvaluationController{
         try {
 
             const where = {
-                assignment_entry: {id: In([req.query?.assignmentEntries])},
+                assignment_entry: {id: In(String(req.query?.assignmentEntries).split(','))},
+                enrollment: {id: In(String(req.query?.enrollments).split(','))},
             }
 
-            const findData = {relations: [], where: removeFalsyFromObject(where)}
+            const findData = {relations: ['assignment_entry', 'enrollment'], where: removeFalsyFromObject(where), loadRelationIds: true};
             const evaluationModel = new EvaluationModel();
             const evaluation = await evaluationModel.get(Evaluation, findData);
 
