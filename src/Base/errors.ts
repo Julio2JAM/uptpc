@@ -55,3 +55,27 @@ export function handleError(e: any, res: Response) {
     }
 
 }
+
+
+export function handleError2(err: Error) {
+
+    if(isJsonString(err.message)) {
+        err.message = JSON.parse(err.message);
+    }
+    
+    const errorMap: { [key: string]: number } = {
+        NotFound: HTTP_STATUS.NOT_FOUND,
+        BadRequest: HTTP_STATUS.BAD_REQUEST,
+        Unauthorized: HTTP_STATUS.UNAUTHORIZED
+    };
+
+    const errorType = Object.keys(errorMap).find(type => err instanceof (eval(type) as new () => Error));
+    const status = errorType ? errorMap[errorType] : HTTP_STATUS.INTERNAL_SERVER_ERROR;
+    const response = { 
+        status: status,
+        response: { message: err.message, status: status}
+    };
+
+    return response
+    
+}

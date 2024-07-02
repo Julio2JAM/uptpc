@@ -2,10 +2,15 @@ import { Subject, SubjectModel } from "../Models/subject.model";
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { Like } from "typeorm";
-import Errors, { handleError } from "../Base/errors";
+import Errors, { handleError, handleError2 } from "../Base/errors";
 import fs from 'fs';
 import { removeFalsyFromObject } from "../Base/toolkit";
 import { PDF } from "../libs/pdf"
+
+interface response{
+    response: any,
+    status: number
+};
 
 export class SubjectController{
     
@@ -61,7 +66,7 @@ export class SubjectController{
      * @param {Response} res res object
      * @returns {Promise<Response>}
      */
-    async get(req:Request, res:Response):Promise<any>{
+    async get(req:Request):Promise<response>{
         try {
 
             const where = {
@@ -79,28 +84,27 @@ export class SubjectController{
                 throw new Errors.NotFound(`Subjects not found`);
             }
             
-            // return {status: HTTP_STATUS.OK, response: subject};
-            return res.status(HTTP_STATUS.OK).json(subject);
+            return {status: HTTP_STATUS.OK, response: subject};
 
-        } catch (error) {
-            return handleError(error, res);
+        } catch (error:any) {
+            return handleError2(error);
         }
     }
 
-    async post(req:Request, res:Response):Promise<Response>{
+    async post(req:Request):Promise<response>{
         try {
 
             const newSubject = new Subject(req.body);
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.create(Subject, newSubject);
-            return res.status(HTTP_STATUS.CREATED).json(subject);
+            return {status: HTTP_STATUS.CREATED, response: subject};
 
-        } catch (error) {
-            return handleError(error, res);
+        } catch (error:any) {
+            return handleError2(error);
         }
     }
 
-    async put(req: Request, res: Response):Promise<Response>{
+    async put(req: Request):Promise<response>{
         try {
 
             if(!req.body.id){
@@ -117,10 +121,10 @@ export class SubjectController{
 
             subjectToUpdate = Object.assign(subjectToUpdate, req.body);
             const subject = await subjectModel.create(Subject,subjectToUpdate);
-            return res.status(HTTP_STATUS.CREATED).json(subject);
+            return {status: HTTP_STATUS.CREATED, response: subject};
 
-        } catch (error) {
-            return handleError(error, res);
+        } catch (error:any) {
+            return handleError2(error);
         }
     }
     

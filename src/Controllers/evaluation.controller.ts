@@ -161,27 +161,29 @@ export class EvaluationController{
                 const assignmentEntry = await model.getById(Assignment_entry, Number(element.idAssignmentEntry));
                 const enrollment = await model.getById(Enrollment, Number(element.idEnrollment));
 
+                const dataPost:any = {
+                    assignment_entry: assignmentEntry,
+                    enrollment: enrollment,
+                    grade: element.grade
+                }
+
                 const validateEvaluation = await model.get(Evaluation, {
                     assignment_entry: assignmentEntry,
                     enrollment: enrollment,
                 });
 
                 if(validateEvaluation.length > 0){
-                    response.failed++;
+                    const evaluationToUpdate = Object.assign(validateEvaluation[0], req.body);
+                    const evaluationModel = new EvaluationModel();
+                    const evaluation = await evaluationModel.create(Evaluation, evaluationToUpdate);
+                    evaluation ? response.success++ : response.failed++;
                     continue;
-                }
-
-                const dataPost = {
-                    assignment_entry: assignmentEntry,
-                    enrollment: enrollment,
-                    grade: element.grade
                 }
 
                 const newEvaluation = new Evaluation(dataPost);
                 const errors = await validation(newEvaluation);
 
                 if(errors){
-                    console.log(errors);
                     response.failed++;
                     continue;
                 }
