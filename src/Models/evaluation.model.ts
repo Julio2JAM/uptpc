@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, Index } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, Index, ManyToOne } from "typeorm";
 import { Model } from "../Base/model";
 import { Enrollment } from "./enrollment.model";
 import { IsInt, IsNotEmpty, IsPositive } from "class-validator";
@@ -16,13 +16,13 @@ export class Evaluation {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @OneToOne(() => Assignment_entry, { nullable: false, createForeignKeyConstraints: true })
+    @ManyToOne(() => Assignment_entry, { nullable: false, createForeignKeyConstraints: true })
     @JoinColumn({ name: "id_assignment_entry" })
     @Index("evaluation_FK_1")
     @IsNotEmpty({ message: "The assignment is required" })
     assignment_entry: Assignment_entry;
 
-    @OneToOne(() => Enrollment, { nullable: false, createForeignKeyConstraints: true })
+    @ManyToOne(() => Enrollment, { nullable: false, createForeignKeyConstraints: true })
     @JoinColumn({ name: "id_enrollment" })
     @Index("evaluation_FK_2")
     @IsNotEmpty({ message: "The enrollment is required" })

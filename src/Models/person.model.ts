@@ -6,7 +6,7 @@ import { Student } from "./student.model";
 import { Professor } from "./professor.model";
 import { User } from "./user.model";
 
-interface StudentI{
+interface PersonI{
     id: number,
     cedule: number,
     name: string,
@@ -70,7 +70,7 @@ export class Person {
     @IsInt()
     id_status!: number;
 
-    constructor(data:StudentI) {
+    constructor(data:PersonI) {
         this.cedule     = data?.cedule && Number(data?.cedule);
         this.name       = data?.name && data?.name.toUpperCase();
         this.lastName   = data?.lastName && data?.lastName.toUpperCase();

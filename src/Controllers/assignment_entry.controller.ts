@@ -21,6 +21,7 @@ export class Assignment_entryController{
                     subject: true
                 },
                 classroom: true,
+                // evaluation: true,
             };
 
             const where = {

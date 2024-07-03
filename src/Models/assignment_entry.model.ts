@@ -8,6 +8,7 @@ import { Assignment } from "./assignment.model";
 import { Classroom } from "./classroom.model";
 import AppDataSource from "../database/database";
 import { Enrollment } from "./enrollment.model";
+// import { Evaluation } from "./evaluation.model";
 
 interface Assignment_entryI{
     assignment: Assignment,
@@ -63,6 +64,9 @@ export class Assignment_entry{
 
     @Column({ type: "tinyint", width: 2, default: 1, nullable: false})
     id_status!: number
+
+    // @OneToMany(() => Evaluation, evaluation => evaluation.assignment_entry)
+    // evaluation!: Evaluation[];
 
     constructor(data:Assignment_entryI){
         this.assignment = data?.assignment;
