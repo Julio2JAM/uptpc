@@ -35,11 +35,12 @@ export class AssignmentController{
                 subject       : {
                     id: req.query?.idSubject,
                 },
-                name            : req.query?.name && Like(`%${req.query.name}%`),
+                title           : req.query?.title && Like(`%${req.query.title}%`),
                 description     : req.query?.description && Like(`%${req.query.description}%`),
                 porcentage      : req.query?.porcentage && Number(req.query.porcentage),
                 quantity        : req.query?.quantity && Number(req.query.quantity),
                 datetime_end    : req.query?.datetime_end,
+                datetime_start  : req.query?.datetime_start,
                 id_status       : req.query?.id_status,
             }
 
