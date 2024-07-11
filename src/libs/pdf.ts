@@ -140,7 +140,6 @@ export class PDF{
                 }
                 return row;
             }),
-            
         };
         // console.log(doc.page.width - (doc.page.margins.left + doc.page.margins.right)); //468
         const options:Options = {
@@ -153,7 +152,8 @@ export class PDF{
                 header: {
                     disabled: true,
                 }
-            }
+            },
+            // prepareRow: (_row:any, _indexColumn:any, _indexRow:any, _rectRow:any, _rectCell:any) => doc.font("Helvetica").fontSize(10), // {Function} 
         }
     
         doc.moveDown(2).table(table, options);

@@ -15,8 +15,11 @@ export class EvaluationController{
         try {
             const relations = {
                 assignment_entry: {
-                    assignment  : true,
+                    assignment  : {
+                        subject: true
+                    },
                     classroom   : true,
+                    // subject     : true
                 },
                 enrollment  : {
                     classroom           : true,
@@ -243,4 +246,5 @@ export class EvaluationController{
             return handleError(error, res);
         }
     }
+
 }
