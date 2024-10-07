@@ -5,6 +5,7 @@ import { removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Model } from "../Base/model";
 import { Program } from "../Models/program.model";
 import { Enrollment } from "../Models/enrollment.model";
+import Errors, { handleError } from "../Base/errors";
 
 export class CalificationController{
 
@@ -43,20 +44,19 @@ export class CalificationController{
             const calification = await calificationModel.get(Calification,findData);
 
             if(calification.length === 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Calification not founds", status: HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Califications not found`);
             }
 
             return res.status(HTTP_STATUS.OK).json(calification);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
     async post(req: Request, res: Response):Promise<Response>{
         try {
             if(!req.body.program && !req.body.enrollment){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid data`);
             }
 
             const model = new Model();
@@ -64,7 +64,7 @@ export class CalificationController{
             req.body.enrollment = await model.getById(Enrollment, Number(req.body.enrollment), ["student"]);
             
             if(!req.body.program && !req.body.enrollment){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Invalid data`);
             }
 
             const calificationModel = new CalificationModel();
@@ -74,14 +74,13 @@ export class CalificationController{
             const newCalification = new Calification(req.body);
             const errors = await validation(newCalification);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
             const calification = await model.create(Calification, newCalification);
             return res.status(HTTP_STATUS.CREATED).json(calification);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});    
+            return handleError(error, res);
         }
     }
 
@@ -89,14 +88,14 @@ export class CalificationController{
         try {
             
             if(!req.body?.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const calificationModel = new CalificationModel();
             const calificationToUpdate = await calificationModel.getById(Calification, req.body.id, ["program", "enrollment"]);
 
             if(!calificationToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Calification no found", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Calification not found`);
             }
 
             const grade = await calificationModel.calculateGrade(req.body.program.id,req.body.enrollment.student.id);
@@ -107,8 +106,7 @@ export class CalificationController{
             return res.status(HTTP_STATUS.CREATED).json(calification);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Something went wrong", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});    
+            return handleError(error, res);
         }
     }
 }

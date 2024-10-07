@@ -6,8 +6,66 @@ import { Role } from "../Models/role.model";
 import { Model } from "../Base/model";
 import { Like } from "typeorm";
 import { Person } from "../Models/person.model";
+import Errors, { handleError } from "../Base/errors";
+import { PDF } from "../libs/pdf";
+import fs from 'fs';
 
 export class UserController{
+
+    async pdf (req: Request, res: Response) {
+        try {
+
+            const relations = {
+                role: true,
+                person: true
+            }
+            const where = {
+                id          : req.query?.id,
+                username    : req.query?.username && Like(`%${req.query?.username}%`),
+                id_status   : req.query?.id_status,
+                role: {
+                    id      : req.query?.idRole
+                },
+                person: {
+                    id      : req.query?.person,
+                }
+            }
+
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
+            const userModel = new UserModel();
+            const user = await userModel.get(User,findData);
+           
+            const tableOptions = {
+                title: 'Tabla de Usuarios',
+                subtitle:'Informacion de los Usuarios',
+                header: [
+                    {label:'ID', width: 50},
+                    {label:'Usuario', width: 184},
+                    {label:'Propietario', width: 184},
+                    {label:'Estado', width: 50},
+                ],
+                rows: user,
+                fields: ["id","username","person.name","id_status"]
+            }
+
+            const pdf = new PDF();
+            const newPdf = await pdf.newPDF('usuarios', tableOptions);
+
+            if (typeof newPdf != "string") {
+                throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
+            }
+
+            const pdfBuffer = fs.readFileSync(newPdf);
+            return res.set({
+                "Content-Type": "application/pdf",
+                "Content-Disposition": "attachment; filename=document.pdf",
+            }).send(pdfBuffer);
+
+        } catch (error) {
+            console.log(error);
+            return handleError(error, res);
+        }
+    }
 
     async get(req:Request, res:Response):Promise<Response>{
         try {
@@ -33,14 +91,12 @@ export class UserController{
             const user = await userModel.get(User,findData);
 
             if(user.length === 0){
-                console.log("no users found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:'not users found', status:HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Subjects not found`);
             }
-            
             return res.status(HTTP_STATUS.OK).json(user);
+
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -48,18 +104,15 @@ export class UserController{
         try {
         
             if(!req.query.username){
-                console.log("No username send");
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"No username found", status:HTTP_STATUS.BAD_REQUEST});    
+                throw new Errors.BadRequest(`Username is requered`);
             }
             
             const userModel = new UserModel();
-            const user = await userModel.get(User, {where:{username: req.query.username}});
-            
+            const user = await userModel.get(User, {where:{username: req.query.username}});            
             return res.status(HTTP_STATUS.OK).send({message: user[0] ? true : false, status:HTTP_STATUS.OK});
 
         }catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
     
@@ -67,23 +120,24 @@ export class UserController{
         try {
             //Se valida que se haya enviado una password para procedeser a hashearse
             if(!req.body.password || req.body.password.length < 8 || req.body.password.length > 16){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid password", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest("Invalid password");
             }
             req.body.password = await hashPassword(req.body.password);
             
             const model = new Model();
-            if(req.body.role){
-                const role = model.getById(Role, req.body.role ?? req.body.idRole);
+            if(req.body.role || req.body.idRole){
+                const role = await model.getById(Role, req.body.role ?? req.body.idRole);
                 if(!role){
-                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid role id", "status": HTTP_STATUS.BAD_REQUEST});
+                    throw new Errors.BadRequest("Invalid role id");
                 }
+                if(!req.body.idRole){delete req.body.idRole;}
                 req.body.role = role;
             }
 
             if(req.body.idPerson){
-                const person = model.getById(Person,req.body.role);
+                const person = await model.getById(Person,req.body.idPerson);
                 if(!person){
-                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid person id", "status": HTTP_STATUS.BAD_REQUEST});
+                    throw new Errors.BadRequest("Invalid person id");
                 }
                 req.body.person = person;
                 delete req.body.idPerson;
@@ -95,15 +149,15 @@ export class UserController{
             //Se utiliza la funcion 'validate' para asegurarnos que los campos se hayan mandado de manera correcta
             const errors = await validation(newUser);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
             const userModel = new UserModel();
             const user = await userModel.create(User,newUser);
             return res.status(HTTP_STATUS.CREATED).json(user);
+
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -111,7 +165,7 @@ export class UserController{
         try {
             
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Id is requered", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const model = new Model();
@@ -119,13 +173,13 @@ export class UserController{
             delete req.body.id;
             
             if(!userToUpdate){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"User not found", status:HTTP_STATUS.NOT_FOUND});
+                throw new Errors.BadRequest(`User not found`);
             }
 
             if(req.body.idPerson){
                 const person = await model.getById(Person, req.body.idPerson);
                 if(!person){
-                    return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Invalid data", status:HTTP_STATUS.BAD_REQUEST});
+                    throw new Errors.BadRequest(`Invalid person data`);
                 }
                 userToUpdate.person = person;
                 delete req.body.idPerson;
@@ -134,7 +188,7 @@ export class UserController{
             if(req.body.idRole){
                 const role = await model.getById(Role,req.body.idRole);
                 if(!role){
-                    res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Role not found", status:HTTP_STATUS.BAD_REQUEST});
+                    throw new Errors.BadRequest(`Invalid role data`);
                 }
                 userToUpdate.role = role;
                 delete req.body.idRole;
@@ -148,9 +202,9 @@ export class UserController{
             userToUpdate = Object.assign(userToUpdate, req.body);
             const user = await model.create(User,userToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(user);
-        } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+
+        } catch (error) {            
+            return handleError(error, res);
         }
     }
 }

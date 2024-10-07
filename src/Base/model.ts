@@ -11,7 +11,6 @@ export class Model{
      * @returns {Promise<ObjectLiteral>} Returns the data of the entity stored in the database.
      */
     async get(entity:EntityTarget<ObjectLiteral>, findData:Object = {where:{},relations:{}}): Promise<any>{
-        console.log("get");
         return await AppDataSource.manager.find(entity, findData);
     }
 
@@ -22,9 +21,8 @@ export class Model{
      * @param {Object} [relationData]
      * @returns {Promise<any>} - Returns the data from the database with the specified id of an entity.
      */
-    async getById(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral = {}): Promise<any>{
-        console.log("get by id");
-        return await AppDataSource.manager.findOne(entity, { where: { id: Number(id)}, relations: relationData, loadRelationIds: true });
+    async getById(entity:EntityTarget<ObjectLiteral>, id:Number, relationData:ObjectLiteral = {}, loadRelationIds:boolean = true): Promise<any>{
+        return await AppDataSource.manager.findOne(entity, { where: { id: Number(id)}, relations: relationData, loadRelationIds: loadRelationIds });
     }
 
     /**
@@ -34,7 +32,6 @@ export class Model{
      * @returns {Promise<ObjectLiteral>} Returns the data of the entity stored in the database.
      */
     async create(entity:EntityTarget<ObjectLiteral>, data:DeepPartial<ObjectLiteral>):Promise<ObjectLiteral>{
-        console.log("creating");
         return await AppDataSource.manager.save(entity,data);
     }
 }

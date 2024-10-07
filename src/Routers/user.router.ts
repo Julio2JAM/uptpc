@@ -4,6 +4,7 @@ const router = Router();
 
 const controller = new UserController();
 
+router.get('/pdf', controller.pdf);
 router.get('/',controller.get);
 router.get('/username/',controller.validateUsername);
 router.post('/',controller.post);

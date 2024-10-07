@@ -5,6 +5,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 // import { Person } from "../Models/person.model";
 import { Like } from "typeorm";
 import { removeFalsyFromObject } from "../Base/toolkit";
+import Errors, { handleError } from "../Base/errors";
 
 export class StudentController{
 
@@ -49,13 +50,12 @@ export class StudentController{
 
             if(student.length == 0){
                 console.log("No students found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No students found.", status:HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Students not found`);
             }
-
             return res.status(HTTP_STATUS.OK).json(student);
+
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -63,14 +63,14 @@ export class StudentController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No id send", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const studentModel = new StudentModel();
-            var studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"]);
+            var studentToUpdate = await studentModel.getById(Student, req.body.id, ["person", "representative1", "representative2"], false);
 
             if(!studentToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Student no fund", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Student not found`);
             }
             delete req.body.id;
 
@@ -97,8 +97,7 @@ export class StudentController{
             return res.status(HTTP_STATUS.CREATED).json(student);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -106,7 +105,7 @@ export class StudentController{
         try {
 
             if(!req.body.person){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Incorret data", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Person data is required`);
             }
 
             for (const key in req.body) {
@@ -121,8 +120,7 @@ export class StudentController{
             return res.status(HTTP_STATUS.CREATED).json(student);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 

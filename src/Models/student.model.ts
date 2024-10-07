@@ -49,6 +49,7 @@ export class Student{
         this.person = typeof data?.person === "string" ? JSON.parse(data?.person) : data?.person;
         this.representative1 = data?.representative1;
         this.representative2 = data?.representative2;
+        this.id_status = data?.id_status;
     }
 
 }

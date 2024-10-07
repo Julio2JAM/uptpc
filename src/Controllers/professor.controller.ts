@@ -4,6 +4,7 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 import { Person, PersonModel } from "../Models/person.model";
 import { removeFalsyFromObject } from "../Base/toolkit";
 import { Like } from "typeorm";
+import Errors, { handleError } from "../Base/errors";
 
 export class ProfessorController{
 
@@ -32,13 +33,12 @@ export class ProfessorController{
             const professor = await professorModel.get(Professor,findData);
 
             if(professor.length == 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "Professors not found", status: HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Professors not found`);
             }
-
             return res.status(HTTP_STATUS.OK).json(professor);
+
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -50,10 +50,10 @@ export class ProfessorController{
             }
 
             const professorModel = new ProfessorModel();
-            var professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"]);
+            var professorToUpdate = await professorModel.getById(Professor, req.body.id, ["person"], false);
 
             if(!professorToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Professor not found", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Professor not found`);
             }
             delete req.body.id;
 
@@ -71,8 +71,7 @@ export class ProfessorController{
             return res.status(HTTP_STATUS.CREATED).json(professor);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -80,7 +79,7 @@ export class ProfessorController{
         try {
 
             if(!req.body.person && !req.body.idPerson){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data"});
+                throw new Errors.BadRequest(`Person data is requered`);
             }
 
             const professorModel = new ProfessorModel();
@@ -89,8 +88,7 @@ export class ProfessorController{
             return res.status(HTTP_STATUS.CREATED).json(professor);
 
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message: "Internal Server Error", status: HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 }

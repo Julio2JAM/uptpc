@@ -4,6 +4,8 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 import { getUserData, removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Professor, ProfessorModel } from "../Models/professor.model";
 import { Like } from "typeorm";
+import Errors, { handleError } from "../Base/errors";
+import { Subject, SubjectModel } from "../Models/subject.model";
 
 export class AssignmentController{
 
@@ -12,7 +14,7 @@ export class AssignmentController{
 
             const user = await getUserData(req.user);
             if(!user || !user.role){
-                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status:HTTP_STATUS.UNAUTHORIZED});
+                throw new Errors.Unauthorized(`Permission failed`);
             }
             req.query.idPerson = Number(user.role) !== 1 ? String(user?.person) : '';
 
@@ -20,6 +22,7 @@ export class AssignmentController{
                 professor   : {
                     person: true
                 },
+                subject: true
             }
             const where = {
                 id              : req.query?.id,
@@ -29,11 +32,15 @@ export class AssignmentController{
                         id: req.query?.idPerson
                     },
                 },
-                name            : req.query?.name && Like(`%${req.query.name}%`),
+                subject       : {
+                    id: req.query?.idSubject,
+                },
+                title           : req.query?.title && Like(`%${req.query.title}%`),
                 description     : req.query?.description && Like(`%${req.query.description}%`),
                 porcentage      : req.query?.porcentage && Number(req.query.porcentage),
                 quantity        : req.query?.quantity && Number(req.query.quantity),
                 datetime_end    : req.query?.datetime_end,
+                datetime_start  : req.query?.datetime_start,
                 id_status       : req.query?.id_status,
             }
 
@@ -42,14 +49,12 @@ export class AssignmentController{
             const assignment = await assignmentModel.get(Assignment,findData);
 
             if(assignment.length == 0){
-                console.log("No assignment found");
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message: "No Assignment found.", status:HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Assignments not found`);
             }
-
             return res.status(HTTP_STATUS.OK).json(assignment);
+
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -58,16 +63,30 @@ export class AssignmentController{
             
             const user = await getUserData(req.user);
             if(!user || !user.role || Number(user.role) === 3){
-                return res.status(HTTP_STATUS.UNAUTHORIZED).send({message:"Permission failed", status:HTTP_STATUS.UNAUTHORIZED});
+                throw new Errors.Unauthorized(`Permission failed`);
             }
 
             // Inicializar el objeto professorData
             const professorData:any = {};
 
+            if(!req.body.idSubject){
+                throw new Errors.BadRequest(`Subject required`);
+            }
+
+            const subjectModel = new SubjectModel();
+            const subject = await subjectModel.getById(Subject, req.body.idSubject);
+
+            if(!subject){
+                throw new Errors.BadRequest(`Subject required`);
+            }
+
+            delete req.body.idSubject;
+            req.body.subject = subject;
+
             // Verificar si el rol del usuario es 1 (admin)
             if (Number(user.role) === 1) {
                 if (!req.body.professor) {
-                    return res.status(HTTP_STATUS.BAD_REQUEST).send({ message: "Professor not found", status: HTTP_STATUS.BAD_REQUEST });
+                    throw new Errors.BadRequest(`Professor not found`);
                 }
                 professorData.id = req.body.professor;
             } else {
@@ -82,34 +101,22 @@ export class AssignmentController{
             const professor = await professorModel.get(Professor, professorData);
 
             if(!professor){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message:"Professor not found", status:HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Professor not found`);
             }
             
             req.body.professor = professor[0];
-            const assignmentModel = new AssignmentModel();
-
-            //! Esta funcion debe moverse al lugar donde se asigna la actividad
-            /*
-            if(req.body.porcentage){
-                const porcentage = await assignmentModel.calculatePorcentage(req.body.program.id);
-
-                if(porcentage && Number(req.body.porcentage) > porcentage.porcentage){
-                   return res.status(HTTP_STATUS.BAD_REQUEST).send({message: `Porcenge valid: ${porcentage.porcentage}`, "status": HTTP_STATUS.BAD_REQUEST});
-                }
-            }
-            */
 
             const newAssignment = new Assignment(req.body);
             const errors = await validation(newAssignment);
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
+            const assignmentModel = new AssignmentModel();
             const assignment = await assignmentModel.create(Assignment,newAssignment);
             return res.status(HTTP_STATUS.CREATED).json(assignment)
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR})
+            return handleError(error, res);
         }
     }
 
@@ -117,11 +124,11 @@ export class AssignmentController{
         try {
 
             if(!req.body?.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Invalid data", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             if( (req.body.datetime_start && req.body.datetime_end) && (new Date(req.body.datetime_start) > new Date(req.body.datetime_end)) ){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "Datetime start must be less than datetime end", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Datetime start must be less than datetime end`);
             }
 
             const assignmentModel = new AssignmentModel();
@@ -129,7 +136,7 @@ export class AssignmentController{
             delete req.body.id;
 
             if(!assignmentToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "No assignment fund", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`No assignment found`);
             }
 
             /*
@@ -146,8 +153,7 @@ export class AssignmentController{
             const assignment = await assignmentModel.create(Assignment, assignmentToUpdate);
             return res.status(HTTP_STATUS.CREATED).json(assignment);
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({"message":"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR})
+            return handleError(error, res);
         }
     }
 }

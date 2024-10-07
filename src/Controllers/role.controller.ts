@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { HTTP_STATUS } from "../Base/statusHttp";
 import { removeFalsyFromObject, validation } from "../Base/toolkit";
 import { Like } from "typeorm";
+import Errors, { handleError } from "../Base/errors";
 
 export class RoleController{
 
@@ -19,13 +20,12 @@ export class RoleController{
             const role = await roleModel.get(Role, {where: removeFalsyFromObject(where)});
 
             if(role.length == 0){
-                return res.status(HTTP_STATUS.NOT_FOUND).send({message:"Role not found", status: HTTP_STATUS.NOT_FOUND});
+                throw new Errors.NotFound(`Roles not found`);
             }
-            
             return res.status(HTTP_STATUS.OK).json(role);
+
         } catch (error) {
-            console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something went wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -33,17 +33,17 @@ export class RoleController{
         try {
             const newRole = new Role(req.body);
             const errors = await validation(newRole);
-            
+
             if(errors) {
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: errors, "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(JSON.stringify(errors));
             }
 
             const roleModel = new RoleModel();
             const role = await roleModel.create(Role, newRole);
             return res.status(HTTP_STATUS.CREATED).json(role);
+
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }
     }
 
@@ -51,14 +51,14 @@ export class RoleController{
         try {
 
             if(!req.body.id){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Id is requered`);
             }
 
             const roleModel = new RoleModel();
             let roleToUpdate = await roleModel.getById(Role, req.body.id);
 
             if(!roleToUpdate){
-                return res.status(HTTP_STATUS.BAD_REQUEST).send({message: "invalid data", "status": HTTP_STATUS.BAD_REQUEST});
+                throw new Errors.BadRequest(`Role not found`);
             }
 
             req.body.name = req.body?.name ?? roleToUpdate.name;
@@ -70,8 +70,7 @@ export class RoleController{
             return res.status(HTTP_STATUS.CREATED).json(role);
 
         } catch (error) {
-            console.error(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({message:"Something was wrong", status:HTTP_STATUS.INTERNAL_SERVER_ERROR});
+            return handleError(error, res);
         }    
     }
 }
