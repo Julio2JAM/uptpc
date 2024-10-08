@@ -5,11 +5,77 @@ import { HTTP_STATUS } from "../Base/statusHttp";
 // import { Person } from "../Models/person.model";
 import { Like } from "typeorm";
 import { removeFalsyFromObject } from "../Base/toolkit";
-import Errors, { handleError } from "../Base/errors";
+import Errors, { handleError, handleError2 } from "../Base/errors";
+import { PDF } from "../libs/pdf";
+import fs from 'fs';
+
+interface response{
+    response: any,
+    status: number
+};
 
 export class StudentController{
 
-    async get(req: Request, res: Response): Promise<Response>{
+    pdf = async (req: Request, res: Response) => {
+        try {
+
+            const relations = {
+                person:true,
+            };
+            const where = {
+                id              : req.query.id,
+                id_status       : req.query.id_status,
+                person : {
+                    id          : req.query?.idPerson,
+                    cedule      : req.query?.cedule && Like(`%${Number(req.query?.cedule)}%`),
+                    name        : req.query?.name && Like(`%${req.query?.name}%`),
+                    lastName    : req.query?.lastName && Like(`%${req.query?.lastName}%`),
+                    phone       : req.query?.phone && Like(`%${req.query?.phone}%`),
+                    email       : req.query?.email && Like(`%${req.query?.email}%`),
+                    birthday    : typeof req.query?.birthday === "string" ? new Date(req.query.birthday) : undefined,
+                },
+            };
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
+
+            const studentModel = new StudentModel();
+            const student = await studentModel.get(Student, findData);
+           
+            const tableOptions = {
+                title: 'Tabla de Estudiantes',
+                subtitle:'Informacion de los Estudiantes',
+                header: [
+                    {label:'ID', width: 40},
+                    {label:'Nombre', width: 80},
+                    {label:'Apellido', width: 80},
+                    {label:'Cedula', width: 68},
+                    {label:'Telefono', width: 80},
+                    {label:'Email', width: 80},
+                    {label:'Estado', width: 40},
+                ],
+                rows: student,
+                fields: ["id","person.name","person.lastName","person.cedule","person.phone","person.email","id_status"]
+            }
+
+            const pdf = new PDF();
+            const newPdf = await pdf.newPDF('estudiantes', tableOptions);
+
+            if (typeof newPdf != "string") {
+                throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
+            }
+
+            const pdfBuffer = fs.readFileSync(newPdf);
+            return res.set({
+                "Content-Type": "application/pdf",
+                "Content-Disposition": "attachment; filename=document.pdf",
+            }).send(pdfBuffer);
+
+        } catch (error) {
+            console.log(error);
+            return handleError(error, res);
+        }
+    }
+
+    async get(req:Request):Promise<response>{
         try {
 
             const relations = {
@@ -52,10 +118,11 @@ export class StudentController{
                 console.log("No students found");
                 throw new Errors.NotFound(`Students not found`);
             }
-            return res.status(HTTP_STATUS.OK).json(student);
+            
+            return {status: HTTP_STATUS.OK, response: student};
 
-        } catch (error) {
-            return handleError(error, res);
+        } catch (error:any) {
+            return handleError2(error);
         }
     }
 

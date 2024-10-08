@@ -34,18 +34,21 @@ export class UserController{
             const findData = {relations: relations, where: removeFalsyFromObject(where)}
             const userModel = new UserModel();
             const user = await userModel.get(User,findData);
-           
+
             const tableOptions = {
                 title: 'Tabla de Usuarios',
                 subtitle:'Informacion de los Usuarios',
                 header: [
-                    {label:'ID', width: 50},
-                    {label:'Usuario', width: 184},
-                    {label:'Propietario', width: 184},
-                    {label:'Estado', width: 50},
+                    {label:'ID', width: 40},
+                    {label:'Usuario', width: 78},
+                    {label:'Rol', width: 80},
+                    {label:'Nombre', width: 80},
+                    {label:'Apellido', width: 80},
+                    {label:'Cedula', width: 70},
+                    {label:'Estado', width: 40},
                 ],
                 rows: user,
-                fields: ["id","username","person.name","id_status"]
+                fields: ["id","username","role.name","person.name","person.lastName","person.cedule","id_status"]
             }
 
             const pdf = new PDF();
