@@ -7,11 +7,94 @@ import { Model } from "../Base/model";
 import { Like } from "typeorm";
 import { Program } from "../Models/program.model";
 import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
-import Errors, { handleError } from "../Base/errors";
+import Errors, { handleError, handleError2 } from "../Base/errors";
+import { PDF } from "../libs/pdf";
+import fs from 'fs';
+
+interface response{
+    response: any,
+    status: number
+};
 
 export class EnrollmentController{
 
-    async get(req: Request, res:Response):Promise<Response>{
+    pdf = async (req: Request, res: Response) => {
+        try {
+
+            const relations = {
+                classroom           : true,
+                student: {
+                    person          : true,
+                    representative1 : true,
+                    representative2 : true,
+                },
+            }
+            const where = {
+                id                  : req.query?.id,
+                id_status           : req.query?.idStatus,
+                student: {
+                    id              : req.query?.idStudent,
+                    person:{
+                        id          : req.query?.idPerson && Number(req.query.idPerson),
+                        name        : req.query?.personName && Like(`%${req.query?.personName}%`),
+                        lastName    : req.query?.personLastName && Like(`%${req.query?.personLastName}%`),
+                        cedule      : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
+                        phone       : req.query?.personPhone && Like(`%${req.query?.personPhone}%`),
+                    }
+                },
+                classroom: {
+                    id              : req.query?.idClassroom,
+                    name            : req.query?.name && Like(`%${req.query?.name}%`),
+                    datetime_start  : req.query?.datetime_start,
+                    datetime_end    : req.query?.datetime_end,
+                },
+            };
+            
+            const findData = {relations: relations, where: removeFalsyFromObject(where)}
+
+            const enrollmentModel = new EnrollmentModel();
+            const enrollment = await enrollmentModel.get(Enrollment, findData);
+           
+            const tableOptions = {
+                title: 'Tabla de Materias',
+                subtitle:'Informacion de las Materias',
+                header: [
+                    {label:'ID', width: 50},
+                    {label:'Seccion', width: 88},
+                    {label:'Nombre', width: 140},
+                    {label:'Apellido', width: 140},
+                    {label:'Estado', width: 50},
+                ],
+                rows: enrollment,
+                fields: ["id","classroom.name","student.person.name","student.person.lastName","id_status"]
+            }
+
+            const pdf = new PDF();
+            const newPdf = await pdf.newPDF('enrollment', tableOptions);
+
+            if (typeof newPdf != "string") {
+                throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
+            }
+
+            const pdfBuffer = fs.readFileSync(newPdf);
+            return res.set({
+                "Content-Type": "application/pdf",
+                "Content-Disposition": "attachment; filename=document.pdf",
+            }).send(pdfBuffer);
+
+        } catch (error) {
+            console.log(error);
+            return handleError(error, res);
+        }
+    }
+
+    /**
+     * Function to retrieve records from the database.
+     * @param {Request} req request object
+     * @param {Response} res res object
+     * @returns {Promise<Response>}
+     */
+    async get(req:Request):Promise<response>{
         try {
 
             const user = await getUserData(req.user);
@@ -48,7 +131,7 @@ export class EnrollmentController{
                     datetime_end    : req.query?.datetime_end,
                 },
             };
-            
+
             const findData = {relations: relations, where: removeFalsyFromObject(where)}
             const enrollmentModel = new EnrollmentModel();
             const enrollment = await enrollmentModel.get(Enrollment, findData);
@@ -57,9 +140,10 @@ export class EnrollmentController{
                 throw new Errors.NotFound(`Enrollments not found`);
             }
 
-            return res.status(HTTP_STATUS.OK).json(enrollment);
-        } catch (error) {
-            return handleError(error, res);
+            return {status: HTTP_STATUS.OK, response: enrollment};
+
+        } catch (error:any) {
+            return handleError2(error);
         }
     }
 
