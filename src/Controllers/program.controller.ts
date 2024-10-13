@@ -7,10 +7,98 @@ import { Subject } from "../Models/subject.model";
 import { Professor } from "../Models/professor.model";
 import { getUserData, removeFalsyFromObject } from "../Base/toolkit";
 import { Like } from "typeorm";
-import Errors, { handleError } from "../Base/errors";
+import Errors, { handleError, handleError2 } from "../Base/errors";
+import { PDF } from "../libs/pdf";
+import fs from 'fs';
+
+interface response{
+    response: any,
+    status: number
+};
 
 export class ProgramController{
-    async get(req: Request, res: Response):Promise<Response>{
+
+    pdf = async (req: Request, res: Response) => {
+        try {
+
+            /*
+            const user = await getUserData(req.user);
+            if(!user || !user.role){
+                throw new Errors.Unauthorized(`Permission failed`);
+            }
+            req.query.idPerson = Number(user.role) == 2 ? String(user?.person) : '';
+            */
+
+            const relations = {
+                classroom: true, 
+                subject: true,
+                professor: {
+                    person: true
+                }, 
+            };
+            const where = {
+                id              : req.query?.id,
+                classroom: {
+                    id          : req.query?.idClassroom,
+                    name        : req.query?.classroomName,
+                },
+                subject: {
+                    id          : req.query?.idSubject,
+                    name        : req.query?.subjectName && Like(`%${req.query?.subjectName}%`),
+                },
+                professor: {
+                    id          : req.query?.idProfessor,
+                    person: {
+                        id      : req.query?.idPerson,
+                        name    : req.query?.personName && Like(`%${req.query?.personName}%`),
+                        lastName: req.query?.personLastName && Like(`%${req.query?.personLastName}%`),
+                        cedule  : req.query?.personCedule && Like(`%${req.query?.personCedule}%`),
+                    }
+                },
+                id_status       : req.query?.idStatus,
+            }
+
+            const findData = {relations:relations, where: removeFalsyFromObject(where)}
+
+            const programModel = new ProgramModel();
+            const program = await programModel.get(Program, findData);
+           
+            const tableOptions = {
+                title: 'Tabla de Estudiantes',
+                subtitle:'Informacion de los Estudiantes',
+                header: [
+                    {label:'ID', width: 40},
+                    {label:'Nombre', width: 80},
+                    {label:'Apellido', width: 80},
+                    {label:'Cedula', width: 68},
+                    {label:'Telefono', width: 80},
+                    {label:'Email', width: 80},
+                    {label:'Estado', width: 40},
+                ],
+                rows: program,
+                fields: ["id","person.name","person.lastName","person.cedule","person.phone","person.email","id_status"]
+            }
+
+            const pdf = new PDF();
+            const newPdf = await pdf.newPDF('estudiantes', tableOptions);
+
+            if (typeof newPdf != "string") {
+                throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
+            }
+
+            const pdfBuffer = fs.readFileSync(newPdf);
+            return res.set({
+                "Content-Type": "application/pdf",
+                "Content-Disposition": "attachment; filename=document.pdf",
+            }).send(pdfBuffer);
+
+        } catch (error) {
+            console.log(error);
+            return handleError(error, res);
+        }
+    }
+
+    async get(req:Request):Promise<response>{
         try {
             
             const user = await getUserData(req.user);
@@ -55,10 +143,11 @@ export class ProgramController{
             if(program.length == 0){
                 throw new Errors.NotFound(`Program not found`);
             }
-            return res.status(HTTP_STATUS.OK).json(program);
 
-        } catch (error) {
-            return handleError(error, res);
+            return {status: HTTP_STATUS.OK, response: program};
+
+        } catch (error:any) {
+            return handleError2(error);
         }
     }
 
