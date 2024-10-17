@@ -39,13 +39,13 @@ export class UserController{
                 title: 'Tabla de Usuarios',
                 subtitle:'Informacion de los Usuarios',
                 header: [
-                    {label:'ID', width: 40},
+                    {label:'ID', width: 20},
                     {label:'Usuario', width: 78},
                     {label:'Rol', width: 80},
                     {label:'Nombre', width: 80},
                     {label:'Apellido', width: 80},
                     {label:'Cedula', width: 70},
-                    {label:'Estado', width: 40},
+                    {label:'Estado', width: 60},
                 ],
                 rows: user,
                 fields: ["id","username","role.name","person.name","person.lastName","person.cedule","id_status"]

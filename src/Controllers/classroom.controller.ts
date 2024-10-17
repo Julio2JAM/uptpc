@@ -32,11 +32,11 @@ export class ClassroomController{
                 title: 'Tabla de Docentes',
                 subtitle:'Informacion de los Docentes',
                 header: [
-                    {label:'ID', width: 50},
+                    {label:'ID', width: 30},
                     {label:'Nombre', width: 128},
                     {label:'Fecha inicio', width: 120},
                     {label:'Fecha cierre', width: 120},
-                    {label:'Estado', width: 50},
+                    {label:'Estado', width: 70},
                 ],
                 rows: classroom,
                 fields: ["id","name","datetime_start","datetime_end","id_status"]

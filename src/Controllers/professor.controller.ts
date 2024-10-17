@@ -43,13 +43,13 @@ export class ProfessorController{
                 title: 'Tabla de Docentes',
                 subtitle:'Informacion de los Docentes',
                 header: [
-                    {label:'ID', width: 40},
+                    {label:'ID', width: 20},
                     {label:'Nombre', width: 80},
                     {label:'Apellido', width: 80},
                     {label:'Cedula', width: 68},
                     {label:'Telefono', width: 80},
                     {label:'Email', width: 80},
-                    {label:'Estado', width: 40},
+                    {label:'Estado', width: 60},
                 ],
                 rows: professor,
                 fields: ["id","person.name","person.lastName","person.cedule","person.phone","person.email","id_status"]

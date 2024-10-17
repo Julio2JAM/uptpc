@@ -32,10 +32,10 @@ export class SubjectController{
                 title: 'Tabla de Materias',
                 subtitle:'Informacion de las Materias',
                 header: [
-                    {label:'ID', width: 50},
+                    {label:'ID', width: 30},
                     {label:'Nombre', width: 184},
                     {label:'Descripcion', width: 184},
-                    {label:'Estado', width: 50},
+                    {label:'Estado', width: 70},
                 ],
                 rows: subject,
                 fields: ["id","name","description","id_status"]

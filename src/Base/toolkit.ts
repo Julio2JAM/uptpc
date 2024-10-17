@@ -74,7 +74,7 @@ export async function getUserData(idUser: string | number | undefined): Promise<
 export function getPropertyValue(obj: any, propertyPath: string): any {
 
     const parts = propertyPath.split('.');
-    let value = obj;
+    let value:any = obj;
 
     for (const part of parts) {
       if (value && typeof value === "object" && part in value) {
@@ -84,6 +84,17 @@ export function getPropertyValue(obj: any, propertyPath: string): any {
         break;
       }
     }
+
+    const status_value:any = {
+        "-1":"Eliminado",
+        "0":"No disponible",
+        "1":"Disponible",
+    }
+
+    if(propertyPath == "id_status"){
+        value = status_value[value];
+    }
+
     return value;
 
 }

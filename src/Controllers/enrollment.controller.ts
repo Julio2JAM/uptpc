@@ -59,11 +59,11 @@ export class EnrollmentController{
                 title: 'Tabla de Materias',
                 subtitle:'Informacion de las Materias',
                 header: [
-                    {label:'ID', width: 50},
+                    {label:'ID', width: 30},
                     {label:'Seccion', width: 88},
                     {label:'Nombre', width: 140},
                     {label:'Apellido', width: 140},
-                    {label:'Estado', width: 50},
+                    {label:'Estado', width: 70},
                 ],
                 rows: enrollment,
                 fields: ["id","classroom.name","student.person.name","student.person.lastName","id_status"]
