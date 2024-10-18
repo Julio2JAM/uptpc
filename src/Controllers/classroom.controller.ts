@@ -28,9 +28,9 @@ export class ClassroomController{
             const classroomModel = new ClassroomModel();
             const classroom = await classroomModel.get(Classroom, findData);
            
-            const tableOptions = {
-                title: 'Tabla de Docentes',
-                subtitle:'Informacion de los Docentes',
+            const tableRecords = {
+                title: 'Tabla de Secciones',
+                subtitle:'Informacion de las Secciones',
                 header: [
                     {label:'ID', width: 30},
                     {label:'Nombre', width: 128},
@@ -42,8 +42,25 @@ export class ClassroomController{
                 fields: ["id","name","datetime_start","datetime_end","id_status"]
             }
 
+            const tableStatistic = {
+                title: 'Estadisticas de Secciones',
+                subtitle:'Informacion de los Secciones',
+                header: [
+                    {label:'Descripcion', width: 340},
+                    {label:'Cantidad', width: 98},
+                    {label:'%', width: 30},
+                ],
+                rows: classroom,
+            }
+
+            const tableOptions = {
+                records:tableRecords,
+                statistic:tableStatistic,
+            }
+
             const pdf = new PDF();
             const newPdf = await pdf.newPDF('secciones', tableOptions);
+            pdf.deletePDF("secciones");
 
             if (typeof newPdf != "string") {
                 throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");

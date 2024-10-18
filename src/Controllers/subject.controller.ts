@@ -28,8 +28,8 @@ export class SubjectController{
             const subjectModel = new SubjectModel();
             const subject = await subjectModel.get(Subject, findData);
            
-            const tableOptions = {
-                title: 'Tabla de Materias',
+            const tableRecords = {
+                title: 'Registros de Materias',
                 subtitle:'Informacion de las Materias',
                 header: [
                     {label:'ID', width: 30},
@@ -41,8 +41,25 @@ export class SubjectController{
                 fields: ["id","name","description","id_status"]
             }
 
+            const tableStatistic = {
+                title: 'Estadisticas de Materias',
+                subtitle:'Informacion de las Materias',
+                header: [
+                    {label:'Descripcion', width: 340},
+                    {label:'Cantidad', width: 98},
+                    {label:'%', width: 30},
+                ],
+                rows: subject,
+            }
+
+            const tableOptions = {
+                records:tableRecords,
+                statistic:tableStatistic,
+            }
+
             const pdf = new PDF();
             const newPdf = await pdf.newPDF('materias', tableOptions);
+            pdf.deletePDF("materias");
 
             if (typeof newPdf != "string") {
                 throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");

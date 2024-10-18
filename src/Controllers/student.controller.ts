@@ -40,8 +40,8 @@ export class StudentController{
             const studentModel = new StudentModel();
             const student = await studentModel.get(Student, findData);
            
-            const tableOptions = {
-                title: 'Tabla de Estudiantes',
+            const tableRecords = {
+                title: 'Registros de Estudiantes',
                 subtitle:'Informacion de los Estudiantes',
                 header: [
                     {label:'ID', width: 20},
@@ -56,8 +56,25 @@ export class StudentController{
                 fields: ["id","person.name","person.lastName","person.cedule","person.phone","person.email","id_status"]
             }
 
+            const tableStatistic = {
+                title: 'Estadisticas de Estudiantes',
+                subtitle:'Informacion de las Estudiantes',
+                header: [
+                    {label:'Descripcion', width: 340},
+                    {label:'Cantidad', width: 98},
+                    {label:'%', width: 30},
+                ],
+                rows: student,
+            }
+
+            const tableOptions = {
+                records:tableRecords,
+                statistic:tableStatistic,
+            }
+
             const pdf = new PDF();
             const newPdf = await pdf.newPDF('estudiantes', tableOptions);
+            pdf.deletePDF("estudiantes");
 
             if (typeof newPdf != "string") {
                 throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");

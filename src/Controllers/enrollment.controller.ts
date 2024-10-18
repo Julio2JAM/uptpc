@@ -55,9 +55,9 @@ export class EnrollmentController{
             const enrollmentModel = new EnrollmentModel();
             const enrollment = await enrollmentModel.get(Enrollment, findData);
            
-            const tableOptions = {
-                title: 'Tabla de Materias',
-                subtitle:'Informacion de las Materias',
+            const tableRecords = {
+                title: 'Registros de Matricula',
+                subtitle:'Informacion de las Matricula',
                 header: [
                     {label:'ID', width: 30},
                     {label:'Seccion', width: 88},
@@ -69,8 +69,25 @@ export class EnrollmentController{
                 fields: ["id","classroom.name","student.person.name","student.person.lastName","id_status"]
             }
 
+            const tableStatistic = {
+                title: 'Estadisticas de Matricula',
+                subtitle:'Informacion de los Matricula',
+                header: [
+                    {label:'Descripcion', width: 340},
+                    {label:'Cantidad', width: 98},
+                    {label:'%', width: 30},
+                ],
+                rows: enrollment,
+            }
+
+            const tableOptions = {
+                records:tableRecords,
+                statistic:tableStatistic,
+            }
+
             const pdf = new PDF();
             const newPdf = await pdf.newPDF('enrollment', tableOptions);
+            pdf.deletePDF("enrollment");
 
             if (typeof newPdf != "string") {
                 throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");

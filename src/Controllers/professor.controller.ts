@@ -39,8 +39,8 @@ export class ProfessorController{
             const professorModel = new ProfessorModel();
             const professor = await professorModel.get(Professor, findData);
            
-            const tableOptions = {
-                title: 'Tabla de Docentes',
+            const tableRecords = {
+                title: 'Registros de Docentes',
                 subtitle:'Informacion de los Docentes',
                 header: [
                     {label:'ID', width: 20},
@@ -55,8 +55,25 @@ export class ProfessorController{
                 fields: ["id","person.name","person.lastName","person.cedule","person.phone","person.email","id_status"]
             }
 
+            const tableStatistic = {
+                title: 'Estadisticas de Docentes',
+                subtitle:'Informacion de los Docentes',
+                header: [
+                    {label:'Descripcion', width: 340},
+                    {label:'Cantidad', width: 98},
+                    {label:'%', width: 30},
+                ],
+                rows: professor,
+            }
+
+            const tableOptions = {
+                records:tableRecords,
+                statistic:tableStatistic,
+            }
+
             const pdf = new PDF();
             const newPdf = await pdf.newPDF('docentes', tableOptions);
+            pdf.deletePDF("docentes");
 
             if (typeof newPdf != "string") {
                 throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");

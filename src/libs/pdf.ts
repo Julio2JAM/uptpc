@@ -41,14 +41,12 @@ export class PDF{
         };
     }
 
-    public async newPDF(fileName: string, tableOptions?:Object):Promise<any>{
+    public async newPDF(fileName: string, tableOptions?:{ [key: string]: any }):Promise<any>{
 
         const doc = new PDFDocument();
-        this.loadImg(doc);
-        this.loadLetterhead(doc);
-        this.loadDate(doc);
-        doc.moveDown(2).text("Este documento es confidencial y está destinado exclusivamente para uso interno de la institución educativa. Queda prohibida su divulgación, copia o distribución sin autorización previa por parte de las autoridades escolares.", {align: "justify"})
-        this.buildTable(doc, tableOptions);
+        this.initPage(doc);
+        this.buildTable(doc, tableOptions?.records);
+        this.buildStatistics(doc, tableOptions?.statistic);
 
         const response = new Promise((resolve, reject) => {
 
@@ -70,6 +68,20 @@ export class PDF{
         return response;
     }
 
+    private initPage(doc:PDFDocument):PDFDocument|null{
+        try {
+
+            this.loadImg(doc);
+            this.loadLetterhead(doc);
+            this.loadDate(doc);
+            doc.moveDown(2).text("Este documento es confidencial y está destinado exclusivamente para uso interno de la institución educativa. Queda prohibida su divulgación, copia o distribución sin autorización previa por parte de las autoridades escolares.", {align: "justify"})
+            return doc;
+            
+        } catch (error) {
+            return null;
+        }
+    }
+
     private loadLetterhead(doc:PDFDocument):PDFDocument|null{
         try {
 
@@ -89,7 +101,7 @@ export class PDF{
         try {
 
             const imgRute = this.routeImg;
-            doc.image(imgRute, 60, 25, { width: 100 })
+            doc.image(imgRute, 60, 25, { width: 120 })
               .fillColor("#000")
             return doc;
 
@@ -116,54 +128,146 @@ export class PDF{
         }
     }
 
-    private buildTable(doc:PDFDocumentWithTables, tableOptions:any){
+    private buildTable(doc:PDFDocumentWithTables, tableOptions:any):PDFDocument|null{
 
-        const headers:Header[] = tableOptions.header.map((item:any) => ({
-            label: item.label,
-            headerOpacity: 0,
-            columnColor: "#FFFFFF",
-            headerColor: "#FFFFFF",
-            align: "left",
-            // headerAlign: "center",
-            width: item.width
-        }));
+        try {
+
+            const headers:Header[] = tableOptions.header.map((item:any) => ({
+                label: item.label,
+                headerOpacity: 0,
+                columnColor: "#FFFFFF",
+                headerColor: "#FFFFFF",
+                align: "left",
+                // headerAlign: "center",
+                width: item.width
+            }));
+        
+            const table:Table = {
+                title: tableOptions.title,
+                subtitle: tableOptions.subtitle,
+                headers: headers,
+                // datas: data,
+                rows: tableOptions.rows.map((item: any) => {
+                    const row = [];
+                    for (const field of tableOptions.fields) {
+                        row.push(getPropertyValue(item,field));
+                    }
+                    return row;
+                }),
+            };
+            // console.log(doc.page.width - (doc.page.margins.left + doc.page.margins.right)); //468
+            const options:Options = {
+                width: doc.page.width - (doc.page.margins.left + doc.page.margins.right),
+                padding: [5,5],
+                divider: {
+                    // horizontal: {
+                    //     disabled: true,
+                    // },
+                    header: {
+                        disabled: true,
+                    }
+                },
+                // prepareRow: (_row:any, _indexColumn:any, _indexRow:any, _rectRow:any, _rectCell:any) => doc.font("Helvetica").fontSize(10), // {Function} 
+            }
+        
+            doc.moveDown(2).table(table, options);
+            return doc;
     
-        const table:Table = {
-            title: tableOptions.title,
-            subtitle: tableOptions.subtitle,
-            headers: headers,
-            // datas: data,
-            rows: tableOptions.rows.map((item: any) => {
-                const row = [];
-                for (const field of tableOptions.fields) {
-                    row.push(getPropertyValue(item,field));
-                }
-                return row;
-            }),
-        };
-        // console.log(doc.page.width - (doc.page.margins.left + doc.page.margins.right)); //468
-        const options:Options = {
-            width: doc.page.width - (doc.page.margins.left + doc.page.margins.right),
-            padding: [5,5],
-            divider: {
-                // horizontal: {
-                //     disabled: true,
-                // },
-                header: {
-                    disabled: true,
-                }
-            },
-            // prepareRow: (_row:any, _indexColumn:any, _indexRow:any, _rectRow:any, _rectCell:any) => doc.font("Helvetica").fontSize(10), // {Function} 
+        } catch (error) {
+            return null;
         }
-    
-        doc.moveDown(2).table(table, options);
 
     }
 
-    //! IN DEV
-    public deletePDF() {
-        const fileName = path.join(__dirname, "output.pdf");
-        fs.unlink(fileName, (err) => {
+    private buildStatistics(doc:PDFDocumentWithTables, tableOptions:any){
+
+        try {
+            doc.addPage();
+            this.initPage(doc);
+
+            const headers:Header[] = tableOptions.header.map((item:any) => ({
+                label: item.label,
+                headerOpacity: 0,
+                columnColor: "#FFFFFF",
+                headerColor: "#FFFFFF",
+                align: "left",
+                // headerAlign: "center",
+                width: item.width
+            }));
+
+            const rows:{[key:string]:any} = {
+                "total":{
+                    "description":"Registros totales",
+                    "amount":tableOptions.rows.length,
+                    "porcentage":100,
+                },
+                "-1":{
+                    "description":"Registros elimados",
+                    "amount":0,
+                    "porcentage":0,
+                },
+                "0":{
+                    "description":"Registros no disponibles",
+                    "amount":0,
+                    "porcentage":0,
+                },
+                "1":{
+                    "description":"Registros disponibles",
+                    "amount":0,
+                    "porcentage":0,
+                }
+            };
+
+            for (const element of tableOptions.rows) {
+                rows[element.id_status].amount++;
+            }
+
+            for (const row of Object.values(rows)) {
+                row.porcentage =  Math.round((row.amount*100)/rows.total.amount);
+            }
+
+            const orderedKeys = ["total", "-1", "0", "1"];
+
+            const newArray = orderedKeys.map(key => ([
+                rows[key].description,
+                rows[key].amount,
+                rows[key].porcentage
+            ]));
+
+            const table:Table = {
+                title: tableOptions.title,
+                subtitle: tableOptions.subtitle,
+                headers: headers,
+                // datas: data,
+                rows: newArray,
+            };
+            // console.log(doc.page.width - (doc.page.margins.left + doc.page.margins.right)); //468
+            const options:Options = {
+                width: doc.page.width - (doc.page.margins.left + doc.page.margins.right),
+                padding: [5,5],
+                divider: {
+                    // horizontal: {
+                    //     disabled: true,
+                    // },
+                    header: {
+                        disabled: true,
+                    }
+                },
+                // prepareRow: (_row:any, _indexColumn:any, _indexRow:any, _rectRow:any, _rectCell:any) => doc.font("Helvetica").fontSize(10), // {Function} 
+            }
+        
+            doc.moveDown(2).table(table, options);
+            return doc;
+
+        } catch (error) {
+            return null;
+        }
+
+    }
+
+    public async deletePDF(fileName:string) {
+        const fileRute = path.join(__dirname, fileName+".pdf");
+        fs.unlink(fileRute, (err) => {
             if (err) {return;}
         })
     };

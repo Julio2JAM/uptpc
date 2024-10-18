@@ -35,8 +35,8 @@ export class UserController{
             const userModel = new UserModel();
             const user = await userModel.get(User,findData);
 
-            const tableOptions = {
-                title: 'Tabla de Usuarios',
+            const tableRecords = {
+                title: 'Registros de Usuarios',
                 subtitle:'Informacion de los Usuarios',
                 header: [
                     {label:'ID', width: 20},
@@ -51,8 +51,25 @@ export class UserController{
                 fields: ["id","username","role.name","person.name","person.lastName","person.cedule","id_status"]
             }
 
+            const tableStatistic = {
+                title: 'Estadisticas de Usuarios',
+                subtitle:'Informacion de los Usuarios',
+                header: [
+                    {label:'Descripcion', width: 340},
+                    {label:'Cantidad', width: 98},
+                    {label:'%', width: 30},
+                ],
+                rows: user,
+            }
+
+            const tableOptions = {
+                records:tableRecords,
+                statistic:tableStatistic,
+            }
+
             const pdf = new PDF();
             const newPdf = await pdf.newPDF('usuarios', tableOptions);
+            pdf.deletePDF("usuarios");
 
             if (typeof newPdf != "string") {
                 throw new Errors.InternalServerError("Ocurrio un error al generar el documento.");
